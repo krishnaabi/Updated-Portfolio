@@ -40,17 +40,245 @@
   };
 
 
+  // Default Curated Fallback Datasets (Ensures 100% beautiful rendering on static hosts like Cloudflare Pages)
+  const defaultWorkItems = [
+    {
+      id: 'w1',
+      title: 'Hanioo — Real-Time Interpreter Marketplace',
+      category: 'work|main|Product Design',
+      description: 'An on-demand interpreter booking ecosystem connecting global clients with certified multi-lingual specialists in under 30 seconds.',
+      url: 'https://www.behance.net/gallery/248442393/Hanioo-Interpretation-Application',
+      productUrl: 'https://hanioo.com',
+      image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1200&q=95',
+      featured: true,
+      tags: 'Product Design | Mobile & Web | Real-Time Dispatch | Design System',
+      tools: 'Figma | React Native | Next.js | WebSockets'
+    },
+    {
+      id: 'w2',
+      title: 'Flubn — AI Creator Studio & Video Monetization',
+      category: 'work|main|UI/UX Strategy',
+      description: 'Empowering digital creators with automated video editing, multi-track timelines, and audience monetization tools.',
+      url: 'https://flubn.com',
+      productUrl: 'https://flubn.com',
+      image: 'https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?auto=format&fit=crop&w=1200&q=95',
+      featured: true,
+      tags: 'UI/UX Strategy | Creator Tools | AI Workflows | Video Editor',
+      tools: 'Figma | WebGL | Canvas API | Tailwind'
+    },
+    {
+      id: 'w3',
+      title: 'FinScale — Enterprise Liquidity & Wealth Analytics',
+      category: 'work|main|Fintech Product',
+      description: 'High-density financial analytics platform engineered for portfolio managers, tracking real-time asset flows and predictive yields.',
+      url: 'https://behance.net',
+      productUrl: '',
+      image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1200&q=95',
+      featured: true,
+      tags: 'Fintech | Data Visualization | Dark Mode UI | Enterprise Dashboard',
+      tools: 'Figma | D3.js | Design Tokens | Microcharts'
+    },
+    {
+      id: 'w4',
+      title: 'Portagam — Global Digital Asset Exchange',
+      category: 'work|main|Design Systems',
+      description: 'A curated marketplace and collaborative workspace for 3D artists, UI creators, and digital brand designers.',
+      url: 'https://dribbble.com',
+      productUrl: '',
+      image: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=1200&q=95',
+      featured: false,
+      tags: 'Design Systems | Asset Marketplace | Web Application | 3D Assets',
+      tools: 'Figma | Three.js | Token Engine'
+    }
+  ];
+
+  const defaultPlaygroundItems = [
+    {
+      id: 'pg-1',
+      title: 'Spatial Canvas Nodes — Dynamic Node-Graph Interface',
+      category: 'playground|experiments|UI & Motion',
+      description: 'An infinite zoomable node canvas exploring fluid connection physics, magnetic bezier curves, and gesture panning.',
+      url: 'https://dribbble.com',
+      image: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800&q=80'
+    },
+    {
+      id: 'pg-2',
+      title: 'Dark Mode Data Flow — Kinetic Financial Charts',
+      category: 'playground|experiments|Concepts',
+      description: 'Interactive telemetry telemetry charts with custom shader glow and real-time candlestick rendering.',
+      url: 'https://dribbble.com',
+      image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80'
+    },
+    {
+      id: 'pg-3',
+      title: 'Orbital 3D Particle Constellation Engine',
+      category: 'playground|experiments|3D & Visuals',
+      description: 'WebGL atmospheric depth simulator with mouse parallax, inertia drift, and champagne particle physics.',
+      url: 'https://dribbble.com',
+      image: 'https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?auto=format&fit=crop&w=800&q=80'
+    },
+    {
+      id: 'pg-4',
+      title: 'Tactile Haptic Sliders & Fluid Spring Physics',
+      category: 'playground|experiments|UI & Motion',
+      description: 'Micro-interaction study experimenting with spring damping, velocity inertia, and audio-haptic feedback cues.',
+      url: 'https://dribbble.com',
+      image: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=800&q=80'
+    },
+    {
+      id: 'pg-5',
+      title: 'Proactive AI Workspace Canvas',
+      category: 'playground|experiments|Concepts',
+      description: 'Exploration of human-in-the-loop AI interaction cards that anticipate intent based on viewport context.',
+      url: 'https://dribbble.com',
+      image: 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?auto=format&fit=crop&w=800&q=80'
+    },
+    {
+      id: 'pg-6',
+      title: 'Glassmorphic HUD Control Suite',
+      category: 'playground|experiments|3D & Visuals',
+      description: 'Multi-layered frosted glass panels with dynamic background diffraction and chromatic aberration.',
+      url: 'https://dribbble.com',
+      image: 'https://images.unsplash.com/photo-1581291518633-83b4ebd1d83e?auto=format&fit=crop&w=800&q=80'
+    },
+    { id: 'sk-1', title: 'Spatial Grid Layout', category: 'playground|sketches|Sketches', url: 'https://dribbble.com', image: 'https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?auto=format&fit=crop&w=400&q=80' },
+    { id: 'sk-2', title: 'Gestural Radial Menu', category: 'playground|sketches|Sketches', url: 'https://dribbble.com', image: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=400&q=80' },
+    { id: 'sk-3', title: 'Dynamic Island HUD', category: 'playground|sketches|Sketches', url: 'https://dribbble.com', image: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=400&q=80' },
+    { id: 'sk-4', title: 'Card Stack Depth', category: 'playground|sketches|Sketches', url: 'https://dribbble.com', image: 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?auto=format&fit=crop&w=400&q=80' },
+    { id: 'sk-5', title: 'Variable Type Shifter', category: 'playground|sketches|Sketches', url: 'https://dribbble.com', image: 'https://images.unsplash.com/photo-1581291518633-83b4ebd1d83e?auto=format&fit=crop&w=400&q=80' },
+    { id: 'sk-6', title: 'Tactile Rotary Dial', category: 'playground|sketches|Sketches', url: 'https://dribbble.com', image: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=400&q=80' },
+    { id: 'sk-7', title: 'Generative Palette Mix', category: 'playground|sketches|Sketches', url: 'https://dribbble.com', image: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=400&q=80' },
+    { id: 'sk-8', title: 'Neo-brutalist Toggles', category: 'playground|sketches|Sketches', url: 'https://dribbble.com', image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=400&q=80' },
+    { id: 'fn-1', title: 'Cyberpunk Synth Dashboard', category: 'playground|fun|Just for Fun', description: '80s retro-futurism synth wave visualizer.', url: 'https://dribbble.com', image: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=600&q=80' },
+    { id: 'fn-2', title: 'Isometric Clay Scene 3D', category: 'playground|fun|Just for Fun', description: 'A cozy minimalist isometric workspace study.', url: 'https://dribbble.com', image: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=600&q=80' },
+    { id: 'fn-3', title: 'Fluid Liquid Blob Physics', category: 'playground|fun|Just for Fun', description: 'Interactive metaball fluid dynamics with cursor repulsion.', url: 'https://dribbble.com', image: 'https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?auto=format&fit=crop&w=600&q=80' },
+    { id: 'fn-4', title: 'Mechanical Switch Exploded View', category: 'playground|fun|Just for Fun', description: '3D mechanical engineering disassembly visualization.', url: 'https://dribbble.com', image: 'https://images.unsplash.com/photo-1581291518633-83b4ebd1d83e?auto=format&fit=crop&w=600&q=80' },
+    { id: 'fn-5', title: 'Vintage Braun Radio Simulator', category: 'playground|fun|Just for Fun', description: 'Dieter Rams-inspired physical radio tuner interaction.', url: 'https://dribbble.com', image: 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?auto=format&fit=crop&w=600&q=80' },
+    { id: 'fn-6', title: 'Holographic HUD with Gyro Tilt', category: 'playground|fun|Just for Fun', description: '3D gyroscope-driven holographic depth card.', url: 'https://dribbble.com', image: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=600&q=80' }
+  ];
+
+  const defaultMilestones = [
+    {
+      id: 'm1',
+      title: 'Hanioo Launch Event & Stage Pitch',
+      category: '🎤 STAGE KEYNOTE PRESENTATION',
+      year: '2025',
+      eventLocation: 'CHENNAI TECH SUMMIT',
+      summary: 'Presented the product UX strategy, real-time interpreter booking architecture, and component design system live to an audience of tech founders and industry leaders.',
+      spec1Label: '🎤 AUDIENCE',
+      spec1Value: '500+ Attendees',
+      spec2Label: '🚀 STAGE DEMO',
+      spec2Value: 'Live Dispatch UX',
+      spec3Label: '📱 PLATFORM',
+      spec3Value: 'iOS, Web & Android',
+      url: 'https://www.behance.net/gallery/248442393/Hanioo-Interpretation-Application',
+      buttonText: 'Watch Keynote Deck',
+      image: 'https://images.unsplash.com/photo-1475721027785-f74eccf877e2?auto=format&fit=crop&w=1200&q=95'
+    },
+    {
+      id: 'm2',
+      title: 'Hanioo Platform Marketplace Shipped',
+      category: '🚀 GLOBAL PRODUCT LAUNCH',
+      year: '2025',
+      eventLocation: 'SHIPPED TO APP STORE',
+      summary: 'Architected and launched the full-scale interpreter booking ecosystem across iOS & Web, empowering on-demand multi-language interpretation assistance globally.',
+      spec1Label: '🚀 RELEASES',
+      spec1Value: 'iOS & Web Apps',
+      spec2Label: '⚡ MATCH TIME',
+      spec2Value: 'Under 30 Seconds',
+      spec3Label: '🌐 COVERAGE',
+      spec3Value: 'Global Dispatch',
+      url: 'https://hanioo.com',
+      buttonText: 'Explore Live Application',
+      image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1200&q=95'
+    },
+    {
+      id: 'm4',
+      title: 'Design System Token Engine',
+      category: '🌐 SYSTEM ARCHITECTURE SHIFT',
+      year: '2024',
+      eventLocation: 'ENTERPRISE DESIGN TOKENS',
+      summary: 'Engineered a unified enterprise design system token engine with automated Figma libraries, responsive guidelines, and dark mode theme switching.',
+      spec1Label: '🌐 TOKENS',
+      spec1Value: '200+ Components',
+      spec2Label: '⚡ VELOCITY',
+      spec2Value: '4x Faster Builds',
+      spec3Label: '🎨 THEMES',
+      spec3Value: 'Light & Dark Modes',
+      url: 'work.html',
+      buttonText: 'Explore Design System',
+      image: 'https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?auto=format&fit=crop&w=1200&q=95'
+    }
+  ];
+
+  const defaultTestimonials = [
+    {
+      id: 't1',
+      name: 'Abi Krishna',
+      role: 'Founder, Flubn',
+      quote: 'Abi combines curiosity, empathy and sharp product thinking. He makes complex experiences feel effortless.',
+      img: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=120&q=80'
+    },
+    {
+      id: 't2',
+      name: 'Rohan Varma',
+      role: 'VP Product, FinScale',
+      quote: 'Working with Abi transformed our product clarity. User activation jumped 45% within two months of launch.',
+      img: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=120&q=80'
+    },
+    {
+      id: 't3',
+      name: 'Elena Rostova',
+      role: 'Design Director, Studio Nova',
+      quote: 'A rare talent who bridges design, business strategy and engineering seamlessly. Exceptional craft and velocity.',
+      img: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80'
+    }
+  ];
+
+  const defaultBrands = [
+    { id: 'b1', name: 'HANIOO', logo: '' },
+    { id: 'b2', name: 'FLUBN', logo: '' },
+    { id: 'b3', name: 'FINSCALE', logo: '' },
+    { id: 'b4', name: 'PORTAGAM', logo: '' },
+    { id: 'b5', name: 'G-FORCE', logo: '' },
+    { id: 'b6', name: 'STUDIO NOVA', logo: '' }
+  ];
+
+  const defaultSettings = {
+    email: 'hello@abikrishna.design',
+    homeStat1Val: '4.5+',
+    homeStat1Lbl: 'Years Experience',
+    homeStat2Val: '1200+',
+    homeStat2Lbl: 'UI Screens Designed',
+    homeStat3Val: '20+',
+    homeStat3Lbl: 'Digital Products & Brands',
+    homeStat4Val: '5+',
+    homeStat4Lbl: 'Products Concept to Launch',
+    homeStat5Val: '15+',
+    homeStat5Lbl: 'Clients & Solutions'
+  };
+
   const API_BASE_URLS = ['', 'http://127.0.0.1:4173', 'http://localhost:4173'];
 
   async function apiFetch(path, options = {}) {
+    // 1. Try local/Cloudflare backend API endpoint
     for (const base of API_BASE_URLS) {
       try {
         const url = base ? `${base}${path}` : path;
         const res = await fetch(url, options);
-        if (res.ok) return res;
+        if (res.ok) {
+          const contentType = res.headers.get('content-type') || '';
+          if (contentType.includes('application/json') || res.status === 200) {
+            const data = await res.json();
+            if (data && (Array.isArray(data) ? data.length > 0 : Object.keys(data).length > 0)) {
+              return { ok: true, status: 200, json: async () => data, text: async () => JSON.stringify(data) };
+            }
+          }
+        }
       } catch (e) {}
     }
-    // Direct Supabase fallback if backend server is unreachable
+
+    // 2. Direct Supabase fallback if configured in supabase-config.js
     if ((!options.method || options.method === 'GET') && window.ABIKRISHNA_SUPABASE && window.ABIKRISHNA_SUPABASE.url) {
       try {
         const { url: sbUrl, anonKey } = window.ABIKRISHNA_SUPABASE;
@@ -73,13 +301,15 @@
               payload = (raw || []).map(row => ({
                 id: row.id,
                 title: row.title,
-                category: `${row.content_type}|${row.category || 'Product Design'}`,
+                category: `${row.content_type || 'work'}|${row.section || 'main'}|${row.category || 'Product Design'}`,
                 description: row.description || '',
                 contentBody: row.content_body || '',
                 url: row.destination_url || '',
+                productUrl: row.product_url || '',
                 image: row.image_url || '',
                 featured: Boolean(row.featured),
                 tags: row.tags || '',
+                tools: row.tools || '',
                 readTime: row.read_time || '5 min read',
                 platform: row.platform || '',
                 journalType: row.journal_type || 'link',
@@ -88,12 +318,55 @@
             } else if (path === '/api/settings') {
               payload = (Array.isArray(raw) && raw[0] && raw[0].settings) ? raw[0].settings : {};
             }
-            return { ok: true, status: 200, json: async () => payload, text: async () => JSON.stringify(payload) };
+            if (payload && (Array.isArray(payload) ? payload.length > 0 : Object.keys(payload).length > 0)) {
+              return { ok: true, status: 200, json: async () => payload, text: async () => JSON.stringify(payload) };
+            }
           }
         }
       } catch (e) {}
     }
-    return { ok: false, json: async () => (path === '/api/settings' ? {} : []) };
+
+    // 3. Direct Static data.json fallback
+    if (!options.method || options.method === 'GET') {
+      try {
+        const dataRes = await fetch('data.json');
+        if (dataRes.ok) {
+          const staticData = await dataRes.json();
+          if (path === '/api/projects') {
+            const allItems = [...(staticData.projects || []), ...(staticData.playground || []), ...(staticData.journal || [])];
+            if (allItems.length) return { ok: true, status: 200, json: async () => allItems, text: async () => JSON.stringify(allItems) };
+          } else if (path === '/api/settings' && staticData.settings && Object.keys(staticData.settings).length) {
+            return { ok: true, status: 200, json: async () => staticData.settings, text: async () => JSON.stringify(staticData.settings) };
+          } else if (path === '/api/milestones' && staticData.milestones && staticData.milestones.length) {
+            return { ok: true, status: 200, json: async () => staticData.milestones, text: async () => JSON.stringify(staticData.milestones) };
+          } else if (path === '/api/testimonials' && staticData.testimonials && staticData.testimonials.length) {
+            return { ok: true, status: 200, json: async () => staticData.testimonials, text: async () => JSON.stringify(staticData.testimonials) };
+          } else if (path === '/api/brands' && staticData.brands && staticData.brands.length) {
+            return { ok: true, status: 200, json: async () => staticData.brands, text: async () => JSON.stringify(staticData.brands) };
+          }
+        }
+      } catch (e) {}
+    }
+
+    // 4. Default Curated Static Data Fallback (Guaranteed to render completely on static hosting)
+    if (path === '/api/projects') {
+      const allDefaults = [...defaultWorkItems, ...defaultPlaygroundItems, ...defaultJournalArticles];
+      return { ok: true, status: 200, json: async () => allDefaults, text: async () => JSON.stringify(allDefaults) };
+    }
+    if (path === '/api/milestones') {
+      return { ok: true, status: 200, json: async () => defaultMilestones, text: async () => JSON.stringify(defaultMilestones) };
+    }
+    if (path === '/api/testimonials') {
+      return { ok: true, status: 200, json: async () => defaultTestimonials, text: async () => JSON.stringify(defaultTestimonials) };
+    }
+    if (path === '/api/brands') {
+      return { ok: true, status: 200, json: async () => defaultBrands, text: async () => JSON.stringify(defaultBrands) };
+    }
+    if (path === '/api/settings') {
+      return { ok: true, status: 200, json: async () => defaultSettings, text: async () => JSON.stringify(defaultSettings) };
+    }
+
+    return { ok: false, json: async () => (path === '/api/settings' ? defaultSettings : []) };
   }
 
   // Default fallback articles (displayed when no CMS journal items are created yet)
@@ -468,7 +741,8 @@
   // -------------------------------------------------------------
   // Dynamic Editorial Accordion Runway Engine (Admin Connected)
   // -------------------------------------------------------------
-  apiFetch('/api/milestones').then(res => res.ok ? res.json() : []).then(milestones => {
+  apiFetch('/api/milestones').then(res => res.ok ? res.json() : []).then(rawMilestones => {
+    const milestones = (rawMilestones && rawMilestones.length) ? rawMilestones : defaultMilestones;
     try {
       const savedMs = JSON.parse(localStorage.getItem('custom_milestones_order'));
       if (savedMs && Array.isArray(savedMs) && savedMs.length) {
@@ -614,6 +888,9 @@
     const featuredWrapper = document.querySelector('.featured-carousel-wrapper');
     if (featuredTrack) {
       let featuredItems = items.filter(item => Boolean(item.featured) && isWorkType(item));
+      if (!featuredItems.length) {
+        featuredItems = defaultWorkItems.filter(item => Boolean(item.featured));
+      }
       if (featuredItems.length) {
         if (featuredWrapper) featuredWrapper.style.display = 'block';
         featuredTrack.innerHTML = featuredItems.map((item, index) => {
@@ -718,7 +995,9 @@
 
       // Deduplicate items by ID
       const seenIds = new Set();
-      const playgroundItems = items.filter(item => typeOf(item) === 'playground').filter(item => {
+      const rawPlayground = items.filter(item => typeOf(item) === 'playground');
+      const playgroundSource = rawPlayground.length ? rawPlayground : defaultPlaygroundItems;
+      const playgroundItems = playgroundSource.filter(item => {
         const idKey = String(item.id || item.title || '');
         if (!idKey || seenIds.has(idKey)) return false;
         seenIds.add(idKey);
@@ -869,7 +1148,8 @@
     // 4. Work Page (work.html)
     if (document.body.classList.contains('work-page')) {
       const projects = document.querySelector('.projects');
-      const workItems = items.filter(item => isWorkType(item));
+      const rawWork = items.filter(item => isWorkType(item));
+      const workItems = rawWork.length ? rawWork : defaultWorkItems;
       if (projects) {
         projects.innerHTML = '';
         if (workItems.length) {

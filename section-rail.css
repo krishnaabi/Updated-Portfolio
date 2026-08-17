@@ -1,2 +1,185 @@
-/* Home section rail: current section stays at the top of the rail */
-.side-index{top:155px!important;gap:clamp(56px,8vh,88px)!important;transition:transform .55s cubic-bezier(.22,1,.36,1);will-change:transform}.side-index a{height:58px}.side-index a:after{top:44px!important;height:clamp(52px,7.5vh,82px)!important}.side-index .active:before{top:56px!important;left:4px!important;width:6px!important;height:6px!important;background:var(--accent)!important;border:2px solid var(--paper)!important;box-sizing:content-box!important}.side-index a.active strong{color:var(--ink)}@media(min-width:1051px) and (max-width:1280px){.side-index{display:flex!important}}@media(max-width:1050px){.side-index{display:none!important}}
+/* ==========================================================================
+   Ultra-Smooth Section Navigation Rail (Jesko Jets & Apple Inspired)
+   ========================================================================== */
+
+.side-index,
+.about-index {
+  position: fixed !important;
+  left: clamp(20px, 2.6vw, 42px) !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  z-index: 80 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: clamp(28px, 4.8vh, 48px) !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  width: auto !important;
+  max-width: 90px !important;
+  list-style: none !important;
+  user-select: none !important;
+  pointer-events: auto !important;
+  transition: opacity 0.3s ease !important;
+  will-change: auto !important;
+}
+
+/* Continuous Vertical Rail Track Line */
+.side-index .rail-track,
+.about-index .rail-track {
+  position: absolute !important;
+  left: 6px !important;
+  width: 1.5px !important;
+  background: rgba(0, 0, 0, 0.08) !important;
+  border-radius: 2px !important;
+  z-index: 1 !important;
+  pointer-events: none !important;
+  overflow: hidden !important;
+}
+
+/* Dark mode / dark page support */
+.dark-page .side-index .rail-track,
+.dark-page .about-index .rail-track,
+body.dark-mode .side-index .rail-track {
+  background: rgba(255, 255, 255, 0.12) !important;
+}
+
+/* Active Track Progress Fill Line */
+.side-index .rail-track-fill,
+.about-index .rail-track-fill {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 0% !important;
+  background: var(--accent, #ff4e1b) !important;
+  border-radius: 2px !important;
+  transition: height 0.35s cubic-bezier(0.22, 1, 0.36, 1) !important;
+}
+
+/* Gliding Indicator Dot with Glowing Halo - Centered on Rail Track */
+.side-index .rail-indicator-dot,
+.about-index .rail-indicator-dot {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0.25px !important;
+  width: 9px !important;
+  height: 9px !important;
+  border-radius: 50% !important;
+  background: var(--accent, #ff4e1b) !important;
+  border: 2px solid var(--paper, #faf9f6) !important;
+  box-sizing: content-box !important;
+  box-shadow: 0 0 10px rgba(255, 78, 27, 0.6), 0 2px 5px rgba(0, 0, 0, 0.12) !important;
+  z-index: 4 !important;
+  pointer-events: none !important;
+  transform: translate3d(0, var(--dot-y, 0px), 0) !important;
+  transition: transform 0.42s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.3s ease !important;
+  will-change: transform !important;
+}
+
+/* Clear all fragmented pseudo lines and static pseudo dots */
+.side-index a::before,
+.side-index a::after,
+.side-index .active::before,
+.side-index .active::after,
+.about-index a::before,
+.about-index a::after,
+.about-index a.active::before,
+.about-index a.active::after {
+  display: none !important;
+  content: none !important;
+}
+
+/* Section Item Links */
+.side-index a,
+.about-index a {
+  position: relative !important;
+  z-index: 2 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 2px !important;
+  padding-left: 22px !important;
+  height: auto !important;
+  width: auto !important;
+  min-width: 58px !important;
+  text-decoration: none !important;
+  color: var(--muted, #868480) !important;
+  cursor: pointer !important;
+  transition: color 0.3s cubic-bezier(0.22, 1, 0.36, 1), transform 0.3s cubic-bezier(0.22, 1, 0.36, 1) !important;
+  will-change: transform, color !important;
+}
+
+/* Numbers (01, 02, etc.) */
+.side-index a strong,
+.about-index a b {
+  display: block !important;
+  font-family: 'DM Mono', monospace !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.2px !important;
+  line-height: 1.15 !important;
+  color: #9c9893 !important;
+  transition: color 0.3s cubic-bezier(0.22, 1, 0.36, 1), transform 0.3s cubic-bezier(0.22, 1, 0.36, 1) !important;
+}
+
+/* Labels (HOME, WORK, etc.) */
+.side-index a span,
+.about-index a span {
+  display: block !important;
+  font-family: 'DM Mono', monospace !important;
+  font-size: 8.5px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.9px !important;
+  line-height: 1.1 !important;
+  color: #b0aca6 !important;
+  text-transform: uppercase !important;
+  transition: color 0.3s cubic-bezier(0.22, 1, 0.36, 1), transform 0.3s cubic-bezier(0.22, 1, 0.36, 1) !important;
+}
+
+/* Hover State */
+.side-index a:hover,
+.about-index a:hover {
+  transform: translateX(3px) !important;
+}
+
+.side-index a:hover strong,
+.about-index a:hover b {
+  color: var(--ink, #121211) !important;
+}
+
+.side-index a:hover span,
+.about-index a:hover span {
+  color: var(--ink, #121211) !important;
+}
+
+/* Active State */
+.side-index a.active,
+.about-index a.active {
+  transform: translateX(4px) !important;
+}
+
+.side-index a.active strong,
+.about-index a.active b {
+  color: var(--ink, #121211) !important;
+  font-weight: 800 !important;
+}
+
+.side-index a.active span,
+.about-index a.active span {
+  color: var(--accent, #ff4e1b) !important;
+  font-weight: 700 !important;
+}
+
+/* Responsive Rules */
+@media (min-width: 1051px) {
+  .side-index,
+  .about-index {
+    display: flex !important;
+  }
+}
+
+@media (max-width: 1050px) {
+  .side-index,
+  .about-index {
+    display: none !important;
+  }
+}

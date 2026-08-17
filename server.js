@@ -894,11 +894,6 @@ http.createServer(async (req, res) => {
   fs.readFile(target, (error, data) => {
     if (error) { res.writeHead(404); return res.end('Not found'); }
     const extension = path.extname(target);
-    if (extension === '.html' && requestPath !== 'admin.html') {
-      const finalNav = '<nav aria-label="Main navigation"><a href="work.html">Work</a><a href="about.html">About</a><a href="playground.html">Playground</a><a href="blog.html">Journal</a></nav>';
-      const sharedHead = '<link rel="stylesheet" href="/responsive.css?v=4"><link rel="stylesheet" href="/section-rail.css?v=2"><link rel="stylesheet" href="/header-uniform.css?v=4"><link rel="stylesheet" href="/home-brand.css?v=2"><link rel="stylesheet" href="/cms-content.css?v=3"><link rel="stylesheet" href="/experience.css?v=1"><link rel="stylesheet" href="/process-enhance.css?v=1"><script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js" defer></script><script src="/icons.js?v=2" defer></script><script src="/content-render.js?v=50" defer></script><script src="/motion.js" defer></script><script src="/process-enhance.js" defer></script>';
-      data = Buffer.from(data.toString().replace(/<nav(?:\s+aria-label="[^"]*")?>[\s\S]*?<\/nav>/, finalNav).replace(/admin\.js(?:\?v=\d+)?/g, 'admin.js?v=15').replace(/admin\.css(?:\?v=\d+)?/g, 'admin.css?v=8').replace('</head>', `${sharedHead}</head>`));
-    }
     res.writeHead(200, { 'Content-Type': types[extension] || 'application/octet-stream' }); res.end(data);
   });
 }).listen(process.argv[2] || process.env.PORT || 4173, '127.0.0.1', () => console.log(`Abikrishna portfolio running on local port ${process.argv[2] || process.env.PORT || 4173}`));

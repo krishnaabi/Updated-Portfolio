@@ -19,42 +19,192 @@ const observer = new IntersectionObserver((entries) => {
 }, { threshold: 0.12 });
 document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
 
-const sections = [...document.querySelectorAll('main section')];
-const navItems = [...document.querySelectorAll('.side-index a, .about-index a')];
-const rail = document.querySelector('.side-index');
-const sectionAnchor = (section) => section.querySelector(':scope > .section-heading') || section.querySelector(':scope > h2') || section;
-const setRailActive = (id) => {
-  const index = navItems.findIndex((link) => link.getAttribute('href') === `#${id}`);
-  if (index < 0) return;
-  navItems.forEach((link, itemIndex) => link.classList.toggle('active', itemIndex === index));
-  if (rail) {
-    const step = index ? navItems[index].offsetTop - navItems[0].offsetTop : 0;
-    rail.style.transform = `translateY(${-step}px)`;
-  }
-};
-const updateRail = () => {
-  if (!navItems.length) return;
-  const line = window.scrollY + 125;
-  let current = sections[0];
-  sections.forEach((section) => {
-    const anchor = sectionAnchor(section);
-    const anchorTop = window.scrollY + anchor.getBoundingClientRect().top;
-    if (anchorTop <= line) current = section;
+// Ultra-Smooth Section Navigation Rail Engine
+function initSmoothSectionRail() {
+  const railContainers = document.querySelectorAll('.side-index, .about-index');
+  if (!railContainers.length) return;
+
+  railContainers.forEach((rail) => {
+    const navItems = [...rail.querySelectorAll('a')];
+    if (!navItems.length) return;
+
+    // 1. Inject or reuse track & floating indicator dot
+    let track = rail.querySelector('.rail-track');
+    let fill = rail.querySelector('.rail-track-fill');
+    let dot = rail.querySelector('.rail-indicator-dot');
+
+    if (!track) {
+      track = document.createElement('div');
+      track.className = 'rail-track';
+      fill = document.createElement('div');
+      fill.className = 'rail-track-fill';
+      track.appendChild(fill);
+      rail.prepend(track);
+    }
+    if (!dot) {
+      dot = document.createElement('div');
+      dot.className = 'rail-indicator-dot';
+      rail.appendChild(dot);
+    }
+
+    // 2. Map links to existing sections
+    const sectionMap = navItems.map((item) => {
+      const href = item.getAttribute('href');
+      const target = href && href.startsWith('#') ? document.querySelector(href) : null;
+      return { item, target, id: href ? href.slice(1) : '' };
+    }).filter((entry) => entry.target);
+
+    if (!sectionMap.length) return;
+
+    let activeIndex = -1;
+    let isClickScrolling = false;
+    let clickScrollTimer = null;
+
+    // Layout calibration: position track line exactly between first and last numbers
+    const updateRailTrackGeometry = () => {
+      if (!sectionMap.length || !track) return;
+      const firstLink = sectionMap[0].item;
+      const lastLink = sectionMap[sectionMap.length - 1].item;
+      const firstNum = firstLink.querySelector('strong, b') || firstLink;
+      const lastNum = lastLink.querySelector('strong, b') || lastLink;
+
+      const yFirst = firstLink.offsetTop + firstNum.offsetTop + (firstNum.offsetHeight / 2);
+      const yLast = lastLink.offsetTop + lastNum.offsetTop + (lastNum.offsetHeight / 2);
+
+      track.style.top = `${Math.round(yFirst)}px`;
+      track.style.height = `${Math.max(0, Math.round(yLast - yFirst))}px`;
+    };
+
+    const setRailDot = (index) => {
+      if (index < 0 || index >= sectionMap.length) return;
+      activeIndex = index;
+
+      navItems.forEach((link, idx) => {
+        link.classList.toggle('active', idx === index);
+      });
+
+      const activeLink = sectionMap[index].item;
+      const numEl = activeLink.querySelector('strong, b') || activeLink;
+      const dotH = dot.offsetHeight || 13;
+
+      // Pure layout offsetTop (immune to html zoom / viewport scaling)
+      const targetCenterY = activeLink.offsetTop + numEl.offsetTop + (numEl.offsetHeight / 2);
+      const targetDotY = targetCenterY - (dotH / 2);
+
+      dot.style.setProperty('--dot-y', `${Math.round(targetDotY)}px`);
+
+      // Track progress fill
+      if (fill && sectionMap.length > 1) {
+        const firstLink = sectionMap[0].item;
+        const lastLink = sectionMap[sectionMap.length - 1].item;
+        const firstNum = firstLink.querySelector('strong, b') || firstLink;
+        const lastNum = lastLink.querySelector('strong, b') || lastLink;
+        const yFirst = firstLink.offsetTop + firstNum.offsetTop + (firstNum.offsetHeight / 2);
+        const yLast = lastLink.offsetTop + lastNum.offsetTop + (lastNum.offsetHeight / 2);
+        const totalDist = yLast - yFirst;
+
+        if (totalDist > 0) {
+          const currentDist = targetCenterY - yFirst;
+          const pct = Math.min(Math.max((currentDist / totalDist) * 100, 0), 100);
+          fill.style.height = `${pct.toFixed(1)}%`;
+        }
+      }
+    };
+
+    // Smooth section spy on scroll
+    const updateSpy = () => {
+      if (isClickScrolling) return;
+
+      const scrollY = window.scrollY;
+      const winHeight = window.innerHeight;
+      const docHeight = document.documentElement.scrollHeight;
+      const isAtBottom = (winHeight + scrollY) >= (docHeight - 80);
+
+      if (isAtBottom) {
+        if (activeIndex !== sectionMap.length - 1) {
+          setRailDot(sectionMap.length - 1);
+        }
+        return;
+      }
+
+      // Viewport trigger threshold: 38% from top of window
+      const triggerY = scrollY + winHeight * 0.38;
+      let matchedIndex = 0;
+
+      for (let i = 0; i < sectionMap.length; i++) {
+        const section = sectionMap[i].target;
+        const anchor = section.querySelector(':scope > .section-heading') || section.querySelector(':scope > h2') || section;
+        const sectionTop = window.scrollY + anchor.getBoundingClientRect().top;
+        if (sectionTop <= triggerY) {
+          matchedIndex = i;
+        }
+      }
+
+      if (matchedIndex !== activeIndex) {
+        setRailDot(matchedIndex);
+      }
+    };
+
+    // Nav click interaction
+    sectionMap.forEach((entry, idx) => {
+      entry.item.addEventListener('click', (e) => {
+        const href = entry.item.getAttribute('href');
+        if (!href || !href.startsWith('#')) return;
+        const target = entry.target;
+        if (!target) return;
+
+        e.preventDefault();
+        isClickScrolling = true;
+        setRailDot(idx);
+
+        clearTimeout(clickScrollTimer);
+        clickScrollTimer = setTimeout(() => {
+          isClickScrolling = false;
+        }, 700);
+
+        const anchor = target.querySelector(':scope > .section-heading') || target.querySelector(':scope > h2') || target;
+        const anchorTop = window.scrollY + anchor.getBoundingClientRect().top;
+        const offset = 90; // Header clearance
+        window.scrollTo({
+          top: Math.max(0, anchorTop - offset),
+          behavior: 'smooth'
+        });
+      });
+    });
+
+    // Throttled scroll with rAF
+    let scrollTicking = false;
+    window.addEventListener('scroll', () => {
+      if (!scrollTicking) {
+        requestAnimationFrame(() => {
+          updateSpy();
+          scrollTicking = false;
+        });
+        scrollTicking = true;
+      }
+    }, { passive: true });
+
+    const handleResize = () => {
+      updateRailTrackGeometry();
+      if (activeIndex >= 0) setRailDot(activeIndex);
+    };
+
+    window.addEventListener('resize', handleResize);
+
+    // Initial setup with font-load resilience
+    requestAnimationFrame(() => {
+      updateRailTrackGeometry();
+      updateSpy();
+      if (activeIndex < 0) setRailDot(0);
+    });
+
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(handleResize);
+    }
   });
-  if (current) setRailActive(current.id);
-};
-navItems.forEach((link) => link.addEventListener('click', (event) => {
-  const target = document.querySelector(link.getAttribute('href'));
-  if (!target) return;
-  event.preventDefault();
-  setRailActive(target.id);
-  const anchor = sectionAnchor(target);
-  const anchorTop = window.scrollY + anchor.getBoundingClientRect().top;
-  window.scrollTo({ top: Math.max(0, anchorTop - 112), behavior: 'smooth' });
-}));
-window.addEventListener('scroll', updateRail, { passive: true });
-window.addEventListener('resize', updateRail);
-updateRail();
+}
+
+initSmoothSectionRail();
 
 const metricObserver = new IntersectionObserver((entries, observer) => {
   entries.forEach((entry) => {
@@ -237,18 +387,32 @@ window.initFeaturedCarousel();
     }, 3500);
   };
 
-  fetch('/api/testimonials')
-    .then(res => res.ok ? res.json() : null)
-    .then(data => {
-      if (Array.isArray(data) && data.length) {
-        testimonials = data;
-        tIndex = 0;
-        updateDisplay(testimonials[0]);
-        startLoop();
+  const loadTestimonials = async () => {
+    try {
+      let res = await fetch('/api/testimonials');
+      if (res.ok) {
+        const data = await res.json();
+        if (Array.isArray(data) && data.length) {
+          testimonials = data;
+          tIndex = 0;
+          updateDisplay(testimonials[0]);
+          return;
+        }
       }
-    })
-    .catch(() => {});
+      // Static fallback
+      res = await fetch('data.json');
+      if (res.ok) {
+        const staticData = await res.json();
+        if (Array.isArray(staticData.testimonials) && staticData.testimonials.length) {
+          testimonials = staticData.testimonials;
+          tIndex = 0;
+          updateDisplay(testimonials[0]);
+        }
+      }
+    } catch (e) {}
+  };
 
+  loadTestimonials();
   startLoop();
 })();
 
@@ -259,21 +423,52 @@ window.initFeaturedCarousel();
 
   const escapeHtml = str => String(str || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' })[c]);
 
-  fetch('/api/brands')
-    .then(res => res.ok ? res.json() : [])
-    .then(brands => {
-      if (!Array.isArray(brands) || !brands.length) return;
-      const renderCard = b => {
-        const content = b.logo
-          ? `<img src="${escapeHtml(b.logo)}" alt="${escapeHtml(b.name)}" class="brand-logo-img">`
-          : `<div class="brand-text-badge"><span class="brand-icon">✦</span> <span>${escapeHtml(b.name)}</span></div>`;
-        return `<div class="trusted-brand-card">${content}</div>`;
-      };
-      // Multiply brand items to create smooth seamless looping marquee
-      const repeated = [...brands, ...brands, ...brands, ...brands, ...brands];
-      marqueeTrack.innerHTML = repeated.map(renderCard).join('');
-    })
-    .catch(() => {});
+  const defaultBrandsList = [
+    { id: 'b1', name: 'HANIOO' },
+    { id: 'b2', name: 'FLUBN' },
+    { id: 'b3', name: 'FINSCALE' },
+    { id: 'b4', name: 'PORTAGAM' },
+    { id: 'b5', name: 'G-FORCE' },
+    { id: 'b6', name: 'STUDIO NOVA' }
+  ];
+
+  const renderBrands = (brands) => {
+    const list = Array.isArray(brands) && brands.length ? brands : defaultBrandsList;
+    const renderCard = b => {
+      const content = b.logo
+        ? `<img src="${escapeHtml(b.logo)}" alt="${escapeHtml(b.name)}" class="brand-logo-img">`
+        : `<div class="brand-text-badge"><span class="brand-icon">✦</span> <span>${escapeHtml(b.name)}</span></div>`;
+      return `<div class="trusted-brand-card">${content}</div>`;
+    };
+    const repeated = [...list, ...list, ...list, ...list, ...list];
+    marqueeTrack.innerHTML = repeated.map(renderCard).join('');
+  };
+
+  const loadBrands = async () => {
+    try {
+      let res = await fetch('/api/brands');
+      if (res.ok) {
+        const brands = await res.json();
+        if (Array.isArray(brands) && brands.length) {
+          renderBrands(brands);
+          return;
+        }
+      }
+      res = await fetch('data.json');
+      if (res.ok) {
+        const staticData = await res.json();
+        if (Array.isArray(staticData.brands) && staticData.brands.length) {
+          renderBrands(staticData.brands);
+          return;
+        }
+      }
+      renderBrands(defaultBrandsList);
+    } catch (e) {
+      renderBrands(defaultBrandsList);
+    }
+  };
+
+  loadBrands();
 })();
 
 // Animated Scroll Number Counters for Stats Section

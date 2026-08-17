@@ -117,6 +117,30 @@ async function apiFetch(path, options = {}) {
     } catch (e) {}
   }
 
+  // Fallback to static data.json if GET request
+  if (!options.method || options.method === 'GET') {
+    try {
+      const dataRes = await fetch('data.json');
+      if (dataRes.ok) {
+        const staticData = await dataRes.json();
+        let payload = [];
+        if (path === '/api/projects') payload = [...(staticData.projects || []), ...(staticData.playground || []), ...(staticData.journal || [])];
+        else if (path === '/api/settings') payload = staticData.settings || {};
+        else if (path === '/api/milestones') payload = staticData.milestones || [];
+        else if (path === '/api/testimonials') payload = staticData.testimonials || [];
+        else if (path === '/api/brands') payload = staticData.brands || [];
+        else if (path === '/api/messages') payload = staticData.messages || [];
+
+        return {
+          ok: true,
+          status: 200,
+          json: async () => payload,
+          text: async () => JSON.stringify(payload)
+        };
+      }
+    } catch (e) {}
+  }
+
   throw lastError || new Error(`API fetch failed for ${path}`);
 }
 
