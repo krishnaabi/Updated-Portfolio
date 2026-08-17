@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="en" class="ak-intro-active">
+
+<head>
+  <script>try{if(sessionStorage.getItem('ak_intro_seen_v1')==='true'){document.documentElement.classList.remove('ak-intro-active');}}catch(e){}</script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Abi Krishna — Product Designer crafting intuitive experiences that solve real business problems." />
+  <title>Abi Krishna — Product Designer</title>
+  <link rel="icon" type="image/svg+xml" href="assets/ak-logo.svg" />
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="enhancements.css?v=54" />
+  <link rel="stylesheet" href="layout-scale.css?v=2" />
+  <link rel="preload" as="image" href="assets/ak-logo-exact.png" />
+</head>
+
+<body>
+  <div id="ak-intro-curtain">
+    <div id="ak-intro-shimmer-wrap">
+      <div class="ak-logo-halo"></div>
+      <img src="assets/ak-logo-exact.png" alt="AK." id="ak-intro-img" />
+      <div class="ak-shimmer-sheen"></div>
+      <div class="ak-shimmer-secondary"></div>
+    </div>
+  </div>
+  <!-- CRITICAL: Inline carousel & marquee styles — cannot be cached, always wins -->
+  <style>
+    .featured-carousel-container { margin-top: 28px; position: relative; }
+    .featured-carousel-wrapper   { overflow: hidden !important; border-radius: 20px; position: relative; }
+    .featured-carousel-track     { display: flex !important; flex-direction: row !important; flex-wrap: nowrap !important; width: 100%; transition: transform 0.72s cubic-bezier(0.22,1,0.36,1); will-change: transform; }
+    .featured-carousel-track > .fc-slide { min-width: 100% !important; width: 100% !important; flex: 0 0 100% !important; display: grid; grid-template-columns: 1fr 1fr; min-height: 440px; border-radius: 20px; overflow: hidden; position: relative; background: #0f0e0d; }
+    .carousel-controls { display: flex; align-items: center; justify-content: center; gap: 16px; margin-top: 20px; padding: 0; position: static !important; }
+
+    .trusted-marquee-wrapper { position: relative !important; width: 100% !important; max-width: 100% !important; overflow: hidden !important; padding: 10px 0 !important; mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%) !important; -webkit-mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%) !important; }
+    .trusted-marquee-track   { display: flex !important; flex-direction: row !important; flex-wrap: nowrap !important; align-items: center !important; gap: 20px !important; width: max-content !important; animation: trustedMarquee 28s linear infinite !important; will-change: transform; }
+    .trusted-marquee-wrapper:hover .trusted-marquee-track { animation-play-state: paused !important; }
+    .trusted-brand-card      { flex: 0 0 auto !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; white-space: nowrap !important; padding: 14px 28px !important; background: #ffffff !important; border: 1px solid #e9e4df !important; border-radius: 16px !important; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03) !important; height: 58px !important; min-width: 150px !important; transition: all 0.35s cubic-bezier(0.22, 1, 0.36, 1) !important; cursor: pointer !important; }
+    .trusted-brand-card:hover { transform: translateY(-4px) scale(1.04) !important; border-color: var(--accent, #ff4e1b) !important; box-shadow: 0 12px 28px rgba(255, 78, 27, 0.15) !important; }
+    .trusted-brand-card img.brand-logo-img { height: 32px !important; max-width: 140px !important; object-fit: contain !important; filter: grayscale(100%) opacity(0.85) !important; transition: filter 0.3s ease !important; }
+    .trusted-brand-card:hover img.brand-logo-img { filter: grayscale(0%) opacity(1) !important; }
+    .brand-text-badge        { display: inline-flex !important; align-items: center !important; gap: 8px !important; font-family: 'Manrope', sans-serif !important; font-weight: 800 !important; font-size: 15px !important; letter-spacing: -0.4px !important; color: #1e1b18 !important; white-space: nowrap !important; }
+    .brand-text-badge .brand-icon { color: var(--accent, #ff4e1b) !important; font-size: 12px !important; }
+    @keyframes trustedMarquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+  </style>
+
+  <div class="grain"></div>
+  <header class="site-header">
+    <a class="logo" href="#home" aria-label="Abi Krishna home"><img src="assets/ak-logo-exact.png" alt="AK." class="brand-logo-img"></a>
+    <nav aria-label="Main navigation">
+      <a href="#work">Work</a><a href="#about">About</a><a href="#process">Process</a><a href="#journal">Journal</a>
+    </nav>
+    <div class="header-actions"><a class="talk-link" href="#contact">Let's talk <b>↗</b></a><button class="menu-button"
+        aria-label="Open menu"><span></span><span></span></button></div>
+  </header>
+
+  <aside class="side-index" aria-label="Page sections">
+    <a class="active" href="#home"><strong>01</strong><span>HOME</span></a>
+    <a href="#work"><strong>02</strong><span>WORK</span></a>
+    <a href="#metrics"><strong>03</strong><span>STATS</span></a>
+    <a href="#process"><strong>04</strong><span>PROCESS</span></a>
+    <a href="#about"><strong>05</strong><span>ABOUT</span></a>
+    <a href="#journal"><strong>06</strong><span>INSIGHTS</span></a>
+  </aside>
+
+  <main>
+    <section class="hero section" id="home">
+      <div class="hero-copy reveal">
+        <p class="eyebrow">Hello, I’m <span>Abi Krishna ✦</span></p>
+        <h1>Product Designer crafting intuitive experiences that solve real <em>business problems.</em></h1>
+        <p class="intro">Product Designer with 4.5+ years of experience creating user-focused products, scalable design systems, and digital brands. I help startups and businesses transform ideas into meaningful experiences.</p>
+        <a class="text-cta" href="work.html">Explore Case Studies <b>↗</b></a>
+        
+        <div class="specialized-in-bar reveal delay-1">
+          <span class="spec-label">SPECIALIZED IN</span>
+          <div class="spec-pills">
+            <span class="spec-pill">Product Design</span>
+            <span class="spec-pill">UX Strategy</span>
+            <span class="spec-pill">Design Systems</span>
+            <span class="spec-pill">Branding</span>
+            <span class="spec-pill">AI Workflows</span>
+          </div>
+        </div>
+      </div>
+      <div class="hero-visual reveal delay-1">
+        <div class="orbit orbit-one"></div>
+        <div class="orbit orbit-two"></div>
+        <div class="orbital-dot"></div>
+        <div class="portrait-wrap"><img
+            src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=1000&q=90"
+            alt="Portrait of Abi Krishna" /></div>
+        <p class="scroll-note">SCROLL TO EXPLORE <i></i></p>
+      </div>
+    </section>
+
+    <!-- Trusted Companies Section -->
+    <section class="trusted-section section reveal" id="trusted">
+      <p class="label trusted-label">✦ TRUSTED BY LEADING BRANDS & STARTUPS</p>
+      <div class="trusted-marquee-wrapper">
+        <div class="trusted-marquee-track">
+          <div class="trusted-brand-card"><div class="brand-text-badge"><span class="brand-icon">✦</span> <span>Honey Universal</span></div></div>
+          <div class="trusted-brand-card"><div class="brand-text-badge"><span class="brand-icon">✦</span> <span>Haniooo</span></div></div>
+          <div class="trusted-brand-card"><div class="brand-text-badge"><span class="brand-icon">✦</span> <span>G-FORCE</span></div></div>
+          <div class="trusted-brand-card"><div class="brand-text-badge"><span class="brand-icon">✦</span> <span>STUAK</span></div></div>
+          <div class="trusted-brand-card"><div class="brand-text-badge"><span class="brand-icon">✦</span> <span>FLUBN</span></div></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="work section" id="work">
+      <div class="section-heading reveal">
+        <p class="label">✦ FEATURED WORK</p>
+        <h2>Projects that solved problems<br />and created <em>measurable impact.</em></h2><a href="work.html" class="view-all">All projects
+          <b>↗</b></a>
+      </div>
+      <div class="featured-carousel-container reveal">
+        <div class="featured-carousel-wrapper">
+          <div class="featured-carousel-track"></div>
+          <div class="fc-progress-bar"></div>
+        </div>
+        <div class="carousel-controls" style="display:none;">
+          <button class="carousel-btn carousel-prev" aria-label="Previous slide">&#8249;</button>
+          <div class="carousel-dots"></div>
+          <button class="carousel-btn carousel-next" aria-label="Next slide">&#8250;</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="metrics section" id="metrics">
+      <div><b id="home-stat1-val">4.5+</b><span id="home-stat1-lbl">Years<br />Experience</span></div>
+      <div><b id="home-stat2-val">1200+</b><span id="home-stat2-lbl">UI Screens<br />Designed</span></div>
+      <div><b id="home-stat3-val">20+</b><span id="home-stat3-lbl">Digital Products<br />& Brands</span></div>
+      <div><b id="home-stat4-val">5+</b><span id="home-stat4-lbl">Products Concept<br />to Launch</span></div>
+      <div><b id="home-stat5-val">15+</b><span id="home-stat5-lbl">Clients &<br />Business Solutions</span></div>
+    </section>
+
+    <section class="process section" id="process">
+      <div class="section-heading reveal">
+        <p class="label">✦ MY DESIGN PROCESS</p>
+      </div>
+      <div class="process-row reveal">
+        <div><i>⌕</i><b>Research</b><span>Understand users, business<br />goals & challenges</span></div>
+        <div><i>◎</i><b>Define</b><span>Identify opportunities &<br />user solutions</span></div>
+        <div><i>✦</i><b>Ideate</b><span>Generate ideas, user<br />flows & concepts</span></div>
+        <div><i><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg></i><b>Design</b><span>Intuitive interfaces &<br />scalable systems</span></div>
+        <div><i>&lt;/&gt;</i><b>Prototype</b><span>Interactive prototypes<br />& usability testing</span></div>
+        <div><i class="accent">↗</i><b>Launch</b><span>Dev collaboration &<br />iterative feedback</span></div>
+      </div>
+    </section>
+
+    <section class="about section" id="about">
+      <article class="quote-card reveal" id="testimonial-card"><span class="quote-mark">“</span>
+        <p>Abi combines curiosity, empathy and sharp product thinking. He makes complex experiences feel effortless.
+        </p>
+        <div class="person"><img
+            src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=120&q=80"
+            alt="" /><span><b>Sanya Mehra</b><small>Founder, Noma Health</small></span></div>
+      </article>
+      <div class="about-image reveal delay-1"><img
+          src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=750&q=90"
+          alt="Abi Krishna in profile" /></div>
+      <article class="about-copy reveal delay-2">
+        <p class="label">✦ ABOUT ME</p>
+        <h2>I design digital products that balance user needs with <em>business goals.</em></h2>
+        <p>Over the last 4.5 years, I've worked across product design, UI/UX, branding, and digital experiences. From research and wireframes to polished interfaces and developer handoff, I enjoy building products that are simple, scalable, and meaningful.</p><a
+          class="text-cta" href="about.html">My Journey <b>↗</b></a>
+      </article>
+    </section>
+
+    <section class="journal section" id="journal">
+      <div class="section-heading reveal">
+        <p class="label">✦ FROM THE JOURNAL</p>
+        <h2>Design insights, product thinking,<br />and <em>lessons from real projects.</em></h2><a href="blog.html" class="view-all">All articles
+          <b>↗</b></a>
+      </div>
+      <div class="article-grid"></div>
+    </section>
+  </main>
+  <footer id="contact">
+    <div class="footer-intro">
+      <p class="label">✦ LET'S CONNECT</p>
+      <h2>Let's build your<br />next <em>digital product.</em></h2>
+      <p class="footer-tagline">Whether you're building a startup, scaling a product, or improving an existing experience, I'd love to help turn your ideas into impactful digital products.</p>
+      <p class="footer-location"><span class="location-dot"></span> Based in Chennai, India 🇮🇳</p>
+
+      <div class="available-for-box">
+        <p class="label">✦ AVAILABLE FOR</p>
+        <div class="available-tags">
+          <span class="avail-pill">• Product Design</span>
+          <span class="avail-pill">• UI/UX Design</span>
+          <span class="avail-pill">• Branding</span>
+          <span class="avail-pill">• Freelance Projects</span>
+          <span class="avail-pill">• Full-time Opportunities</span>
+        </div>
+      </div>
+    </div>
+    <div class="contact-links" id="footer-contact-links">
+      <a href="mailto:hello@abikrishna.design" id="footer-email-link">
+        <span>✉</span>hello@abikrishna.design
+      </a>
+      <a href="#" id="footer-cv-link" target="_blank" download>
+        <span><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+            <polyline points="7 10 12 15 17 10" />
+            <line x1="12" y1="15" x2="12" y2="3" />
+          </svg></span>Download CV
+      </a>
+
+
+    </div>
+    <a class="big-arrow" href="#home" aria-label="Back to top">↗</a>
+    <div class="footer-bottom">
+      <a class="logo" href="#home" aria-label="Abi Krishna home"><img src="assets/ak-logo-exact.png" alt="AK." class="brand-logo-img"></a>
+      <span class="footer-copy">© 2026 Abi Krishna. All rights reserved.</span>
+      <span class="footer-craft">Crafted with intention <b>♥</b></span>
+      <div class="footer-social" id="footer-social-links">
+        <!-- Populated dynamically from admin settings -->
+      </div>
+    </div>
+  </footer>
+  <!-- Article Reader Modal (opened inline from Journal section) -->
+  <div class="article-modal" id="article-modal" aria-hidden="true">
+    <div class="article-modal-backdrop" id="article-modal-backdrop"></div>
+    <div class="article-modal-content">
+      <button class="article-modal-close" id="article-modal-close" aria-label="Close article">×</button>
+      <div class="article-modal-body" id="article-modal-body"></div>
+    </div>
+  </div>
+  <script src="script.js"></script>
+</body>
+
+</html>

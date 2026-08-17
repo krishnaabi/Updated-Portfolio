@@ -1,0 +1,50 @@
+/* Desktop presentation scale and generous section rhythm */
+@media (min-width: 901px) {
+  html {
+    zoom: 1.25;
+  }
+
+  /* ── Equal top spacing across all non-hero sections ── */
+  .section:not(.hero) {
+    padding-top: 120px;       /* renders as 150px with zoom:1.25 */
+    scroll-margin-top: 110px; /* stops section hiding behind fixed header */
+  }
+
+  /* Metrics bottom padding only — top comes from .section rule above */
+  .metrics {
+    padding-bottom: 100px;
+  }
+
+  .process {
+    padding-bottom: 100px;
+  }
+
+  .journal {
+    padding-bottom: 120px;
+  }
+
+  footer {
+    padding-top: 70px;
+  }
+
+  /* Hero sits close to header */
+  .hero {
+    padding-top: 56px !important;
+    align-items: start !important;
+    scroll-margin-top: 0;
+  }
+}
+
+@media (max-width: 900px) {
+  .section:not(.hero) {
+    padding-top: 90px;
+    scroll-margin-top: 90px;
+  }
+}
+
+@media (max-width: 600px) {
+  .section:not(.hero) {
+    padding-top: 72px;
+    scroll-margin-top: 80px;
+  }
+}

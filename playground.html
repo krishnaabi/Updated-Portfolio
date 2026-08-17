@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>Playground — Abikrishna T.</title>
+  <meta name="description" content="A space to explore creative concepts, 3D renders, UI motion tests, and side projects by Abikrishna T." />
+  <link rel="icon" type="image/svg+xml" href="assets/ak-logo.svg" />
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="enhancements.css?v=60" />
+  <link rel="stylesheet" href="playground.css?v=40" />
+
+
+</head>
+
+<body class="play-page">
+  <header class="site-header">
+    <a class="logo" href="index.html" aria-label="Abi Krishna home"><img src="assets/ak-logo-exact.png" alt="AK." class="brand-logo-img"></a>
+    <nav>
+      <a href="work.html">Work</a>
+      <a href="about.html">About</a>
+      <a href="playground.html" class="selected">Playground</a>
+      <a href="blog.html">Journal</a>
+    </nav>
+    <div class="header-actions">
+      <a class="talk-link" href="#contact">Let's Talk <b>↗</b></a>
+      <button class="menu-button"><span></span><span></span></button>
+    </div>
+  </header>
+
+  <main>
+    <!-- Playground Hero Section -->
+    <section class="pg-hero" id="top">
+      <div class="reveal">
+        <p class="label">✦ CREATIVE PLAYGROUND</p>
+        <h1>A space to <em>explore</em><br />ideas and have <em>fun.</em></h1>
+        <p>Concepts, motion tests, 3D scenes, and visual explorations<br />that keep my creative engine flowing.</p>
+
+        <!-- Micro Stats Banner -->
+        <div class="pg-stats-banner">
+          <div class="pg-stat-pill">
+            <span class="stat-num">25+</span>
+            <span class="stat-label">Creative Studies</span>
+          </div>
+          <div class="pg-stat-divider"></div>
+          <div class="pg-stat-pill">
+            <span class="stat-num">UI / Motion</span>
+            <span class="stat-label">3D & Visuals</span>
+          </div>
+          <div class="pg-stat-divider"></div>
+          <div class="pg-stat-pill">
+            <span class="stat-num">100%</span>
+            <span class="stat-label">Side Projects</span>
+          </div>
+        </div>
+      </div>
+      <div class="pg-hero-visual" id="pg-hero-visual">
+        <img src="" alt="Playground Hero" id="pg-hero-img" style="display:none;" />
+      </div>
+    </section>
+
+    <!-- Main Experiments Grid -->
+    <section class="experiment-grid-section" id="experiments">
+      <div class="pg-section-header">
+        <h2>Interactive <em>Explorations</em></h2>
+        <span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--accent);font-weight:700;">01 / EXPERIMENTS</span>
+      </div>
+
+      <!-- Filter Pill Switcher (below line, above cards) -->
+      <div class="filters" id="playground-filters">
+        <button class="active" data-filter="all">All Explorations</button>
+        <button data-filter="ui">UI & Motion</button>
+        <button data-filter="concept">Concepts</button>
+        <button data-filter="3d">3D & Visuals</button>
+        <button data-filter="sketches">Quick Sketches</button>
+        <button data-filter="fun">Just for Fun</button>
+      </div>
+
+      <div class="experiment-grid"></div>
+
+      <!-- Load More Button -->
+      <div class="load-more-wrapper" id="load-more-experiments-wrapper" style="display:none;text-align:center;margin-top:40px;">
+        <button id="load-more-experiments-btn" class="load-more-btn">
+          <span>Load More Explorations</span> <b id="remaining-count-badge"></b>
+        </button>
+      </div>
+    </section>
+
+
+    <!-- Quick Sketches Section -->
+    <section class="sketches-section" id="sketches">
+      <div class="pg-section-header">
+        <h2>Quick <em>sketches</em> & Wireframes</h2>
+        <span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--accent);font-weight:700;">02 / SKETCHES</span>
+      </div>
+      <div class="sketch-grid"></div>
+
+      <!-- Load More Button for Sketches -->
+      <div class="load-more-wrapper" id="load-more-sketches-wrapper" style="display:none;text-align:center;margin-top:40px;">
+        <button id="load-more-sketches-btn" class="load-more-btn">
+          <span>Load More Explorations</span> <b></b>
+        </button>
+      </div>
+    </section>
+
+    <!-- Just For Fun Section -->
+    <section class="fun-section" id="fun">
+      <div class="pg-section-header">
+        <h2>Just for <em>fun</em> & Visual Tests</h2>
+        <span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--accent);font-weight:700;">03 / FUN ZONE</span>
+      </div>
+      <div class="fun-grid"></div>
+
+      <!-- Load More Button for Fun Zone -->
+      <div class="load-more-wrapper" id="load-more-fun-wrapper" style="display:none;text-align:center;margin-top:40px;">
+        <button id="load-more-fun-btn" class="load-more-btn">
+          <span>Load More Explorations</span> <b></b>
+        </button>
+      </div>
+    </section>
+  </main>
+
+  <footer id="contact">
+    <div class="footer-intro">
+      <p class="label">✦ LET'S CONNECT</p>
+      <h2>Let's create<br />something <em>amazing.</em></h2>
+      <p class="footer-tagline">Open to product design, consulting and design leadership roles.</p>
+    </div>
+    <div class="contact-links" id="footer-contact-links">
+      <a href="mailto:hello@abikrishna.design" id="footer-email-link"><span>✉</span>hello@abikrishna.design</a>
+      <a href="#" id="footer-cv-link" target="_blank" download><span><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></span>Download CV</a>
+    </div>
+    <a class="big-arrow" href="#top" aria-label="Back to top">↗</a>
+    <div class="footer-bottom">
+      <a class="logo" href="index.html" aria-label="Abi Krishna home"><img src="assets/ak-logo-exact.png" alt="AK." class="brand-logo-img"></a>
+      <span class="footer-copy">© 2026 Abikrishna T. All rights reserved.</span>
+      <span class="footer-craft">Crafted with intention <b>♥</b></span>
+      <div class="footer-social" id="footer-social-links"></div>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+  <script src="site-nav.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,4 @@
+.env
+data.json
+supabase-config.js
+node_modules/

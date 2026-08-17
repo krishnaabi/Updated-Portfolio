@@ -1,0 +1,234 @@
+/* Shared spacing, depth, and motion system */
+:root {
+    --space-section: clamp(72px, 9vw, 142px);
+    --space-card: clamp(18px, 2vw, 30px);
+    --soft-shadow: 0 20px 55px rgba(40, 24, 14, .07)
+}
+
+body {
+    background: radial-gradient(circle at 84% 12%, #ffede50e, transparent 22%), radial-gradient(circle at 13% 46%, #fff3ec3d, transparent 25%), var(--paper)
+}
+
+main>section:not(.hero):not(.work-hero):not(.pg-hero):not(.blog-hero):not(.about-hero) {
+    scroll-margin-top: 115px
+}
+
+.work-hero,
+.pg-hero,
+.blog-hero {
+    padding-bottom: clamp(50px, 6vw, 90px) !important
+}
+
+.content-section {
+    padding-top: clamp(34px, 4vw, 62px) !important;
+    padding-bottom: clamp(34px, 4vw, 62px) !important
+}
+
+.experiment-grid,
+.article-grid,
+.blog-grid,
+.fun-grid {
+    gap: clamp(16px, 2vw, 26px) !important
+}
+
+.project-card,
+.play-card,
+.post,
+.article-card,
+.about,
+.work-item,
+.fun-grid article,
+.subscribe {
+    box-shadow: 0 0 0 rgba(0, 0, 0, 0);
+    transition: transform .5s var(--ease), box-shadow .5s var(--ease), border-color .5s ease !important
+}
+
+.project-card:hover,
+.play-card:hover,
+.post:hover,
+.article-card:hover,
+.fun-grid article:hover {
+    border-color: #f2b39c !important;
+    box-shadow: var(--soft-shadow) !important;
+    transform: translateY(-7px) !important
+}
+
+.project-card,
+.play-card,
+.post,
+.article-card,
+.fun-grid article {
+    overflow: hidden
+}
+
+.project-card:before,
+.play-card:before,
+.post:before,
+.article-card:before {
+    position: absolute;
+    z-index: 1;
+    top: 0;
+    right: 0;
+    left: 0;
+    height: 2px;
+    content: "";
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    opacity: 0;
+    transform: scaleX(.3);
+    transition: .5s var(--ease)
+}
+
+.project-card:hover:before,
+.play-card:hover:before,
+.post:hover:before,
+.article-card:hover:before {
+    opacity: 1;
+    transform: scaleX(1)
+}
+
+.project-card,
+.play-card,
+.post,
+.article-card {
+    position: relative
+}
+
+.site-header {
+    backdrop-filter: blur(10px)
+}
+
+.site-header:after {
+    position: absolute;
+    right: 40px;
+    bottom: 0;
+    left: 40px;
+    content: "";
+    border-bottom: 1px solid transparent;
+    transition: border-color .3s
+}
+
+.site-header:hover:after {
+    border-color: #e9e4e0
+}
+
+.label {
+    position: relative;
+    display: inline-block
+}
+
+.label:after {
+    position: absolute;
+    right: -11px;
+    bottom: 2px;
+    width: 4px;
+    height: 4px;
+    content: "";
+    background: var(--accent);
+    border-radius: 50%;
+    animation: labelPulse 2.7s ease infinite
+}
+
+.big-arrow {
+    box-shadow: 0 10px 25px #ff4e1b14
+}
+
+.big-arrow:hover {
+    box-shadow: 0 16px 32px #ff4e1b35
+}
+
+.work-copy,
+.card-text,
+.post>div {
+    padding-bottom: var(--space-card)
+}
+
+footer {
+    margin-top: clamp(25px, 5vw, 70px) !important
+}
+
+@keyframes labelPulse {
+    50% {
+        transform: scale(1.7);
+        box-shadow: 0 0 0 6px #ff4e1b14
+    }
+}
+
+@media(prefers-reduced-motion:no-preference) {
+
+    .hero-visual,
+    .hero-object,
+    .blog-book,
+    .about-portrait {
+        animation: visualFloat 7s ease-in-out infinite
+    }
+
+    .hero-object {
+        animation-delay: -2s
+    }
+
+    .blog-book {
+        animation-delay: -4s
+    }
+
+    .about-portrait {
+        animation-delay: -3s
+    }
+
+    @keyframes visualFloat {
+
+        0%,
+        100% {
+            translate: 0 0
+        }
+
+        50% {
+            translate: 0 -9px
+        }
+    }
+}
+
+.motion-ready [data-motion] {
+    will-change: transform
+}
+
+.motion-ready .play-card,
+.motion-ready .post,
+.motion-ready .fun-grid article {
+    transform-style: preserve-3d
+}
+
+@media(max-width:820px) {
+    .section {
+        padding-top: clamp(62px, 12vw, 88px) !important
+    }
+
+    .work-hero,
+    .pg-hero,
+    .blog-hero {
+        padding-bottom: 45px !important
+    }
+
+    .site-header:after {
+        right: 20px;
+        left: 20px
+    }
+}
+
+@media(max-width:560px) {
+    .content-section {
+        padding-top: 32px !important;
+        padding-bottom: 32px !important
+    }
+
+    .project-card:hover,
+    .play-card:hover,
+    .post:hover,
+    .article-card:hover,
+    .fun-grid article:hover {
+        transform: none !important
+    }
+
+    .label:after {
+        display: none
+    }
+}

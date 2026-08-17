@@ -1,0 +1,1037 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>Abikrishna — Content Studio</title>
+  <link rel="icon" type="image/svg+xml" href="assets/ak-logo.svg" />
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500;600&family=Manrope:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="admin.css?v=25" />
+  <link rel="preload" as="image" href="assets/ak-logo-exact.png" />
+</head>
+
+<body>
+
+  <!-- Mobile Top Studio Header Bar -->
+  <div class="mobile-admin-bar">
+    <a href="index.html" class="mobile-brand-logo">
+      <img src="assets/ak-logo-exact.png" alt="AK.">
+      <span>STUDIO</span>
+    </a>
+    <button id="admin-sidebar-toggle" class="sidebar-toggle-btn" aria-label="Toggle Navigation">
+      <span class="hamburger-icon">☰ Menu</span>
+    </button>
+  </div>
+
+  <!-- Mobile Backdrop Overlay -->
+  <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+
+  <aside id="admin-sidebar">
+    <div class="sidebar-top">
+      <a href="index.html" class="brand-logo" style="display:inline-flex;align-items:center;"><img src="assets/ak-logo-exact.png" alt="AK." style="height:38px;width:auto;mix-blend-mode:multiply;"></a>
+      <p class="brand-label">ABIKRISHNA STUDIO</p>
+    </div>
+
+    <nav>
+      <p class="nav-section-title">MANAGEMENT</p>
+      <button class="tab active" data-tab="content"><span>✦</span> Content Manager</button>
+      <button class="tab" data-tab="messages"><span>📬</span> Form Inquiries <span id="messages-count-badge" class="nav-count-badge" style="display:none;">0</span></button>
+      <button class="tab" data-tab="testimonials"><span>💬</span> Client Testimonials</button>
+      <button class="tab" data-tab="assets"><span>⚙</span> Site Assets & Config</button>
+    </nav>
+
+    <div class="sidebar-widget">
+      <p class="widget-title">SYSTEM STATUS</p>
+      <div class="widget-status-item">
+        <span class="status-indicator online"></span>
+        <span>CMS Engine Live</span>
+      </div>
+      <div class="widget-info-row">
+        <small>Data Store</small>
+        <strong>Local DB + Media</strong>
+      </div>
+      <div class="widget-info-row">
+        <small>Fast Sync</small>
+        <strong>Instant Live Update</strong>
+      </div>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="admin-user-profile">
+        <div class="user-avatar">AK</div>
+        <div class="user-info">
+          <strong>Abikrishna T.</strong>
+          <small>Portfolio Owner</small>
+        </div>
+      </div>
+      <a href="index.html" class="nav-website-link">View Live Website ↗</a>
+    </div>
+  </aside>
+
+
+  <main>
+    <header class="studio-header">
+      <div>
+        <p class="eyebrow">STUDIO DASHBOARD</p>
+        <h1>Manage Portfolio & Journal</h1>
+      </div>
+      <a href="index.html" class="preview-site-btn">Open Live Portfolio ↗</a>
+    </header>
+
+    <!-- Content Manager Panel -->
+    <section class="panel active" id="content">
+      <!-- Segmented Type Selector -->
+      <div class="type-segmented-bar">
+        <button class="type-segment active" data-type="work">
+          <i>💼</i> Work / Case Study
+        </button>
+        <button class="type-segment" data-type="playground">
+          <i>🧪</i> Playground Studies
+        </button>
+        <button class="type-segment" data-type="journal">
+          <i>📝</i> Journal & Articles
+        </button>
+      </div>
+
+      <div class="admin-grid">
+        <!-- Form Area -->
+        <form id="content-form" class="studio-form">
+          <input type="hidden" name="type" id="content-type" value="work">
+
+          <div class="form-header">
+            <h2 id="form-title-heading">Publish Work / Case Study</h2>
+            <p id="form-subtitle">Add a new project experience to your portfolio showcase.</p>
+          </div>
+
+          <!-- Journal Format Switcher (Journal Only) -->
+          <div id="journal-type-wrapper" class="form-group" style="display:none;">
+            <label class="group-label">Journal Article Format</label>
+            <div class="format-toggle-bar">
+              <label class="format-radio active">
+                <input type="radio" name="journalType" value="link" checked>
+                <span>🔗 External Article (Medium, Substack, etc.)</span>
+              </label>
+              <label class="format-radio">
+                <input type="radio" name="journalType" value="blog">
+                <span>✍️ Internal Blog Post / Case Study</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Playground Area Selector (Playground Only) -->
+          <div id="playground-section-wrapper" class="form-group" style="display:none;">
+            <label class="group-label">Playground Area</label>
+            <select name="section" id="content-section">
+              <option value="experiments">Experiments</option>
+              <option value="sketches">Quick sketches</option>
+              <option value="fun">Just for fun</option>
+            </select>
+          </div>
+
+          <!-- Category Selector -->
+          <div class="form-group" id="category-group-wrapper">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+              <label class="group-label" style="margin-bottom:0;">Category</label>
+              <button type="button" id="toggle-pg-topic-manager-btn" class="topic-mgr-toggle-btn" style="display:none;">
+                ⚙️ Manage Playground Topics
+              </button>
+              <button type="button" id="toggle-journal-topic-manager-btn" class="topic-mgr-toggle-btn" style="display:none;">
+                ⚙️ Manage Journal Topics
+              </button>
+            </div>
+            <select name="category" id="content-category"></select>
+          </div>
+
+          <!-- Playground Inline Topics Manager -->
+          <div id="playground-inline-topics-box" class="form-group pg-topic-manager-box" style="display:none;">
+            <div class="topic-mgr-header">
+              <span class="topic-mgr-title">🧪 Playground Filter Topics</span>
+              <small class="topic-mgr-hint">Controls filter pills on Playground page & categories dropdown</small>
+            </div>
+            <div id="content-pg-topics-chips" class="topic-chips-container"></div>
+            <div class="topic-add-row">
+              <input type="text" id="content-new-pg-topic" placeholder="New topic (e.g. Generative AI, 3D Art)..." class="topic-add-input">
+              <button type="button" id="content-add-pg-topic-btn" class="topic-add-btn">+ Add Topic</button>
+            </div>
+          </div>
+
+          <!-- Journal Inline Topics Manager -->
+          <div id="journal-inline-topics-box" class="form-group pg-topic-manager-box" style="display:none;">
+            <div class="topic-mgr-header">
+              <span class="topic-mgr-title">📝 Journal Filter Topics</span>
+              <small class="topic-mgr-hint">Controls filter pills on Journal / Blog page & categories dropdown</small>
+            </div>
+            <div id="content-journal-topics-chips" class="topic-chips-container"></div>
+            <div class="topic-add-row">
+              <input type="text" id="content-new-journal-topic" placeholder="New topic (e.g. Design Systems, AI Strategy)..." class="topic-add-input">
+              <button type="button" id="content-add-journal-topic-btn" class="topic-add-btn">+ Add Topic</button>
+            </div>
+          </div>
+
+          <!-- URL Field + Auto-Fetch Button (Journal External Link ONLY) -->
+          <div class="form-group">
+            <label class="group-label" id="url-field-label">Link / Destination URL</label>
+            <div class="url-input-wrapper">
+              <input name="url" id="content-url" required placeholder="https://medium.com/@username/article-title">
+              <button type="button" id="auto-fetch-btn" class="auto-fetch-btn" style="display:none;">
+                <span>🪄</span> Auto-Fetch Details
+              </button>
+            </div>
+            <small class="fetch-status-msg" id="fetch-status-msg"></small>
+          </div>
+
+          <!-- Title & Description -->
+          <div class="form-group">
+            <label class="group-label" id="title-field-label">Title / Project Name</label>
+            <input name="title" id="content-title" required placeholder="e.g. Haniio or Designing for Clarity">
+          </div>
+
+          <div class="form-group">
+            <label class="group-label">Description / Excerpt</label>
+            <textarea name="description" id="content-description"
+              placeholder="A brief summary or behind-the-scenes overview..."></textarea>
+          </div>
+
+          <!-- Work Tags & Tools (Work Only) -->
+          <div id="work-fields-group">
+            <div class="form-group" id="tags-field-label">
+              <label class="group-label">Category Tags / Metadata (optional)</label>
+              <input name="tags" id="content-tags" placeholder="e.g. Product | 2025-2026 | App">
+            </div>
+
+            <div class="form-group" id="tools-field-label">
+              <label class="group-label">Tools / Tech Stack (optional)</label>
+              <input name="tools" id="content-tools" placeholder="e.g. Figma | Framer | React | Photoshop">
+            </div>
+
+            <div class="form-group" id="product-url-field-label">
+              <label class="group-label">Live Product Link / URL (optional)</label>
+              <input name="productUrl" id="content-product-url"
+                placeholder="https://app.example.com or https://myproduct.com">
+            </div>
+          </div>
+
+          <!-- Journal Metadata Group (Journal Only) -->
+          <div id="journal-fields-group" class="journal-fields-grid" style="display:none;">
+            <div class="form-group">
+              <label class="group-label">Reading Time</label>
+              <input name="readTime" id="journal-readtime" placeholder="e.g. 8 min read">
+            </div>
+            <div class="form-group">
+              <label class="group-label">Publish Date</label>
+              <input name="date" type="date" id="journal-date">
+            </div>
+          </div>
+
+          <!-- Internal Blog Post Content (Internal Blog Post Only) -->
+          <div class="form-group" id="journal-blog-body-group" style="display:none;">
+            <label class="group-label">Full Article Content (Internal Blog Post)</label>
+            <textarea name="contentBody" id="journal-content-body" style="height:160px;"
+              placeholder="Write or paste your full article body text here. Double line breaks create paragraphs..."></textarea>
+          </div>
+
+          <!-- Cover Image Options -->
+          <div class="form-group">
+            <label class="group-label">Cover Image URL (optional)</label>
+            <input name="imageUrl" id="content-image-url" placeholder="https://images.unsplash.com/... or /uploads/...">
+          </div>
+
+          <div class="form-group">
+            <label class="group-label">Or Upload Cover Image File</label>
+            <input name="imageFile" type="file" accept="image/*" id="content-image-file">
+            <small class="recommended-size">💡 Recommended size: <b>1200 × 800 px</b> (3:2 landscape ratio, max 5 MB)</small>
+          </div>
+
+
+          <label class="checkbox-label" id="featured-field-label">
+            <input type="checkbox" name="featured" id="content-featured" value="true">
+            <span id="featured-label-text">✦ Feature on Home Page</span>
+          </label>
+
+          <input type="hidden" name="editingId" id="editing-id" value="">
+          <div class="form-button-row" style="display:flex;gap:10px;">
+            <button type="submit" class="submit-publish-btn" id="submit-btn">Publish Item <b>↗</b></button>
+            <button type="button" id="cancel-edit-btn"
+              style="display:none;padding:16px;background:#f0ebe5;color:#333;border:0;border-radius:14px;font:700 13px 'Manrope', sans-serif;cursor:pointer;white-space:nowrap;">Cancel
+              Editing</button>
+          </div>
+          <small class="status" id="content-status"></small>
+        </form>
+
+        <!-- Live Card Preview Sidebar -->
+        <div class="live-preview-column">
+          <div class="preview-sticky-card">
+            <div class="preview-header">
+              <span class="pulse-dot"></span>
+              <p>LIVE PREVIEW</p>
+            </div>
+
+            <div class="card-preview-box" id="card-preview-box">
+              <div class="preview-media" id="prev-media">
+                <div class="preview-placeholder">AK.</div>
+              </div>
+              <div class="preview-body">
+                <div class="preview-meta">
+                  <span id="prev-cat" class="prev-cat-tag">PRODUCT DESIGN</span>
+                  <span id="prev-time" class="prev-time-tag">◷ 5 min read</span>
+                </div>
+                <h3 id="prev-title" class="prev-title-text">Project or Article Title</h3>
+                <p id="prev-desc" class="prev-desc-text">Your description summary will appear here dynamically as you
+                  type.</p>
+                <div class="preview-footer">
+                  <span id="prev-author">Abikrishna T.</span>
+                  <i class="prev-arrow">↗</i>
+                </div>
+              </div>
+            </div>
+            <p class="preview-hint">✦ This shows how your card will be rendered live on the website.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Published Items List -->
+      <section class="content-list-section">
+        <div class="list-heading">
+          <div>
+            <h2>Published Content</h2>
+            <p class="list-subtext">Manage, toggle featured state, or remove items from your portfolio.</p>
+          </div>
+          <select id="content-filter" class="filter-select">
+            <option value="all">All Published Items</option>
+            <option value="work">Work Items</option>
+            <option value="playground">Playground Items</option>
+            <option value="journal">Journal Articles</option>
+          </select>
+        </div>
+        <div id="items" class="published-items-grid"></div>
+      </section>
+    </section>
+
+    <!-- Form Inquiries & Submissions Panel -->
+    <section class="panel" id="messages">
+      <div class="inquiries-container">
+        <!-- Top Bar: Notification Email Config -->
+        <div class="notification-email-card" style="background:#fff; border:1px solid #e9e4df; border-radius:18px; padding:24px; margin-bottom:28px; display:flex; flex-direction:column; gap:16px;">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:12px;">
+            <div>
+              <h3 style="margin:0 0 4px; font-size:18px; font-weight:800;">📬 Form Notification & Target Email</h3>
+              <p style="margin:0; color:#666; font-size:13px;">Submitted website forms are saved here and can be shared or forwarded directly to your notification email address.</p>
+            </div>
+            <span class="hero-badge" style="background:#eef7f2; color:#1e7e48; padding:6px 12px; border-radius:99px; font-weight:700; font-size:12px;">Active Receiver</span>
+          </div>
+
+          <form id="notification-email-form" style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
+            <div style="flex:1; min-width:260px;">
+              <input type="email" id="target-notification-email" required placeholder="e.g. hello@abikrishna.design or abikrishna15@gmail.com" style="width:100%; padding:14px 16px; border:1px solid #dfddda; border-radius:12px; font:600 14px 'Manrope', sans-serif;">
+            </div>
+            <button type="submit" class="submit-publish-btn" style="padding:14px 24px; white-space:nowrap;">
+              Save Notification Email <b>↗</b>
+            </button>
+          </form>
+          <small id="notification-email-status" style="font-weight:700; font-size:12px; color:#2e7d32; display:none;"></small>
+        </div>
+
+        <!-- Messages Heading & Stats Bar -->
+        <div class="list-heading" style="margin-bottom:20px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+          <div>
+            <h2 style="font-size:22px; font-weight:800; margin:0 0 4px;">Submitted Form Inquiries</h2>
+            <p class="list-subtext" style="margin:0; color:#666; font-size:13px;">View, reply to senders, forward submissions to your notification email, or delete messages.</p>
+          </div>
+          <button type="button" id="refresh-messages-btn" style="padding:10px 18px; background:#f0ebe5; color:#333; border:0; border-radius:12px; font:700 12px 'Manrope', sans-serif; cursor:pointer;">
+            🔄 Refresh Inquiries
+          </button>
+        </div>
+
+        <!-- Submitted Messages List Container -->
+        <div id="messages-list" class="messages-grid" style="display:flex; flex-direction:column; gap:16px;">
+          <!-- Dynamically populated messages cards -->
+        </div>
+      </div>
+    </section>
+
+    <!-- Testimonials Manager Panel -->
+    <section class="panel" id="testimonials">
+      <div class="admin-grid">
+        <form id="testimonial-form" class="studio-form">
+          <input type="hidden" id="testimonial-editing-id" value="">
+
+          <div class="form-header">
+            <h2 id="testimonial-form-title">Add Client Testimonial</h2>
+            <p id="testimonial-form-subtitle">Add client reviews & recommendations to showcase on your homepage.</p>
+          </div>
+
+          <div class="form-group">
+            <label class="group-label">Client / Person Name *</label>
+            <input id="testimonial-name" type="text" placeholder="e.g. Sanya Mehra" required>
+          </div>
+
+          <div class="form-group">
+            <label class="group-label">Role & Company / Title *</label>
+            <input id="testimonial-role" type="text" placeholder="e.g. Founder, Noma Health" required>
+          </div>
+
+          <div class="form-group">
+            <label class="group-label">Testimonial Quote *</label>
+            <textarea id="testimonial-quote" rows="4" placeholder="Enter client quote or feedback text..." required style="width:100%;padding:14px;border:1px solid #dfddda;border-radius:12px;font:inherit;background:#fff;"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="group-label">Avatar Image URL (Optional)</label>
+            <input id="testimonial-img-url" type="text" placeholder="https://... or /uploads/...">
+          </div>
+
+          <div class="form-group">
+            <label class="group-label">Or Upload Photo File</label>
+            <input type="file" accept="image/*" id="testimonial-img-file">
+            <small class="recommended-size">💡 Recommended size: <b>200 × 200 px</b> (Square photo, max 5 MB)</small>
+          </div>
+
+          <div class="form-button-row" style="display:flex;gap:10px;">
+            <button type="submit" class="submit-publish-btn" id="testimonial-submit-btn">Publish Testimonial <b>↗</b></button>
+            <button type="button" id="testimonial-cancel-btn" style="display:none;padding:16px;background:#f0ebe5;color:#333;border:0;border-radius:14px;font:700 13px 'Manrope', sans-serif;cursor:pointer;white-space:nowrap;">Cancel Editing</button>
+          </div>
+          <small class="status" id="testimonial-status"></small>
+        </form>
+
+        <!-- Published Testimonials Column -->
+        <div class="published-column">
+          <div class="column-header">
+            <h2>Published Testimonials</h2>
+            <p class="list-subtext">Manage client reviews displayed on your home page carousel.</p>
+          </div>
+          <div id="testimonials-list" class="published-items-grid"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Site Assets & Config Studio Panel -->
+    <section class="panel" id="assets">
+      <div class="config-studio-container">
+        <div class="config-studio-header">
+          <h2>Site Assets & Studio Configuration</h2>
+          <p class="config-studio-sub">Manage page hero visuals, stage pitch presentations, achievements, resume files, footer links, and impact stats live.</p>
+
+          <!-- Subtab Controller Bar -->
+          <div class="config-nav-bar" id="config-subnav-bar">
+            <button type="button" class="config-tab active" data-subtab="heroes">🖼️ Page Hero Visuals</button>
+            <button type="button" class="config-tab" data-subtab="topics">🧪 Playground Filter Topics</button>
+            <button type="button" class="config-tab" data-subtab="journal-topics">📝 Journal Filter Topics</button>
+            <button type="button" class="config-tab" data-subtab="brands">🏢 Trusted Brands & Ticker</button>
+            <button type="button" class="config-tab" data-subtab="achievements">🌟 Achievements & Stage Showcase</button>
+            <button type="button" class="config-tab" data-subtab="resume">📄 Resume & Contact</button>
+            <button type="button" class="config-tab" data-subtab="social">🔗 Social Profiles</button>
+            <button type="button" class="config-tab" data-subtab="stats">📊 Impact Metrics</button>
+          </div>
+        </div>
+
+        <form id="assets-form">
+          <!-- Subpanel 1: Hero Images -->
+          <div class="config-subpanel active" id="subpanel-heroes">
+            <div class="hero-manager-section">
+              <h3 class="admin-section-heading">Hero Image Management & Focal Crop Repositioning</h3>
+              <p class="admin-section-sub">Upload files or enter URLs for each page, adjust focal crop positioning, and preview live.</p>
+
+              <!-- Home Hero -->
+              <div class="hero-asset-card" data-hero="home">
+                <div class="hero-asset-header">
+                  <strong>Home Hero Image</strong>
+                  <span class="hero-badge">Home Page</span>
+                </div>
+                <div class="hero-asset-body">
+                  <div class="hero-inputs">
+                    <label class="group-label">Image URL / Path
+                      <input name="heroHomeUrl" id="hero-home-url" type="text" placeholder="https://... or /uploads/...">
+                    </label>
+                    <label class="group-label">Or Upload Image File
+                      <input name="heroHomeFile" id="hero-home-file" type="file" accept="image/*">
+                    </label>
+                    <small class="recommended-size">💡 Recommended size: <b>1000 × 1200 px</b> (3:4 portrait ratio, max 5 MB)</small>
+                    <label class="group-label" style="margin-top:6px;">Focal Repositioning (Crop Focus)
+                      <select name="homeHeroPosition" id="hero-home-pos">
+                        <option value="center center">Center (Default)</option>
+                        <option value="top center">Top Center</option>
+                        <option value="bottom center">Bottom Center</option>
+                        <option value="center left">Center Left</option>
+                        <option value="center right">Center Right</option>
+                        <option value="top left">Top Left</option>
+                        <option value="top right">Top Right</option>
+                      </select>
+                    </label>
+                    <label class="group-label" style="margin-top:6px;">Image Color Treatment
+                      <select name="homeHeroColorMode" id="hero-home-color">
+                        <option value="original">🎨 Original Full Color</option>
+                        <option value="gray">🖤 Classic Grayed (Monochrome)</option>
+                        <option value="warm-gray">🎞 Warm Vintage Monotone</option>
+                      </select>
+                    </label>
+                  </div>
+                  <div class="hero-preview-box">
+                    <div class="hero-preview-thumb">
+                      <img id="hero-home-prev" src="" alt="Home Hero Preview" style="display:none;">
+                      <span class="prev-placeholder" id="hero-home-prev-ph">No Image</span>
+                    </div>
+                    <small>Live Crop Preview</small>
+                    <div style="display:flex; gap:6px; margin-top:8px;">
+                      <button type="button" onclick="reuploadHeroImage('home')" style="flex:1; padding:6px 8px; background:#111; color:#fff; border:0; border-radius:8px; font-size:11px; font-weight:700; cursor:pointer;">🔄 Change</button>
+                      <button type="button" onclick="deleteHeroImage('home')" style="flex:1; padding:6px 8px; background:#fff1f1; color:#d32f2f; border:1px solid #ffcdd2; border-radius:8px; font-size:11px; font-weight:700; cursor:pointer;">🗑 Delete</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Homepage About Section Center Image -->
+              <div class="hero-asset-card" data-hero="center">
+                <div class="hero-asset-header">
+                  <strong>Homepage About Section — Center Image</strong>
+                  <span class="hero-badge">Home Page Center</span>
+                </div>
+                <div class="hero-asset-body">
+                  <div class="hero-inputs">
+                    <label class="group-label">Image URL / Path
+                      <input name="heroCenterUrl" id="hero-center-url" type="text" placeholder="https://... or /uploads/...">
+                    </label>
+                    <label class="group-label">Or Upload Image File
+                      <input name="heroCenterFile" id="hero-center-file" type="file" accept="image/*">
+                    </label>
+                    <small class="recommended-size">💡 Recommended size: <b>750 × 900 px</b> (3:4 portrait ratio, max 5 MB)</small>
+                    <label class="group-label" style="margin-top:6px;">Focal Repositioning (Crop Focus)
+                      <select name="homeCenterPosition" id="hero-center-pos">
+                        <option value="center center">Center (Default)</option>
+                        <option value="top center">Top Center</option>
+                        <option value="bottom center">Bottom Center</option>
+                        <option value="center left">Center Left</option>
+                        <option value="center right">Center Right</option>
+                        <option value="top left">Top Left</option>
+                        <option value="top right">Top Right</option>
+                      </select>
+                    </label>
+                    <label class="group-label" style="margin-top:6px;">Image Color Treatment
+                      <select name="homeCenterColorMode" id="hero-center-color">
+                        <option value="gray">🖤 Classic Grayed (Monochrome)</option>
+                        <option value="original">🎨 Original Full Color</option>
+                        <option value="warm-gray">🎞 Warm Vintage Monotone</option>
+                      </select>
+                    </label>
+                  </div>
+                  <div class="hero-preview-box">
+                    <div class="hero-preview-thumb">
+                      <img id="hero-center-prev" src="" alt="Center Image Preview" style="display:none;">
+                      <span class="prev-placeholder" id="hero-center-prev-ph">No Image</span>
+                    </div>
+                    <small>Live Crop Preview</small>
+                    <div style="display:flex; gap:6px; margin-top:8px;">
+                      <button type="button" onclick="reuploadHeroImage('center')" style="flex:1; padding:6px 8px; background:#111; color:#fff; border:0; border-radius:8px; font-size:11px; font-weight:700; cursor:pointer;">🔄 Change</button>
+                      <button type="button" onclick="deleteHeroImage('center')" style="flex:1; padding:6px 8px; background:#fff1f1; color:#d32f2f; border:1px solid #ffcdd2; border-radius:8px; font-size:11px; font-weight:700; cursor:pointer;">🗑 Delete</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- About Hero -->
+              <div class="hero-asset-card" data-hero="about">
+                <div class="hero-asset-header">
+                  <strong>About Hero Image</strong>
+                  <span class="hero-badge">About Page</span>
+                </div>
+                <div class="hero-asset-body">
+                  <div class="hero-inputs">
+                    <label class="group-label">Image URL / Path
+                      <input name="heroAboutUrl" id="hero-about-url" type="text" placeholder="https://... or /uploads/...">
+                    </label>
+                    <label class="group-label">Or Upload Image File
+                      <input name="heroAboutFile" id="hero-about-file" type="file" accept="image/*">
+                    </label>
+                    <small class="recommended-size">💡 Recommended size: <b>1000 × 1200 px</b> (3:4 portrait ratio, max 5 MB)</small>
+                    <label class="group-label" style="margin-top:6px;">Focal Repositioning (Crop Focus)
+                      <select name="aboutHeroPosition" id="hero-about-pos">
+                        <option value="center center">Center (Default)</option>
+                        <option value="top center">Top Center</option>
+                        <option value="bottom center">Bottom Center</option>
+                        <option value="center left">Center Left</option>
+                        <option value="center right">Center Right</option>
+                        <option value="top left">Top Left</option>
+                        <option value="top right">Top Right</option>
+                      </select>
+                    </label>
+                    <label class="group-label" style="margin-top:6px;">Image Color Treatment
+                      <select name="aboutHeroColorMode" id="hero-about-color">
+                        <option value="original">🎨 Original Full Color</option>
+                        <option value="gray">🖤 Classic Grayed (Monochrome)</option>
+                        <option value="warm-gray">🎞 Warm Vintage Monotone</option>
+                      </select>
+                    </label>
+                  </div>
+                  <div class="hero-preview-box">
+                    <div class="hero-preview-thumb">
+                      <img id="hero-about-prev" src="" alt="About Hero Preview" style="display:none;">
+                      <span class="prev-placeholder" id="hero-about-prev-ph">No Image</span>
+                    </div>
+                    <small>Live Crop Preview</small>
+                    <div style="display:flex; gap:6px; margin-top:8px;">
+                      <button type="button" onclick="reuploadHeroImage('about')" style="flex:1; padding:6px 8px; background:#111; color:#fff; border:0; border-radius:8px; font-size:11px; font-weight:700; cursor:pointer;">🔄 Change</button>
+                      <button type="button" onclick="deleteHeroImage('about')" style="flex:1; padding:6px 8px; background:#fff1f1; color:#d32f2f; border:1px solid #ffcdd2; border-radius:8px; font-size:11px; font-weight:700; cursor:pointer;">🗑 Delete</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Work Hero -->
+              <div class="hero-asset-card" data-hero="work">
+                <div class="hero-asset-header">
+                  <strong>Work Hero Image</strong>
+                  <span class="hero-badge">Work Page</span>
+                </div>
+                <div class="hero-asset-body">
+                  <div class="hero-inputs">
+                    <label class="group-label">Image URL / Path
+                      <input name="heroWorkUrl" id="hero-work-url" type="text" placeholder="https://... or /uploads/...">
+                    </label>
+                    <label class="group-label">Or Upload Image File
+                      <input name="heroWorkFile" id="hero-work-file" type="file" accept="image/*">
+                    </label>
+                    <small class="recommended-size">💡 Recommended size: <b>1400 × 800 px</b> (16:9 landscape ratio, max 5 MB)</small>
+                    <label class="group-label" style="margin-top:6px;">Focal Repositioning (Crop Focus)
+                      <select name="workHeroPosition" id="hero-work-pos">
+                        <option value="center center">Center (Default)</option>
+                        <option value="top center">Top Center</option>
+                        <option value="bottom center">Bottom Center</option>
+                        <option value="center left">Center Left</option>
+                        <option value="center right">Center Right</option>
+                        <option value="top left">Top Left</option>
+                        <option value="top right">Top Right</option>
+                      </select>
+                    </label>
+                    <label class="group-label" style="margin-top:6px;">Image Color Treatment
+                      <select name="workHeroColorMode" id="hero-work-color">
+                        <option value="original">🎨 Original Full Color</option>
+                        <option value="gray">🖤 Classic Grayed (Monochrome)</option>
+                        <option value="warm-gray">🎞 Warm Vintage Monotone</option>
+                      </select>
+                    </label>
+                  </div>
+                  <div class="hero-preview-box">
+                    <div class="hero-preview-thumb">
+                      <img id="hero-work-prev" src="" alt="Work Hero Preview" style="display:none;">
+                      <span class="prev-placeholder" id="hero-work-prev-ph">No Image</span>
+                    </div>
+                    <small>Live Crop Preview</small>
+                    <div style="display:flex; gap:6px; margin-top:8px;">
+                      <button type="button" onclick="reuploadHeroImage('work')" style="flex:1; padding:6px 8px; background:#111; color:#fff; border:0; border-radius:8px; font-size:11px; font-weight:700; cursor:pointer;">🔄 Change</button>
+                      <button type="button" onclick="deleteHeroImage('work')" style="flex:1; padding:6px 8px; background:#fff1f1; color:#d32f2f; border:1px solid #ffcdd2; border-radius:8px; font-size:11px; font-weight:700; cursor:pointer;">🗑 Delete</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Playground Hero -->
+              <div class="hero-asset-card" data-hero="playground">
+                <div class="hero-asset-header">
+                  <strong>Playground Hero Image</strong>
+                  <span class="hero-badge">Playground Page</span>
+                </div>
+                <div class="hero-asset-body">
+                  <div class="hero-inputs">
+                    <label class="group-label">Image URL / Path
+                      <input name="heroPlaygroundUrl" id="hero-playground-url" type="text" placeholder="https://... or /uploads/...">
+                    </label>
+                    <label class="group-label">Or Upload Image File
+                      <input name="heroPlaygroundFile" id="hero-playground-file" type="file" accept="image/*">
+                    </label>
+                    <small class="recommended-size">💡 Recommended size: <b>1400 × 800 px</b> (16:9 landscape ratio, max 5 MB)</small>
+                    <label class="group-label" style="margin-top:6px;">Focal Repositioning (Crop Focus)
+                      <select name="playgroundHeroPosition" id="hero-playground-pos">
+                        <option value="center center">Center (Default)</option>
+                        <option value="top center">Top Center</option>
+                        <option value="bottom center">Bottom Center</option>
+                        <option value="center left">Center Left</option>
+                        <option value="center right">Center Right</option>
+                        <option value="top left">Top Left</option>
+                        <option value="top right">Top Right</option>
+                      </select>
+                    </label>
+                    <label class="group-label" style="margin-top:6px;">Image Color Treatment
+                      <select name="playgroundHeroColorMode" id="hero-playground-color">
+                        <option value="original">🎨 Original Full Color</option>
+                        <option value="gray">🖤 Classic Grayed (Monochrome)</option>
+                        <option value="warm-gray">🎞 Warm Vintage Monotone</option>
+                      </select>
+                    </label>
+                  </div>
+                  <div class="hero-preview-box">
+                    <div class="hero-preview-thumb">
+                      <img id="hero-playground-prev" src="" alt="Playground Hero Preview" style="display:none;">
+                      <span class="prev-placeholder" id="hero-playground-prev-ph">No Image</span>
+                    </div>
+                    <small>Live Crop Preview</small>
+                    <div style="display:flex; gap:6px; margin-top:8px;">
+                      <button type="button" onclick="reuploadHeroImage('playground')" style="flex:1; padding:6px 8px; background:#111; color:#fff; border:0; border-radius:8px; font-size:11px; font-weight:700; cursor:pointer;">🔄 Change</button>
+                      <button type="button" onclick="deleteHeroImage('playground')" style="flex:1; padding:6px 8px; background:#fff1f1; color:#d32f2f; border:1px solid #ffcdd2; border-radius:8px; font-size:11px; font-weight:700; cursor:pointer;">🗑 Delete</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Journal Hero -->
+              <div class="hero-asset-card" data-hero="journal">
+                <div class="hero-asset-header">
+                  <strong>Journal / Blog Hero Image</strong>
+                  <span class="hero-badge">Blog Page</span>
+                </div>
+                <div class="hero-asset-body">
+                  <div class="hero-inputs">
+                    <label class="group-label">Image URL / Path
+                      <input name="heroJournalUrl" id="hero-journal-url" type="text" placeholder="https://... or /uploads/...">
+                    </label>
+                    <label class="group-label">Or Upload Image File
+                      <input name="heroJournalFile" id="hero-journal-file" type="file" accept="image/*">
+                    </label>
+                    <small class="recommended-size">💡 Recommended size: <b>1400 × 800 px</b> (16:9 landscape ratio, max 5 MB)</small>
+                    <label class="group-label" style="margin-top:6px;">Focal Repositioning (Crop Focus)
+                      <select name="journalHeroPosition" id="hero-journal-pos">
+                        <option value="center center">Center (Default)</option>
+                        <option value="top center">Top Center</option>
+                        <option value="bottom center">Bottom Center</option>
+                        <option value="center left">Center Left</option>
+                        <option value="center right">Center Right</option>
+                        <option value="top left">Top Left</option>
+                        <option value="top right">Top Right</option>
+                      </select>
+                    </label>
+                    <label class="group-label" style="margin-top:6px;">Image Color Treatment
+                      <select name="journalHeroColorMode" id="hero-journal-color">
+                        <option value="original">🎨 Original Full Color</option>
+                        <option value="gray">🖤 Classic Grayed (Monochrome)</option>
+                        <option value="warm-gray">🎞 Warm Vintage Monotone</option>
+                      </select>
+                    </label>
+                  </div>
+                  <div class="hero-preview-box">
+                    <div class="hero-preview-thumb">
+                      <img id="hero-journal-prev" src="" alt="Journal Hero Preview" style="display:none;">
+                      <span class="prev-placeholder" id="hero-journal-prev-ph">No Image</span>
+                    </div>
+                    <small>Live Crop Preview</small>
+                    <div style="display:flex; gap:6px; margin-top:8px;">
+                      <button type="button" onclick="reuploadHeroImage('journal')" style="flex:1; padding:6px 8px; background:#111; color:#fff; border:0; border-radius:8px; font-size:11px; font-weight:700; cursor:pointer;">🔄 Change</button>
+                      <button type="button" onclick="deleteHeroImage('journal')" style="flex:1; padding:6px 8px; background:#fff1f1; color:#d32f2f; border:1px solid #ffcdd2; border-radius:8px; font-size:11px; font-weight:700; cursor:pointer;">🗑 Delete</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div style="display:flex; align-items:center; gap:12px; margin-top:20px;">
+                <button type="submit" class="submit-publish-btn">Save Hero Visuals <b>↗</b></button>
+                <span class="status asset-status-msg" style="font-weight:700; font-size:13px; color:#2e7d32;"></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Subpanel 2: Achievements Studio -->
+          <div class="config-subpanel" id="subpanel-achievements">
+            <div class="spotlight-admin-section">
+              <h3 class="admin-section-heading">About Page — Showcase & Stage Presentations Studio</h3>
+              <p class="admin-section-sub">Add stage keynotes, app launches, UI awards, and achievements. You can add as many as you want (1 to 10+)!</p>
+
+              <div class="milestone-form-card" style="padding:24px;background:#fcfbf9;border:1px solid #e7e2dc;border-radius:18px;margin-bottom:28px;">
+                <h4 style="margin:0 0 16px;font-size:16px;font-weight:800;">Add / Edit Stage Milestone</h4>
+                <input type="hidden" id="ms-id-input" value="" />
+
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                  <label class="group-label">Category Badge
+                    <input id="ms-category-input" type="text" placeholder="e.g. 🎤 STAGE KEYNOTE PRESENTATION">
+                  </label>
+                  <label class="group-label">Year & Location
+                    <input id="ms-year-input" type="text" placeholder="e.g. 2025 · CHENNAI TECH SUMMIT">
+                  </label>
+                </div>
+
+                <label class="group-label">Milestone Title / Event Name
+                  <input id="ms-title-input" type="text" placeholder="e.g. Hanioo Launch Event & Stage Pitch">
+                </label>
+
+                <label class="group-label">Summary / Description
+                  <textarea id="ms-summary-input" rows="3" style="width:100%;padding:12px;border:1px solid #dfddda;border-radius:10px;font:inherit;" placeholder="Presented the product UX strategy, platform architecture, and real-time interpreter booking workflows..."></textarea>
+                </label>
+
+                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
+                  <label class="group-label">Spec 1 (Value)
+                    <input id="ms-spec1-val" type="text" placeholder="500+ Attendees">
+                  </label>
+                  <label class="group-label">Spec 2 (Value)
+                    <input id="ms-spec2-val" type="text" placeholder="Live Dispatch UX">
+                  </label>
+                  <label class="group-label">Spec 3 (Value)
+                    <input id="ms-spec3-val" type="text" placeholder="iOS & Web Apps">
+                  </label>
+                </div>
+
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px;">
+                  <label class="group-label">Button Action Text (1 Button)
+                    <input id="ms-btn-text" type="text" placeholder="Watch Keynote Deck">
+                  </label>
+                  <label class="group-label">Button Destination URL
+                    <input id="ms-btn-url" type="text" placeholder="https://behance.net/... or https://hanioo.com">
+                  </label>
+                </div>
+
+                <label class="group-label" style="margin-top:10px;">Photo Image URL
+                  <input id="ms-img-url" type="text" placeholder="https://... or /uploads/...">
+                </label>
+
+                <label class="group-label">Or Upload Photo File
+                  <input id="ms-img-file" type="file" accept="image/*">
+                </label>
+
+                <button type="button" id="save-milestone-btn" class="primary-btn" style="margin-top:16px;width:100%;padding:14px;background:var(--accent, #ff4e1b);color:#fff;border:0;border-radius:99px;font-weight:800;cursor:pointer;">
+                  ✨ Save Stage Milestone
+                </button>
+              </div>
+
+              <!-- List of Published Milestones -->
+              <h4 style="margin:0 0 16px;font-size:16px;font-weight:800;">Published Stage & Launch Milestones</h4>
+              <div id="milestones-admin-list" class="milestones-admin-list" style="display:flex;flex-direction:column;gap:12px;">
+                <!-- Dynamically rendered list -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Subpanel 3: Resume & Contact -->
+          <div class="config-subpanel" id="subpanel-resume">
+            <div class="resume-admin-section">
+              <h3 class="admin-section-heading">Resume PDF & Contact Config</h3>
+              <label class="group-label">Resume URL / File Path
+                <input name="resumeUrl" id="resume-url" type="text" placeholder="https://... or /uploads/...">
+              </label>
+              <label class="group-label">Upload Resume PDF
+                <input name="resumeFile" id="resume-file" type="file" accept="application/pdf">
+                <small class="recommended-size">💡 Recommended document: <b>Standard A4 PDF</b> (max 10 MB)</small>
+              </label>
+
+              <label class="group-label">Contact Email Address
+                <input name="email" id="contact-email" type="email" value="abikrishna15@gmail.com">
+              </label>
+            </div>
+          </div>
+
+          <!-- Subpanel 4: Social Profiles -->
+          <div class="config-subpanel" id="subpanel-social">
+            <div class="social-links-admin-section">
+              <p class="social-links-heading">Social Media Links</p>
+              <p class="social-links-hint">These links appear in the footer of your portfolio. Leave blank to hide.</p>
+              <label>
+                <span class="social-platform-icon">in</span> LinkedIn URL
+                <input name="socialLinkedIn" id="social-linkedin" type="text" placeholder="https://linkedin.com/in/yourname">
+              </label>
+              <label>
+                <span class="social-platform-icon">Be</span> Behance URL
+                <input name="socialBehance" id="social-behance" type="text" placeholder="https://behance.net/yourname">
+              </label>
+              <label>
+                <span class="social-platform-icon">📸</span> Instagram URL
+                <input name="socialInstagram" id="social-instagram" type="text" placeholder="https://instagram.com/yourname">
+              </label>
+              <label>
+                <span class="social-platform-icon">🎯</span> Dribbble URL
+                <input name="socialDribbble" id="social-dribbble" type="text" placeholder="https://dribbble.com/yourname">
+              </label>
+              <label>
+                <span class="social-platform-icon">𝕏</span> Twitter / X URL
+                <input name="socialTwitter" id="social-twitter" type="text" placeholder="https://twitter.com/yourname">
+              </label>
+              <label>
+                <span class="social-platform-icon">▶</span> YouTube URL
+                <input name="socialYoutube" id="social-youtube" type="text" placeholder="https://youtube.com/@yourname">
+              </label>
+            </div>
+          </div>
+
+          <!-- Subpanel 5: Impact Stats -->
+          <div class="config-subpanel" id="subpanel-stats">
+            <div class="stats-admin-section">
+              <h3 class="admin-section-heading">Homepage — Impact Metrics Ticker (5 Stats)</h3>
+              <p class="admin-section-sub">Update values and labels for the 5 key impact metric counters shown on your homepage.</p>
+
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:24px;background:#fcfbf9;padding:18px;border-radius:16px;border:1px solid #e7e2dc;">
+                <label class="group-label">Stat 1 Value
+                  <input name="homeStat1Val" id="home-stat1-val-input" type="text" placeholder="4.5+">
+                </label>
+                <label class="group-label">Stat 1 Label
+                  <input name="homeStat1Lbl" id="home-stat1-lbl-input" type="text" placeholder="Years Experience">
+                </label>
+
+                <label class="group-label">Stat 2 Value
+                  <input name="homeStat2Val" id="home-stat2-val-input" type="text" placeholder="1200+">
+                </label>
+                <label class="group-label">Stat 2 Label
+                  <input name="homeStat2Lbl" id="home-stat2-lbl-input" type="text" placeholder="UI Screens Designed">
+                </label>
+
+                <label class="group-label">Stat 3 Value
+                  <input name="homeStat3Val" id="home-stat3-val-input" type="text" placeholder="20+">
+                </label>
+                <label class="group-label">Stat 3 Label
+                  <input name="homeStat3Lbl" id="home-stat3-lbl-input" type="text" placeholder="Digital Products & Brands">
+                </label>
+
+                <label class="group-label">Stat 4 Value
+                  <input name="homeStat4Val" id="home-stat4-val-input" type="text" placeholder="5+">
+                </label>
+                <label class="group-label">Stat 4 Label
+                  <input name="homeStat4Lbl" id="home-stat4-lbl-input" type="text" placeholder="Products Concept to Launch">
+                </label>
+
+                <label class="group-label">Stat 5 Value
+                  <input name="homeStat5Val" id="home-stat5-val-input" type="text" placeholder="15+">
+                </label>
+                <label class="group-label">Stat 5 Label
+                  <input name="homeStat5Lbl" id="home-stat5-lbl-input" type="text" placeholder="Clients & Business Solutions">
+                </label>
+              </div>
+
+              <h3 class="admin-section-heading">About Page — Impact Stats (Design Beyond Screens)</h3>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;background:#fcfbf9;padding:18px;border-radius:16px;border:1px solid #e7e2dc;">
+                <label class="group-label">Years in Design
+                  <input name="statYears" id="stat-years-input" type="text" placeholder="4.5+">
+                </label>
+                <label class="group-label">Design Disciplines
+                  <input name="statDisciplines" id="stat-disciplines-input" type="text" placeholder="3">
+                </label>
+                <label class="group-label">Products Shaped End-to-End
+                  <input name="statProducts" id="stat-products-input" type="text" placeholder="1">
+                </label>
+                <label class="group-label">Iterations Metric
+                  <input name="statIterations" id="stat-iterations-input" type="text" placeholder="∞">
+                </label>
+              </div>
+
+              <div style="display:flex; align-items:center; gap:12px; margin-top:20px;">
+                <button type="submit" class="submit-publish-btn">Save Impact Metrics <b>↗</b></button>
+                <span class="status asset-status-msg" id="asset-status" style="font-weight:700; font-size:13px; color:#2e7d32;"></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Subpanel: Trusted Brands & Ticker Manager -->
+          <div class="config-subpanel" id="subpanel-brands">
+            <div class="spotlight-admin-section">
+              <h3 class="admin-section-heading">Trusted Brand Logos & Homepage Ticker</h3>
+              <p class="admin-section-sub">Add or upload company logos featured in the "Trusted By" marquee ticker on your homepage.</p>
+
+              <div style="margin-top: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <!-- Brand Form -->
+                <div style="background:#fff; padding: 20px; border-radius: 16px; border: 1px solid #e9e4df;">
+                  <input type="hidden" id="brand-editing-id" value="">
+                  <div class="form-group">
+                    <label class="group-label">Company / Brand Name *</label>
+                    <input id="brand-name" type="text" placeholder="e.g. Honey Universal or G-FORCE">
+                  </div>
+
+                  <div class="form-group">
+                    <label class="group-label">Logo Image URL (Optional)</label>
+                    <input id="brand-logo-url" type="text" placeholder="https://... or /uploads/...">
+                  </div>
+
+                  <div class="form-group">
+                    <label class="group-label">Or Upload Logo Image File</label>
+                    <input type="file" accept="image/*" id="brand-logo-file">
+                    <small class="recommended-size">💡 Recommended format: <b>PNG or SVG with transparent background</b> (max 2 MB)</small>
+                  </div>
+
+                  <div class="form-button-row" style="display:flex;gap:10px;margin-top:16px;">
+                    <button type="button" id="brand-submit-btn" class="submit-publish-btn" style="padding:12px 20px;font-size:13px;">Save Brand Logo <b>↗</b></button>
+                    <button type="button" id="brand-cancel-btn" style="display:none;padding:12px 18px;background:#f0ebe5;color:#333;border:0;border-radius:12px;font:700 12px 'Manrope', sans-serif;cursor:pointer;">Cancel</button>
+                  </div>
+                  <small class="status" id="brand-status"></small>
+                </div>
+
+                <!-- Published Brands List -->
+                <div style="background:#faf8f5; padding: 20px; border-radius: 16px; border: 1px solid #e9e4df;">
+                  <h4 style="margin:0 0 4px; font-weight:800; font-size:14px;">Published Brand Logos</h4>
+                  <p style="margin:0 0 14px; color:#666; font-size:12px;">Logos dynamically displayed in homepage ticker.</p>
+                  <div id="brands-admin-list" style="display:flex; flex-direction:column; gap:8px;"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Subpanel: Playground Filter Topics Studio -->
+          <div class="config-subpanel" id="subpanel-topics">
+            <div class="spotlight-admin-section">
+              <h3 class="admin-section-heading">Playground Page — Filter Topics & Categories</h3>
+              <p class="admin-section-sub">Add, remove, and manage the filter pill buttons displayed on the Playground page. Items in your Playground showcase can be tagged with these topics.</p>
+
+              <div class="topic-management-card">
+                <div class="topic-mgr-top">
+                  <h4>Active Playground Topics (<span id="pg-topics-count">0</span>)</h4>
+                  <button type="button" id="pg-topics-reset-btn" class="secondary-mini-btn">↺ Reset to Defaults</button>
+                </div>
+                <p class="topic-mgr-desc">These topics appear as filter buttons in the interactive experiments switcher on <b>playground.html</b>.</p>
+
+                <div id="assets-pg-topics-list" class="admin-topics-grid"></div>
+
+                <div class="topic-add-form-group">
+                  <input type="text" id="assets-new-pg-topic" placeholder="Enter new topic name (e.g. Mobile UX, Generative 3D, Design Systems)..." class="topic-main-input" />
+                  <button type="button" id="assets-add-pg-topic-btn" class="topic-main-add-btn">
+                    ✨ Add Topic
+                  </button>
+                </div>
+                <small class="topic-status-msg" id="pg-topic-status-msg"></small>
+              </div>
+            </div>
+          </div>
+
+          <!-- Subpanel: Journal Filter Topics Studio -->
+          <div class="config-subpanel" id="subpanel-journal-topics">
+            <div class="spotlight-admin-section">
+              <h3 class="admin-section-heading">Journal Page — Filter Topics & Categories</h3>
+              <p class="admin-section-sub">Add, remove, and manage the category filter pill buttons displayed on the Journal & Articles page (<b>blog.html</b>). Articles can be tagged with these topics.</p>
+
+              <div class="topic-management-card">
+                <div class="topic-mgr-top">
+                  <h4>Active Journal Topics (<span id="journal-topics-count">0</span>)</h4>
+                  <button type="button" id="journal-topics-reset-btn" class="secondary-mini-btn">↺ Reset to Defaults</button>
+                </div>
+                <p class="topic-mgr-desc">These topics appear as filter buttons in the article header bar on <b>blog.html</b>.</p>
+
+                <div id="assets-journal-topics-list" class="admin-topics-grid"></div>
+
+                <div class="topic-add-form-group">
+                  <input type="text" id="assets-new-journal-topic" placeholder="Enter new journal topic (e.g. Design Systems, AI Strategy, Leadership)..." class="topic-main-input" />
+                  <button type="button" id="assets-add-journal-topic-btn" class="topic-main-add-btn">
+                    ✨ Add Topic
+                  </button>
+                </div>
+                <small class="topic-status-msg" id="journal-topic-status-msg"></small>
+              </div>
+            </div>
+          </div>
+        </form>
+
+        <section class="asset-note">
+          <p>✦ LIVE CONTENT</p>
+          <h2>One place for<br /><em>every asset.</em></h2>
+          <p>Use an image URL for externally hosted media, or upload files directly for your local portfolio preview.
+          </p>
+          <ul>
+            <li>Home & About hero portraits</li>
+            <li>Resume PDF download link</li>
+            <li>Work, Playground & Journal hero imagery</li>
+            <li>Contact email and footer links</li>
+          </ul>
+        </section>
+      </div>
+    </section>
+  </main>
+
+  <script src="admin.js?v=22"></script>
+</body>
+
+</html>
