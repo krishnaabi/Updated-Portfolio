@@ -4,10 +4,6 @@ if ('scrollRestoration' in history) {
 }
 window.scrollTo(0, 0);
 
-window.addEventListener('beforeunload', () => {
-  window.scrollTo(0, 0);
-});
-
 document.addEventListener('DOMContentLoaded', () => {
   if (!window.location.hash) {
     window.scrollTo(0, 0);

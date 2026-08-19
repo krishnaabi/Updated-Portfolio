@@ -477,10 +477,28 @@
       });
     });
 
-    document.querySelectorAll('a[href^="mailto:"], .contact-links a').forEach(link => {
-      if (data.email && (link.href.startsWith('mailto:') || /email/i.test(link.textContent))) {
+    document.querySelectorAll('a[href^="mailto:"], #footer-email-link, .contact-links a').forEach(link => {
+      if (data.email && (link.href.startsWith('mailto:') || /email/i.test(link.textContent) || link.id === 'footer-email-link')) {
         link.href = `mailto:${data.email}`;
-        if (/email/i.test(link.textContent)) link.innerHTML = `<span>✉</span>${data.email}`;
+        link.innerHTML = `<span>✉</span>${data.email}`;
+      }
+      if (!link._hasCopyHandler) {
+        link._hasCopyHandler = true;
+        link.addEventListener('click', () => {
+          const rawEmail = (data && data.email) ? data.email : (link.textContent.replace(/[^a-zA-Z0-9@._-]/g, '').trim());
+          if (rawEmail && rawEmail.includes('@')) {
+            try {
+              navigator.clipboard.writeText(rawEmail);
+              const origHtml = link.innerHTML;
+              link.classList.add('copied-active');
+              link.innerHTML = `<span>✓</span>Copied to clipboard!`;
+              setTimeout(() => {
+                link.innerHTML = origHtml;
+                link.classList.remove('copied-active');
+              }, 2400);
+            } catch (err) {}
+          }
+        });
       }
     });
     document.querySelectorAll('.resume, a[href*="resume"], a[href*="cv"], a[href*="download"]').forEach(link => {

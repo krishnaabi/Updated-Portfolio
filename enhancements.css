@@ -1866,6 +1866,22 @@ footer h2 {
   width: 28px !important;
   height: 28px !important;
   font-size: 13px;
+  transition: all 0.25s ease !important;
+}
+
+.contact-links a {
+  transition: all 0.25s ease !important;
+}
+
+.contact-links a.copied-active {
+  color: #10b981 !important;
+}
+
+.contact-links a.copied-active span {
+  background: #10b981 !important;
+  color: #ffffff !important;
+  border-color: #10b981 !important;
+  transform: scale(1.1);
 }
 
 /* ═══════════════════════════════════════

@@ -2,11 +2,12 @@
 <html lang="en" class="ak-intro-active">
 
 <head>
-  <script>try{if(sessionStorage.getItem('ak_intro_seen_v1')==='true'){document.documentElement.classList.remove('ak-intro-active');}}catch(e){}</script>
+  <script>try { if (sessionStorage.getItem('ak_intro_seen_v1') === 'true') { document.documentElement.classList.remove('ak-intro-active'); } } catch (e) { }</script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Abi Krishna — Product Designer crafting intuitive experiences that solve real business problems." />
-  <title>Abi Krishna — Product Designer</title>
+  <meta name="description"
+    content="Abi Krishna - Product Designer crafting intuitive experiences that solve real business problems." />
+  <title>Abi Krishna - Product Designer</title>
   <link rel="icon" type="image/svg+xml" href="assets/ak-logo.svg" />
   <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png" />
   <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png" />
@@ -40,27 +41,149 @@
   </div>
   <!-- CRITICAL: Inline carousel & marquee styles — cannot be cached, always wins -->
   <style>
-    .featured-carousel-container { margin-top: 28px; position: relative; width: 100%; }
-    .featured-carousel-wrapper   { overflow: hidden !important; border-radius: 20px; position: relative; width: 100%; }
-    .featured-carousel-track     { display: flex !important; flex-direction: row !important; flex-wrap: nowrap !important; width: 100% !important; gap: 0 !important; margin: 0 !important; padding: 0 !important; transition: transform 0.72s cubic-bezier(0.22,1,0.36,1); will-change: transform; }
-    .featured-carousel-track > .fc-slide { min-width: 100% !important; width: 100% !important; max-width: 100% !important; flex: 0 0 100% !important; margin: 0 !important; box-sizing: border-box !important; display: grid; grid-template-columns: 1fr 1fr; min-height: 440px; border-radius: 20px; overflow: hidden; position: relative; background: #0f0e0d; }
-    .carousel-controls { display: flex; align-items: center; justify-content: center; gap: 16px; margin-top: 20px; padding: 0; position: static !important; }
+    .featured-carousel-container {
+      margin-top: 28px;
+      position: relative;
+      width: 100%;
+    }
 
-    .trusted-marquee-wrapper { position: relative !important; width: 100% !important; max-width: 100% !important; overflow: hidden !important; padding: 10px 0 !important; mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%) !important; -webkit-mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%) !important; }
-    .trusted-marquee-track   { display: flex !important; flex-direction: row !important; flex-wrap: nowrap !important; align-items: center !important; gap: 20px !important; width: max-content !important; animation: trustedMarquee 28s linear infinite !important; will-change: transform; }
-    .trusted-marquee-wrapper:hover .trusted-marquee-track { animation-play-state: paused !important; }
-    .trusted-brand-card      { flex: 0 0 auto !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; white-space: nowrap !important; padding: 14px 28px !important; background: #ffffff !important; border: 1px solid #e9e4df !important; border-radius: 16px !important; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03) !important; height: 58px !important; min-width: 150px !important; transition: all 0.35s cubic-bezier(0.22, 1, 0.36, 1) !important; cursor: pointer !important; }
-    .trusted-brand-card:hover { transform: translateY(-4px) scale(1.04) !important; border-color: var(--accent, #ff4e1b) !important; box-shadow: 0 12px 28px rgba(255, 78, 27, 0.15) !important; }
-    .trusted-brand-card img.brand-logo-img { height: 32px !important; max-width: 140px !important; object-fit: contain !important; filter: grayscale(100%) opacity(0.85) !important; transition: filter 0.3s ease !important; }
-    .trusted-brand-card:hover img.brand-logo-img { filter: grayscale(0%) opacity(1) !important; }
-    .brand-text-badge        { display: inline-flex !important; align-items: center !important; gap: 8px !important; font-family: 'Manrope', sans-serif !important; font-weight: 800 !important; font-size: 15px !important; letter-spacing: -0.4px !important; color: #1e1b18 !important; white-space: nowrap !important; }
-    .brand-text-badge .brand-icon { color: var(--accent, #ff4e1b) !important; font-size: 12px !important; }
-    @keyframes trustedMarquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+    .featured-carousel-wrapper {
+      overflow: hidden !important;
+      border-radius: 20px;
+      position: relative;
+      width: 100%;
+    }
+
+    .featured-carousel-track {
+      display: flex !important;
+      flex-direction: row !important;
+      flex-wrap: nowrap !important;
+      width: 100% !important;
+      gap: 0 !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      transition: transform 0.72s cubic-bezier(0.22, 1, 0.36, 1);
+      will-change: transform;
+    }
+
+    .featured-carousel-track>.fc-slide {
+      min-width: 100% !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      flex: 0 0 100% !important;
+      margin: 0 !important;
+      box-sizing: border-box !important;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      min-height: 440px;
+      border-radius: 20px;
+      overflow: hidden;
+      position: relative;
+      background: #0f0e0d;
+    }
+
+    .carousel-controls {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      margin-top: 20px;
+      padding: 0;
+      position: static !important;
+    }
+
+    .trusted-marquee-wrapper {
+      position: relative !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      overflow: hidden !important;
+      padding: 10px 0 !important;
+      mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%) !important;
+      -webkit-mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%) !important;
+    }
+
+    .trusted-marquee-track {
+      display: flex !important;
+      flex-direction: row !important;
+      flex-wrap: nowrap !important;
+      align-items: center !important;
+      gap: 20px !important;
+      width: max-content !important;
+      animation: trustedMarquee 28s linear infinite !important;
+      will-change: transform;
+    }
+
+    .trusted-marquee-wrapper:hover .trusted-marquee-track {
+      animation-play-state: paused !important;
+    }
+
+    .trusted-brand-card {
+      flex: 0 0 auto !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      white-space: nowrap !important;
+      padding: 14px 28px !important;
+      background: #ffffff !important;
+      border: 1px solid #e9e4df !important;
+      border-radius: 16px !important;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03) !important;
+      height: 58px !important;
+      min-width: 150px !important;
+      transition: all 0.35s cubic-bezier(0.22, 1, 0.36, 1) !important;
+      cursor: pointer !important;
+    }
+
+    .trusted-brand-card:hover {
+      transform: translateY(-4px) scale(1.04) !important;
+      border-color: var(--accent, #ff4e1b) !important;
+      box-shadow: 0 12px 28px rgba(255, 78, 27, 0.15) !important;
+    }
+
+    .trusted-brand-card img.brand-logo-img {
+      height: 32px !important;
+      max-width: 140px !important;
+      object-fit: contain !important;
+      filter: grayscale(100%) opacity(0.85) !important;
+      transition: filter 0.3s ease !important;
+    }
+
+    .trusted-brand-card:hover img.brand-logo-img {
+      filter: grayscale(0%) opacity(1) !important;
+    }
+
+    .brand-text-badge {
+      display: inline-flex !important;
+      align-items: center !important;
+      gap: 8px !important;
+      font-family: 'Manrope', sans-serif !important;
+      font-weight: 800 !important;
+      font-size: 15px !important;
+      letter-spacing: -0.4px !important;
+      color: #1e1b18 !important;
+      white-space: nowrap !important;
+    }
+
+    .brand-text-badge .brand-icon {
+      color: var(--accent, #ff4e1b) !important;
+      font-size: 12px !important;
+    }
+
+    @keyframes trustedMarquee {
+      0% {
+        transform: translateX(0);
+      }
+
+      100% {
+        transform: translateX(-50%);
+      }
+    }
   </style>
 
   <div class="grain"></div>
   <header class="site-header">
-    <a class="logo" href="index.html" aria-label="Abi Krishna home"><img src="assets/ak-logo-exact.png" alt="AK." class="brand-logo-img"></a>
+    <a class="logo" href="index.html" aria-label="Abi Krishna home"><img src="assets/ak-logo-exact.png" alt="AK."
+        class="brand-logo-img"></a>
     <nav aria-label="Main navigation">
       <a href="work.html">Work</a>
       <a href="about.html">About</a>
@@ -85,9 +208,10 @@
       <div class="hero-copy reveal">
         <p class="eyebrow">Hello, I’m <span>Abi Krishna ✦</span></p>
         <h1>Product Designer crafting intuitive experiences that solve real <em>business problems.</em></h1>
-        <p class="intro">Product Designer with 4.5+ years of experience creating user-focused products, scalable design systems, and digital brands. I help startups and businesses transform ideas into meaningful experiences.</p>
+        <p class="intro">Product Designer with 4.5+ years of experience creating user-focused products, scalable design
+          systems, and digital brands. I help startups and businesses transform ideas into meaningful experiences.</p>
         <a class="text-cta" href="work.html">Explore Case Studies <b>↗</b></a>
-        
+
         <div class="specialized-in-bar reveal delay-1">
           <span class="spec-label">SPECIALIZED IN</span>
           <div class="spec-pills">
@@ -115,11 +239,21 @@
       <p class="label trusted-label">✦ TRUSTED BY LEADING BRANDS & STARTUPS</p>
       <div class="trusted-marquee-wrapper">
         <div class="trusted-marquee-track">
-          <div class="trusted-brand-card"><div class="brand-text-badge"><span class="brand-icon">✦</span> <span>Honey Universal</span></div></div>
-          <div class="trusted-brand-card"><div class="brand-text-badge"><span class="brand-icon">✦</span> <span>Haniooo</span></div></div>
-          <div class="trusted-brand-card"><div class="brand-text-badge"><span class="brand-icon">✦</span> <span>G-FORCE</span></div></div>
-          <div class="trusted-brand-card"><div class="brand-text-badge"><span class="brand-icon">✦</span> <span>STUAK</span></div></div>
-          <div class="trusted-brand-card"><div class="brand-text-badge"><span class="brand-icon">✦</span> <span>FLUBN</span></div></div>
+          <div class="trusted-brand-card">
+            <div class="brand-text-badge"><span class="brand-icon">✦</span> <span>Honey Universal</span></div>
+          </div>
+          <div class="trusted-brand-card">
+            <div class="brand-text-badge"><span class="brand-icon">✦</span> <span>Haniooo</span></div>
+          </div>
+          <div class="trusted-brand-card">
+            <div class="brand-text-badge"><span class="brand-icon">✦</span> <span>G-FORCE</span></div>
+          </div>
+          <div class="trusted-brand-card">
+            <div class="brand-text-badge"><span class="brand-icon">✦</span> <span>STUAK</span></div>
+          </div>
+          <div class="trusted-brand-card">
+            <div class="brand-text-badge"><span class="brand-icon">✦</span> <span>FLUBN</span></div>
+          </div>
         </div>
       </div>
     </section>
@@ -127,7 +261,8 @@
     <section class="work section" id="work">
       <div class="section-heading reveal">
         <p class="label">✦ FEATURED WORK</p>
-        <h2>Projects that solved problems<br />and created <em>measurable impact.</em></h2><a href="work.html" class="view-all">All projects
+        <h2>Projects that solved problems<br />and created <em>measurable impact.</em></h2><a href="work.html"
+          class="view-all">All projects
           <b>↗</b></a>
       </div>
       <div class="featured-carousel-container reveal">
@@ -159,7 +294,11 @@
         <div><i>⌕</i><b>Research</b><span>Understand users, business<br />goals & challenges</span></div>
         <div><i>◎</i><b>Define</b><span>Identify opportunities &<br />user solutions</span></div>
         <div><i>✦</i><b>Ideate</b><span>Generate ideas, user<br />flows & concepts</span></div>
-        <div><i><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg></i><b>Design</b><span>Intuitive interfaces &<br />scalable systems</span></div>
+        <div><i><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
+              <path d="m15 5 4 4" />
+            </svg></i><b>Design</b><span>Intuitive interfaces &<br />scalable systems</span></div>
         <div><i>&lt;/&gt;</i><b>Prototype</b><span>Interactive prototypes<br />& usability testing</span></div>
         <div><i class="accent">↗</i><b>Launch</b><span>Dev collaboration &<br />iterative feedback</span></div>
       </div>
@@ -179,15 +318,17 @@
       <article class="about-copy reveal delay-2">
         <p class="label">✦ ABOUT ME</p>
         <h2>I design digital products that balance user needs with <em>business goals.</em></h2>
-        <p>Over the last 4.5 years, I've worked across product design, UI/UX, branding, and digital experiences. From research and wireframes to polished interfaces and developer handoff, I enjoy building products that are simple, scalable, and meaningful.</p><a
-          class="text-cta" href="about.html">My Journey <b>↗</b></a>
+        <p>Over the last 4.5 years, I've worked across product design, UI/UX, branding, and digital experiences. From
+          research and wireframes to polished interfaces and developer handoff, I enjoy building products that are
+          simple, scalable, and meaningful.</p><a class="text-cta" href="about.html">My Journey <b>↗</b></a>
       </article>
     </section>
 
     <section class="journal section" id="journal">
       <div class="section-heading reveal">
         <p class="label">✦ FROM THE JOURNAL</p>
-        <h2>Design insights, product thinking,<br />and <em>lessons from real projects.</em></h2><a href="blog.html" class="view-all">All articles
+        <h2>Design insights, product thinking,<br />and <em>lessons from real projects.</em></h2><a href="blog.html"
+          class="view-all">All articles
           <b>↗</b></a>
       </div>
       <div class="article-grid"></div>
@@ -197,7 +338,8 @@
     <div class="footer-intro">
       <p class="label">✦ LET'S CONNECT</p>
       <h2>Let's build your<br />next <em>digital product.</em></h2>
-      <p class="footer-tagline">Whether you're building a startup, scaling a product, or improving an existing experience, I'd love to help turn your ideas into impactful digital products.</p>
+      <p class="footer-tagline">Whether you're building a startup, scaling a product, or improving an existing
+        experience, I'd love to help turn your ideas into impactful digital products.</p>
       <p class="footer-location"><span class="location-dot"></span> Based in Chennai, India 🇮🇳</p>
 
       <div class="available-for-box">
@@ -229,7 +371,8 @@
     <a class="big-arrow" href="#home" aria-label="Back to top">↗</a>
     <div class="footer-bottom">
       <div class="footer-bottom-left">
-        <a class="logo" href="#home" aria-label="Abi Krishna home"><img src="assets/ak-logo-exact.png" alt="AK." class="brand-logo-img"></a>
+        <a class="logo" href="#home" aria-label="Abi Krishna home"><img src="assets/ak-logo-exact.png" alt="AK."
+            class="brand-logo-img"></a>
         <div class="footer-meta">
           <span class="footer-copy">© 2026 Abi Krishna. All rights reserved.</span>
           <span class="footer-craft">Crafted with intention <b>♥</b></span>
