@@ -103,7 +103,6 @@ export default {
           description: incoming.description || '',
           content_body: incoming.contentBody || '',
           destination_url: incoming.url || '',
-          product_url: incoming.productUrl || '',
           image_url: incoming.image || '',
           featured: Boolean(incoming.featured),
           tags: incoming.tags || '',
@@ -158,7 +157,6 @@ export default {
         if (incoming.description !== undefined) updatePayload.description = incoming.description;
         if (incoming.contentBody !== undefined) updatePayload.content_body = incoming.contentBody;
         if (incoming.url !== undefined) updatePayload.destination_url = incoming.url;
-        if (incoming.productUrl !== undefined) updatePayload.product_url = incoming.productUrl;
         if (incoming.image !== undefined) updatePayload.image_url = incoming.image;
         if (incoming.featured !== undefined) updatePayload.featured = Boolean(incoming.featured);
         if (incoming.tags !== undefined) updatePayload.tags = incoming.tags;

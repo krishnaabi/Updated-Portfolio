@@ -68,7 +68,6 @@ export async function onRequest(context) {
         description: incoming.description || '',
         content_body: incoming.contentBody || '',
         destination_url: incoming.url || '',
-        product_url: incoming.productUrl || '',
         image_url: incoming.image || '',
         featured: Boolean(incoming.featured),
         tags: incoming.tags || '',

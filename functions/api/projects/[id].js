@@ -26,7 +26,6 @@ export async function onRequest(context) {
       if (incoming.description !== undefined) payload.description = incoming.description;
       if (incoming.contentBody !== undefined) payload.content_body = incoming.contentBody;
       if (incoming.url !== undefined) payload.destination_url = incoming.url;
-      if (incoming.productUrl !== undefined) payload.product_url = incoming.productUrl;
       if (incoming.image !== undefined) payload.image_url = incoming.image;
       if (incoming.featured !== undefined) payload.featured = Boolean(incoming.featured);
       if (incoming.tags !== undefined) payload.tags = incoming.tags;
