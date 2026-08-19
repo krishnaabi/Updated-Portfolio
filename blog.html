@@ -1,204 +1,231 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-    <title>Journal & Insights — Abikrishna T.</title>
-    <link rel="icon" type="image/svg+xml" href="assets/ak-logo.svg" />
-    <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png" />
-    <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png" />
-    <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500;600&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="styles.css" />
-    <link rel="stylesheet" href="enhancements.css?v=61" />
-    <link rel="stylesheet" href="responsive.css?v=5" />
-    <link rel="stylesheet" href="header-uniform.css?v=5" />
-    <link rel="stylesheet" href="home-brand.css?v=3" />
-    <link rel="stylesheet" href="cms-content.css?v=3" />
-    <link rel="stylesheet" href="experience.css?v=1" />
-    <link rel="stylesheet" href="process-enhance.css?v=1" />
-    <link rel="stylesheet" href="blog.css?v=6" />
-  </head>
-  <body class="blog-page">
-    <header class="site-header">
-      <a class="logo" href="index.html" aria-label="Abi Krishna home"><img src="assets/ak-logo-exact.png" alt="AK." class="brand-logo-img"></a>
-      <nav aria-label="Main navigation">
-        <a href="work.html">Work</a>
-        <a href="about.html">About</a>
-        <a href="playground.html">Playground</a>
-        <a class="selected" href="blog.html">Journal</a>
-      </nav>
-      <div class="header-actions">
-        <a class="talk-link" href="#contact">Let's Talk <b>↗</b></a>
-        <button class="menu-button" aria-label="Open menu"><span></span><span></span></button>
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>Journal & Insights - Abikrishna T.</title>
+  <link rel="icon" type="image/svg+xml" href="assets/ak-logo.svg" />
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500;600&family=Manrope:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="enhancements.css?v=61" />
+  <link rel="stylesheet" href="responsive.css?v=5" />
+  <link rel="stylesheet" href="header-uniform.css?v=5" />
+  <link rel="stylesheet" href="home-brand.css?v=3" />
+  <link rel="stylesheet" href="cms-content.css?v=3" />
+  <link rel="stylesheet" href="experience.css?v=1" />
+  <link rel="stylesheet" href="process-enhance.css?v=1" />
+  <link rel="stylesheet" href="blog.css?v=6" />
+</head>
+
+<body class="blog-page">
+  <header class="site-header">
+    <a class="logo" href="index.html" aria-label="Abi Krishna home"><img src="assets/ak-logo-exact.png" alt="AK."
+        class="brand-logo-img"></a>
+    <nav aria-label="Main navigation">
+      <a href="work.html">Work</a>
+      <a href="about.html">About</a>
+      <a href="playground.html">Playground</a>
+      <a class="selected" href="blog.html">Journal</a>
+    </nav>
+    <div class="header-actions">
+      <a class="talk-link" href="#contact">Let's Talk <b>↗</b></a>
+      <button class="menu-button" aria-label="Open menu"><span></span><span></span></button>
+    </div>
+  </header>
+
+  <main class="blog-main">
+    <!-- Hero Section -->
+    <section class="journal-hero">
+      <div class="journal-hero-content reveal">
+        <p class="label">✦ JOURNAL & INSIGHTS</p>
+        <h1>Thoughts on product design, strategy & <em>craft.</em></h1>
+        <p class="journal-intro">Writing about design systems, user psychology, and product decisions built over 4.5+
+          years of crafting digital experiences.</p>
+
+        <div class="journal-search-bar">
+          <i>⌕</i>
+          <input type="text" id="journal-search" placeholder="Search articles by title or keyword..."
+            aria-label="Search articles" />
+          <button type="button" id="journal-search-clear" class="search-clear-btn" style="display:none;"
+            aria-label="Clear search">✕</button>
+        </div>
       </div>
-    </header>
+      <div class="journal-hero-visual" id="journal-hero-visual">
+        <img src="" alt="Journal Hero" id="journal-hero-img" style="display:none;" />
+      </div>
+    </section>
 
-    <main class="blog-main">
-      <!-- Hero Section -->
-      <section class="journal-hero">
-        <div class="journal-hero-content reveal">
-          <p class="label">✦ JOURNAL & INSIGHTS</p>
-          <h1>Thoughts on product design, strategy & <em>craft.</em></h1>
-          <p class="journal-intro">Writing about design systems, user psychology, and product decisions built over 4.5+ years of crafting digital experiences.</p>
-          
-          <div class="journal-search-bar">
-            <i>⌕</i>
-            <input type="text" id="journal-search" placeholder="Search articles by title or keyword..." aria-label="Search articles" />
-            <button type="button" id="journal-search-clear" class="search-clear-btn" style="display:none;" aria-label="Clear search">✕</button>
-          </div>
+
+    <!-- Featured Spotlight Article -->
+    <section class="featured-spotlight reveal delay-1" id="featured-spotlight">
+      <!-- Rendered dynamically -->
+    </section>
+
+    <!-- Main Article Collection Section -->
+    <section class="article-collection">
+      <div class="collection-header">
+        <div class="blog-filters" id="blog-filters">
+          <button class="filter-pill active" data-category="all">All Articles</button>
+          <button class="filter-pill" data-category="UX / UI Design">UX / UI Design</button>
+          <button class="filter-pill" data-category="Product Design">Product Design</button>
+          <button class="filter-pill" data-category="Process">Process</button>
+          <button class="filter-pill" data-category="Career">Career</button>
+          <button class="filter-pill" data-category="Tools">Tools</button>
+          <button class="filter-pill" data-category="Opinion">Opinion</button>
         </div>
-        <div class="journal-hero-visual" id="journal-hero-visual">
-          <img src="" alt="Journal Hero" id="journal-hero-img" style="display:none;" />
+        <div class="collection-sort">
+          <span>Sort by</span>
+          <select id="journal-sort" class="sort-select">
+            <option value="latest">Latest Published</option>
+            <option value="oldest">Oldest First</option>
+            <option value="title">Title (A-Z)</option>
+          </select>
         </div>
-      </section>
+      </div>
 
+      <div class="journal-grid" id="blog-grid-container">
+        <!-- Article grid dynamically populated -->
+      </div>
 
-      <!-- Featured Spotlight Article -->
-      <section class="featured-spotlight reveal delay-1" id="featured-spotlight">
-        <!-- Rendered dynamically -->
-      </section>
+      <div class="journal-pagination" id="journal-pagination">
+        <!-- Dynamic pagination buttons -->
+      </div>
 
-      <!-- Main Article Collection Section -->
-      <section class="article-collection">
-        <div class="collection-header">
-          <div class="blog-filters" id="blog-filters">
-            <button class="filter-pill active" data-category="all">All Articles</button>
-            <button class="filter-pill" data-category="UX / UI Design">UX / UI Design</button>
-            <button class="filter-pill" data-category="Product Design">Product Design</button>
-            <button class="filter-pill" data-category="Process">Process</button>
-            <button class="filter-pill" data-category="Career">Career</button>
-            <button class="filter-pill" data-category="Tools">Tools</button>
-            <button class="filter-pill" data-category="Opinion">Opinion</button>
-          </div>
-          <div class="collection-sort">
-            <span>Sort by</span>
-            <select id="journal-sort" class="sort-select">
-              <option value="latest">Latest Published</option>
-              <option value="oldest">Oldest First</option>
-              <option value="title">Title (A-Z)</option>
-            </select>
-          </div>
+      <div class="journal-empty-state" id="no-results" style="display:none;">
+        <div class="empty-card">
+          <span class="empty-icon">✦</span>
+          <h3>No articles found matching your search</h3>
+          <p>Try searching for a different keyword or select another category filter above.</p>
+          <button id="reset-search-btn" class="reset-btn">Reset All Filters</button>
         </div>
+      </div>
+    </section>
 
-        <div class="journal-grid" id="blog-grid-container">
-          <!-- Article grid dynamically populated -->
-        </div>
-
-        <div class="journal-pagination" id="journal-pagination">
-          <!-- Dynamic pagination buttons -->
-        </div>
-
-        <div class="journal-empty-state" id="no-results" style="display:none;">
-          <div class="empty-card">
-            <span class="empty-icon">✦</span>
-            <h3>No articles found matching your search</h3>
-            <p>Try searching for a different keyword or select another category filter above.</p>
-            <button id="reset-search-btn" class="reset-btn">Reset All Filters</button>
-          </div>
-        </div>
-      </section>
-
-      <!-- Trending Multi-Philosophy Kinetic Card (Linear / Cosmos Style) -->
-      <section class="journal-quote-banner reveal">
-        <div class="glow-border-layer"></div>
-        <div class="quote-banner-container">
-          <div class="quote-header-tag">
-            <div class="philosophy-tabs" id="philosophy-tabs">
-              <button class="philosophy-tab active" data-index="0">01 // JOBS</button>
-              <button class="philosophy-tab" data-index="1">02 // RAMS</button>
-              <button class="philosophy-tab" data-index="2">03 // IVE</button>
-              <button class="philosophy-tab" data-index="3">04 // VIGNELLI</button>
-            </div>
-            
-            <div class="philosophy-carousel-nav">
-              <button type="button" class="carousel-arrow-btn" id="carousel-prev-btn" aria-label="Previous Philosophy" title="Previous Philosophy">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-              </button>
-              <span class="carousel-counter" id="carousel-counter">01 / 04</span>
-              <button type="button" class="carousel-arrow-btn" id="carousel-next-btn" aria-label="Next Philosophy" title="Next Philosophy">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-              </button>
-            </div>
+    <!-- Trending Multi-Philosophy Kinetic Card (Linear / Cosmos Style) -->
+    <section class="journal-quote-banner reveal">
+      <div class="glow-border-layer"></div>
+      <div class="quote-banner-container">
+        <div class="quote-header-tag">
+          <div class="philosophy-tabs" id="philosophy-tabs">
+            <button class="philosophy-tab active" data-index="0">01 // JOBS</button>
+            <button class="philosophy-tab" data-index="1">02 // RAMS</button>
+            <button class="philosophy-tab" data-index="2">03 // IVE</button>
+            <button class="philosophy-tab" data-index="3">04 // VIGNELLI</button>
           </div>
 
-          <div class="philosophy-stage" id="philosophy-stage">
-            <blockquote class="quote-banner-statement" id="philosophy-quote">
-              “Design is not just what it 
-              <span class="kinetic-word" data-label="Visual Aesthetics & Form">looks like</span> 
-              and 
-              <span class="kinetic-word" data-label="Sensory Touch & Feeling">feels like</span>. 
-              Design is 
-              <span class="kinetic-word active-highlight" data-label="System Architecture & Function">how it works</span>.”
-            </blockquote>
+          <div class="philosophy-carousel-nav">
+            <button type="button" class="carousel-arrow-btn" id="carousel-prev-btn" aria-label="Previous Philosophy"
+              title="Previous Philosophy">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                stroke-linecap="round" stroke-linejoin="round">
+                <line x1="19" y1="12" x2="5" y2="12"></line>
+                <polyline points="12 19 5 12 12 5"></polyline>
+              </svg>
+            </button>
+            <span class="carousel-counter" id="carousel-counter">01 / 04</span>
+            <button type="button" class="carousel-arrow-btn" id="carousel-next-btn" aria-label="Next Philosophy"
+              title="Next Philosophy">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                stroke-linecap="round" stroke-linejoin="round">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+              </svg>
+            </button>
+          </div>
+        </div>
 
-            <div class="quote-banner-footer">
-              <div class="quote-author-profile">
-                <div class="author-avatar-badge" id="philosophy-avatar">SJ</div>
-                <div class="author-details">
-                  <strong class="author-name" id="philosophy-author">STEVE JOBS</strong>
-                  <span class="author-role" id="philosophy-role">Co-Founder, Apple Inc.</span>
-                </div>
-              </div>
-              <div class="quote-hover-hint">
-                <span class="hint-icon">✦</span> Hover keywords to inspect design pillars
+        <div class="philosophy-stage" id="philosophy-stage">
+          <blockquote class="quote-banner-statement" id="philosophy-quote">
+            “Design is not just what it
+            <span class="kinetic-word" data-label="Visual Aesthetics & Form">looks like</span>
+            and
+            <span class="kinetic-word" data-label="Sensory Touch & Feeling">feels like</span>.
+            Design is
+            <span class="kinetic-word active-highlight" data-label="System Architecture & Function">how it
+              works</span>.”
+          </blockquote>
+
+          <div class="quote-banner-footer">
+            <div class="quote-author-profile">
+              <div class="author-avatar-badge" id="philosophy-avatar">SJ</div>
+              <div class="author-details">
+                <strong class="author-name" id="philosophy-author">STEVE JOBS</strong>
+                <span class="author-role" id="philosophy-role">Co-Founder, Apple Inc.</span>
               </div>
             </div>
+            <div class="quote-hover-hint">
+              <span class="hint-icon">✦</span> Hover keywords to inspect design pillars
+            </div>
           </div>
         </div>
-      </section>
-    </main>
+      </div>
+    </section>
+  </main>
 
-    <!-- Article Reader Preview Modal -->
-    <div class="article-modal" id="article-modal" aria-hidden="true">
-      <div class="article-modal-backdrop" id="article-modal-backdrop"></div>
-      <div class="article-modal-content">
-        <button class="article-modal-close" id="article-modal-close" aria-label="Close article preview">&times;</button>
-        <div class="article-modal-body" id="article-modal-body">
-          <!-- Dynamically populated article preview -->
-        </div>
+  <!-- Article Reader Preview Modal -->
+  <div class="article-modal" id="article-modal" aria-hidden="true">
+    <div class="article-modal-backdrop" id="article-modal-backdrop"></div>
+    <div class="article-modal-content">
+      <button class="article-modal-close" id="article-modal-close" aria-label="Close article preview">&times;</button>
+      <div class="article-modal-body" id="article-modal-body">
+        <!-- Dynamically populated article preview -->
       </div>
     </div>
+  </div>
 
-    <footer id="contact">
-      <div class="footer-intro">
-        <p class="label">✦ LET'S CONNECT</p>
-        <h2>Let's build your<br/>next <em>digital product.</em></h2>
-        <p class="footer-tagline">Whether you're building a startup, scaling a product, or improving an existing experience, I'd love to help turn your ideas into impactful digital products.</p>
-      </div>
-      <div class="contact-links" id="footer-contact-links">
-        <a href="mailto:hello@abikrishna.design" id="footer-email-link">
-          <span>✉</span>hello@abikrishna.design
-        </a>
-        <a href="#" id="footer-cv-link" target="_blank" download>
-          <span><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></span>Download CV
-        </a>
+  <footer id="contact">
+    <div class="footer-intro">
+      <p class="label">✦ LET'S CONNECT</p>
+      <h2>Let's build your<br />next <em>digital product.</em></h2>
+      <p class="footer-tagline">Whether you're building a startup, scaling a product, or improving an existing
+        experience, I'd love to help turn your ideas into impactful digital products.</p>
+    </div>
+    <div class="contact-links" id="footer-contact-links">
+      <a href="mailto:hello@abikrishna.design" id="footer-email-link">
+        <span>✉</span>hello@abikrishna.design
+      </a>
+      <a href="#" id="footer-cv-link" target="_blank" download>
+        <span><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+            <polyline points="7 10 12 15 17 10" />
+            <line x1="12" y1="15" x2="12" y2="3" />
+          </svg></span>Download CV
+      </a>
 
-      </div>
-      <a class="big-arrow" href="#featured-spotlight" aria-label="Back to top">↗</a>
-      <div class="footer-bottom">
-        <div class="footer-bottom-left">
-          <a class="logo" href="index.html" aria-label="Abi Krishna home"><img src="assets/ak-logo-exact.png" alt="AK." class="brand-logo-img"></a>
-          <div class="footer-meta">
-            <span class="footer-copy">© 2026 Abi Krishna. All rights reserved.</span>
-            <span class="footer-craft">Crafted with intention <b>♥</b></span>
-          </div>
+    </div>
+    <a class="big-arrow" href="#featured-spotlight" aria-label="Back to top">↗</a>
+    <div class="footer-bottom">
+      <div class="footer-bottom-left">
+        <a class="logo" href="index.html" aria-label="Abi Krishna home"><img src="assets/ak-logo-exact.png" alt="AK."
+            class="brand-logo-img"></a>
+        <div class="footer-meta">
+          <span class="footer-copy">© 2026 Abi Krishna. All rights reserved.</span>
+          <span class="footer-craft">Crafted with intention <b>♥</b></span>
         </div>
-        <div class="footer-social" id="footer-social-links">
-          <!-- Populated dynamically from admin settings -->
-        </div>
       </div>
-    </footer>
+      <div class="footer-social" id="footer-social-links">
+        <!-- Populated dynamically from admin settings -->
+      </div>
+    </div>
+  </footer>
 
 
-    <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js" defer></script>
-    <script src="icons.js?v=2" defer></script>
-    <script src="supabase-config.js"></script>
-    <script src="content-render.js?v=72"></script>
-    <script src="motion.js" defer></script>
-    <script src="process-enhance.js" defer></script>
-    <script src="script.js?v=6"></script>
-  </body>
+  <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js" defer></script>
+  <script src="icons.js?v=2" defer></script>
+  <script src="supabase-config.js"></script>
+  <script src="content-render.js?v=72"></script>
+  <script src="motion.js" defer></script>
+  <script src="process-enhance.js" defer></script>
+  <script src="script.js?v=6"></script>
+</body>
+
 </html>
