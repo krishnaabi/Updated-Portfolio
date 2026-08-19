@@ -5,6 +5,8 @@
   "description": "Abi Krishna Portfolio",
   "scripts": {
     "start": "node server.js",
-    "dev": "node server.js"
+    "dev": "node server.js",
+    "deploy": "wrangler deploy",
+    "preview": "wrangler dev"
   }
 }
