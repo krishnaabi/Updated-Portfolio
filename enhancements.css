@@ -505,26 +505,33 @@
 
 /* THE CLIP LAYER — overflow:hidden here is what hides off-screen slides */
 .featured-carousel-wrapper {
-  overflow: hidden;
+  overflow: hidden !important;
   border-radius: 20px;
   position: relative;
+  width: 100%;
 }
 
-/* THE SLIDING RAIL — must be row, no-wrap, no own overflow */
+/* THE SLIDING RAIL — must be row, no-wrap, no own overflow, NO GAP */
 .featured-carousel-track {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: nowrap;
-  width: 100%;
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  width: 100% !important;
+  gap: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
   transition: transform 0.72s cubic-bezier(0.22, 1, 0.36, 1);
   will-change: transform;
 }
 
 /* Each slide = exactly one viewport of the track */
 .featured-carousel-track > .fc-slide {
-  min-width: 100%;
-  width: 100%;
-  flex: 0 0 100%;
+  min-width: 100% !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  flex: 0 0 100% !important;
+  margin: 0 !important;
+  box-sizing: border-box !important;
   display: grid;
   grid-template-columns: 1fr 1fr;
   min-height: 440px;
@@ -1681,18 +1688,8 @@
 }
 
 /* ═══════════════════════════════════════
-   FEATURED PROJECT CARD DESIGN OVERHAUL
+   WORK PAGE PROJECT CARD DESIGN OVERHAUL
    ═══════════════════════════════════════ */
-
-.featured-carousel-wrapper {
-  margin-top: 30px;
-}
-
-.featured-carousel-track {
-  display: flex;
-  flex-direction: column;
-  gap: 40px;
-}
 
 .project-card {
   height: auto !important;
