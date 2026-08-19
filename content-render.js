@@ -262,6 +262,20 @@
     homeStat5Lbl: 'Clients & Solutions'
   };
 
+  const getCachedData = path => {
+    try {
+      const raw = localStorage.getItem('ak_cache_' + path);
+      if (raw) return JSON.parse(raw);
+    } catch (e) {}
+    return null;
+  };
+
+  const setCachedData = (path, data) => {
+    try {
+      if (data) localStorage.setItem('ak_cache_' + path, JSON.stringify(data));
+    } catch (e) {}
+  };
+
   const API_BASE_URLS = ['', 'http://127.0.0.1:4173', 'http://localhost:4173'];
 
   async function apiFetch(path, options = {}) {
@@ -275,6 +289,7 @@
           if (contentType.includes('application/json') || res.status === 200) {
             const data = await res.json();
             if (data && (Array.isArray(data) ? data.length > 0 : Object.keys(data).length > 0)) {
+              setCachedData(path, data);
               return { ok: true, status: 200, json: async () => data, text: async () => JSON.stringify(data) };
             }
           }
@@ -333,6 +348,7 @@
               payload = (Array.isArray(raw) && raw[0] && raw[0].settings) ? raw[0].settings : {};
             }
             if (payload && (Array.isArray(payload) ? payload.length > 0 : Object.keys(payload).length > 0)) {
+              setCachedData(path, payload);
               return { ok: true, status: 200, json: async () => payload, text: async () => JSON.stringify(payload) };
             }
           }
@@ -543,6 +559,12 @@
       `).join('');
     });
   };
+
+  // Instant synchronous cache hydration (0ms delay, zero flash of dummy content)
+  try {
+    const initCachedSettings = getCachedData('/api/settings');
+    if (initCachedSettings) applySettingsToPage(initCachedSettings);
+  } catch (e) {}
 
   const defaultPlaygroundTopics = ['UI & Motion', 'Concepts', '3D & Visuals', 'Quick Sketches', 'Just for Fun'];
   const defaultJournalTopics = ['UX / UI Design', 'Product Design', 'Process', 'Career', 'Tools', 'Opinion', 'Design Thinking'];

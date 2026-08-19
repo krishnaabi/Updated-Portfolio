@@ -4,6 +4,7 @@
  */
 
 const DEFAULT_SUPABASE_URL = 'https://xyzoejcxcwklkjqflmit.supabase.co';
+const DEFAULT_ANON_KEY = 'sb_publishable_dHAKI8M1MxSjzNAPumIc2Q_wQyVNHIB';
 
 const corsHeaders = {
   'Content-Type': 'application/json',
@@ -21,7 +22,7 @@ function json(data, status = 200) {
 
 function getSupabaseCreds(env) {
   const url = (env && env.SUPABASE_URL) || DEFAULT_SUPABASE_URL;
-  const key = (env && (env.SUPABASE_SERVICE_ROLE_KEY || env.SUPABASE_KEY || env.SUPABASE_ANON_KEY)) || '';
+  const key = (env && (env.SUPABASE_SERVICE_ROLE_KEY || env.SUPABASE_KEY || env.SUPABASE_ANON_KEY)) || DEFAULT_ANON_KEY;
   return { url: url.replace(/\/$/, ''), key };
 }
 
