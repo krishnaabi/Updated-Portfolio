@@ -6,17 +6,18 @@
   content: "";
   position: absolute;
   bottom: -14px;
-  left: 45%;
+  left: 50%;
+  transform: translateX(-50%);
   width: 5px;
   height: 5px;
   border-radius: 50%;
-  background: var(--accent);
+  background: var(--accent, #ff4e1b);
 }
 
 .blog-main {
   max-width: 1240px;
   margin: 0 auto;
-  padding: 100px max(5vw, 40px) 80px;
+  padding: 40px max(5vw, 40px) 80px;
 }
 
 /* Journal Hero Section */
@@ -26,6 +27,16 @@
 
 .journal-hero-content {
   max-width: 780px;
+}
+
+.journal-hero .label {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent, #e34c26);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  margin-bottom: 14px;
 }
 
 .journal-hero h1 {
@@ -1079,6 +1090,9 @@
 }
 
 @media (max-width: 960px) {
+  .blog-main {
+    padding: 30px 24px 80px;
+  }
   .spotlight-card {
     grid-template-columns: 1fr;
   }

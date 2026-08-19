@@ -422,6 +422,7 @@
           <!-- Subtab Controller Bar -->
           <div class="config-nav-bar" id="config-subnav-bar">
             <button type="button" class="config-tab active" data-subtab="heroes">🖼️ Page Hero Visuals</button>
+            <button type="button" class="config-tab" data-subtab="tools">🛠️ Toolkit & Tools</button>
             <button type="button" class="config-tab" data-subtab="topics">🧪 Playground Filter Topics</button>
             <button type="button" class="config-tab" data-subtab="journal-topics">📝 Journal Filter Topics</button>
             <button type="button" class="config-tab" data-subtab="brands">🏢 Trusted Brands & Ticker</button>
@@ -734,6 +735,83 @@
             </div>
           </div>
 
+          <!-- Subpanel: Toolkit / Tools Studio -->
+          <div class="config-subpanel" id="subpanel-tools">
+            <div class="tools-admin-section">
+              <h3 class="admin-section-heading">About Page — Toolkit & Software Manager</h3>
+              <p class="admin-section-sub">Add, edit, or remove the tools displayed on your About page Toolkit grid. Select official presets or upload custom app logos.</p>
+
+              <div class="tool-form-card" style="padding:24px;background:#fcfbf9;border:1px solid #e7e2dc;border-radius:18px;margin-bottom:28px;">
+                <h4 id="tool-form-title" style="margin:0 0 16px;font-size:16px;font-weight:800;">Add / Edit Tool</h4>
+                <input type="hidden" id="tool-id-input" value="" />
+
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+                  <label class="group-label">Tool Name
+                    <input id="tool-name-input" type="text" placeholder="e.g. Figma, Spline, Rive, Blender">
+                  </label>
+                  <label class="group-label">Badge Style / App Icon Preset
+                    <select id="tool-icon-select">
+                      <option value="figma">Figma (Official)</option>
+                      <option value="figjam">FigJam (Violet)</option>
+                      <option value="photoshop">Adobe Photoshop (Ps)</option>
+                      <option value="illustrator">Adobe Illustrator (Ai)</option>
+                      <option value="aftereffects">Adobe After Effects (Ae)</option>
+                      <option value="framer">Framer (Black/White)</option>
+                      <option value="notion">Notion (N Mark)</option>
+                      <option value="aitools">AI Tools (Orange Sparkle)</option>
+                      <option value="spline">Spline 3D</option>
+                      <option value="rive">Rive Interactive</option>
+                      <option value="blender">Blender 3D</option>
+                      <option value="webflow">Webflow</option>
+                      <option value="vscode">VS Code</option>
+                      <option value="github">GitHub</option>
+                      <option value="linear">Linear</option>
+                      <option value="miro">Miro</option>
+                      <option value="sketch">Sketch</option>
+                      <option value="custom-image">Custom Image Logo (Upload / URL)</option>
+                    </select>
+                  </label>
+                </div>
+
+                <label class="group-label" style="margin-top:10px;">Subtext / Focus Areas
+                  <input id="tool-category-input" type="text" placeholder="e.g. UI/UX · Prototyping | Design Systems (use | or newline for line 2)">
+                  <small style="display:block;font-size:11px;color:#74716e;margin-top:3px;">💡 Separate lines with a pipeline <code>|</code> or newline (e.g. <code>UI/UX · Prototyping | Design Systems</code>)</small>
+                </label>
+
+                <!-- Custom Image Upload Section (Toggled on or always available) -->
+                <div id="tool-custom-img-wrap" style="display:none;margin-top:10px;padding:14px;background:#ffffff;border:1px solid #e2ddd6;border-radius:12px;">
+                  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                    <label class="group-label">Custom Logo Image URL
+                      <input id="tool-custom-url" type="text" placeholder="https://... or /uploads/...">
+                    </label>
+                    <label class="group-label">Or Upload Logo File
+                      <input id="tool-custom-file" type="file" accept="image/*">
+                    </label>
+                  </div>
+                </div>
+
+                <div style="display:flex;align-items:center;gap:10px;margin-top:16px;">
+                  <button type="button" id="save-tool-btn" class="primary-btn" style="flex:1;padding:14px;background:var(--accent, #ff4e1b);color:#fff;border:0;border-radius:99px;font-weight:800;cursor:pointer;">
+                    ✨ Save Tool to Toolkit
+                  </button>
+                  <button type="button" id="cancel-tool-edit-btn" style="display:none;padding:14px 20px;background:#eee;color:#333;border:0;border-radius:99px;font-weight:700;cursor:pointer;">
+                    Cancel
+                  </button>
+                </div>
+                <div id="tool-save-status" style="display:none;margin-top:14px;padding:11px 16px;background:#eefbf3;border:1px solid #b7ebd0;color:#0d7f44;border-radius:12px;font-size:13px;font-weight:700;text-align:center;animation:fadeIn 0.25s ease;"></div>
+              </div>
+
+              <!-- List of Published Tools -->
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+                <h4 style="margin:0;font-size:16px;font-weight:800;">Published Toolkit (<span id="tools-count-num">0</span>)</h4>
+                <small style="color:#74716e;">Live preview matching About page</small>
+              </div>
+              <div id="tools-admin-list" style="display:grid;grid-template-columns:repeat(auto-fill, minmax(280px, 1fr));gap:12px;">
+                <!-- Dynamically rendered tools -->
+              </div>
+            </div>
+          </div>
+
           <!-- Subpanel 2: Achievements Studio -->
           <div class="config-subpanel" id="subpanel-achievements">
             <div class="spotlight-admin-section">
@@ -818,38 +896,55 @@
               <label class="group-label">Contact Email Address
                 <input name="email" id="contact-email" type="email" value="abikrishna15@gmail.com">
               </label>
+
+              <div style="margin-top:20px;padding-top:16px;border-top:1px solid #eee5df;">
+                <button type="submit" class="submit-publish-btn" style="width:100%;padding:14px 28px;">
+                  💾 Save Resume & Contact <b>↗</b>
+                </button>
+                <small class="asset-status-msg" style="display:block;margin-top:8px;font-weight:700;font-size:13px;text-align:center;"></small>
+              </div>
             </div>
           </div>
 
           <!-- Subpanel 4: Social Profiles -->
           <div class="config-subpanel" id="subpanel-social">
             <div class="social-links-admin-section">
-              <p class="social-links-heading">Social Media Links</p>
-              <p class="social-links-hint">These links appear in the footer of your portfolio. Leave blank to hide.</p>
-              <label>
-                <span class="social-platform-icon">in</span> LinkedIn URL
-                <input name="socialLinkedIn" id="social-linkedin" type="text" placeholder="https://linkedin.com/in/yourname">
-              </label>
-              <label>
-                <span class="social-platform-icon">Be</span> Behance URL
-                <input name="socialBehance" id="social-behance" type="text" placeholder="https://behance.net/yourname">
-              </label>
-              <label>
-                <span class="social-platform-icon">📸</span> Instagram URL
-                <input name="socialInstagram" id="social-instagram" type="text" placeholder="https://instagram.com/yourname">
-              </label>
-              <label>
-                <span class="social-platform-icon">🎯</span> Dribbble URL
-                <input name="socialDribbble" id="social-dribbble" type="text" placeholder="https://dribbble.com/yourname">
-              </label>
-              <label>
-                <span class="social-platform-icon">𝕏</span> Twitter / X URL
-                <input name="socialTwitter" id="social-twitter" type="text" placeholder="https://twitter.com/yourname">
-              </label>
-              <label>
-                <span class="social-platform-icon">▶</span> YouTube URL
-                <input name="socialYoutube" id="social-youtube" type="text" placeholder="https://youtube.com/@yourname">
-              </label>
+              <h3 class="admin-section-heading">Social Media & Portfolio Profiles</h3>
+              <p class="admin-section-sub">These links appear dynamically in the footer of your portfolio across all pages. Leave blank to hide a platform.</p>
+              
+              <div style="display:flex;flex-direction:column;gap:14px;margin-top:16px;">
+                <label class="group-label">
+                  <span class="social-platform-icon">in</span> LinkedIn Profile URL
+                  <input name="socialLinkedIn" id="social-linkedin" type="text" placeholder="https://linkedin.com/in/yourname">
+                </label>
+                <label class="group-label">
+                  <span class="social-platform-icon">Be</span> Behance Portfolio URL
+                  <input name="socialBehance" id="social-behance" type="text" placeholder="https://behance.net/yourname">
+                </label>
+                <label class="group-label">
+                  <span class="social-platform-icon">📸</span> Instagram Profile URL
+                  <input name="socialInstagram" id="social-instagram" type="text" placeholder="https://instagram.com/yourname">
+                </label>
+                <label class="group-label">
+                  <span class="social-platform-icon">🎯</span> Dribbble Profile URL
+                  <input name="socialDribbble" id="social-dribbble" type="text" placeholder="https://dribbble.com/yourname">
+                </label>
+                <label class="group-label">
+                  <span class="social-platform-icon">𝕏</span> Twitter / X Profile URL
+                  <input name="socialTwitter" id="social-twitter" type="text" placeholder="https://x.com/yourname">
+                </label>
+                <label class="group-label">
+                  <span class="social-platform-icon">▶</span> YouTube Channel URL
+                  <input name="socialYoutube" id="social-youtube" type="text" placeholder="https://youtube.com/@yourname">
+                </label>
+              </div>
+
+              <div style="margin-top:24px;padding-top:16px;border-top:1px solid #eee5df;">
+                <button type="submit" class="submit-publish-btn" style="width:100%;padding:14px 28px;">
+                  💾 Save Social Profiles <b>↗</b>
+                </button>
+                <small class="asset-status-msg" style="display:block;margin-top:8px;font-weight:700;font-size:13px;text-align:center;"></small>
+              </div>
             </div>
           </div>
 
@@ -1032,7 +1127,7 @@
   </main>
 
   <script src="supabase-config.js"></script>
-  <script src="admin.js?v=22"></script>
+  <script src="admin.js?v=28"></script>
 </body>
 
 </html>

@@ -111,6 +111,14 @@ function initSmoothSectionRail() {
       }
     };
 
+    function getSectionContentTop(target) {
+      if (!target) return 0;
+      const contentEl = target.querySelector(
+        '.about-intro, .bento-showcase, .bento-top-row, .bento-title-block, .story-container, .story-header-group, .runway-meta-badge, .runway-title, .belief-header, .belief-title-group, .skills-col, .column-heading, .beyond-left-col, .beyond-main-heading, :scope > .section-heading, :scope > h2, .section-title, .work-hero'
+      ) || target;
+      return window.scrollY + contentEl.getBoundingClientRect().top;
+    }
+
     // Smooth section spy on scroll
     const updateSpy = () => {
       if (isClickScrolling) return;
@@ -118,7 +126,7 @@ function initSmoothSectionRail() {
       const scrollY = window.scrollY;
       const winHeight = window.innerHeight;
       const docHeight = document.documentElement.scrollHeight;
-      const isAtBottom = (winHeight + scrollY) >= (docHeight - 80);
+      const isAtBottom = (winHeight + scrollY) >= (docHeight - 60);
 
       if (isAtBottom) {
         if (activeIndex !== sectionMap.length - 1) {
@@ -127,14 +135,11 @@ function initSmoothSectionRail() {
         return;
       }
 
-      // Viewport trigger threshold: 38% from top of window
-      const triggerY = scrollY + winHeight * 0.38;
+      const triggerY = scrollY + 140;
       let matchedIndex = 0;
 
       for (let i = 0; i < sectionMap.length; i++) {
-        const section = sectionMap[i].target;
-        const anchor = section.querySelector(':scope > .section-heading') || section.querySelector(':scope > h2') || section;
-        const sectionTop = window.scrollY + anchor.getBoundingClientRect().top;
+        const sectionTop = getSectionContentTop(sectionMap[i].target);
         if (sectionTop <= triggerY) {
           matchedIndex = i;
         }
@@ -145,7 +150,7 @@ function initSmoothSectionRail() {
       }
     };
 
-    // Nav click interaction
+    // Nav click interaction - brings target content headline properly to the top
     sectionMap.forEach((entry, idx) => {
       entry.item.addEventListener('click', (e) => {
         const href = entry.item.getAttribute('href');
@@ -160,13 +165,22 @@ function initSmoothSectionRail() {
         clearTimeout(clickScrollTimer);
         clickScrollTimer = setTimeout(() => {
           isClickScrolling = false;
-        }, 700);
+        }, 750);
 
-        const anchor = target.querySelector(':scope > .section-heading') || target.querySelector(':scope > h2') || target;
-        const anchorTop = window.scrollY + anchor.getBoundingClientRect().top;
-        const offset = 90; // Header clearance
+        if (idx === 0) {
+          window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+          });
+          return;
+        }
+
+        const contentTop = getSectionContentTop(target);
+        const topClearance = 85; // Clean top margin below fixed header
+        const targetScrollY = Math.max(0, Math.round(contentTop - topClearance));
+
         window.scrollTo({
-          top: Math.max(0, anchorTop - offset),
+          top: targetScrollY,
           behavior: 'smooth'
         });
       });
@@ -244,7 +258,7 @@ document.querySelector('.menu-button').addEventListener('click', () => {
 });
 
 const contactModalLoader = document.createElement('script');
-contactModalLoader.src = 'contact-modal.js';
+contactModalLoader.src = 'contact-modal.js?v=5';
 document.body.append(contactModalLoader);
 
 // Featured Works Carousel Logic
@@ -605,26 +619,36 @@ document.querySelectorAll('.big-arrow').forEach((arrow) => {
     // Social Links Container
     const socialContainer = document.querySelector('#footer-social-links');
     if (socialContainer) {
+      const svgIcons = {
+        linkedin: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect width="4" height="12" x="2" y="9"/><circle cx="4" cy="4" r="2"/></svg>',
+        behance: '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M7.7 11.2c1.2 0 2-.6 2-1.7 0-1-.8-1.5-1.8-1.5H3.5v3.2h4.2zm.3 3.3c1.4 0 2.3-.7 2.3-1.8 0-1.2-1-1.8-2.3-1.8H3.5v3.6H8zm9.5-1.8c0-1.8-1.3-3.2-3.1-3.2-1.9 0-3.3 1.5-3.3 3.3 0 1.9 1.4 3.4 3.4 3.4 1.5 0 2.6-.8 3-2.1h-1.6c-.3.6-.8.9-1.4.9-1 0-1.7-.6-1.8-1.6h4.8v-.6zm-4.7-.8c.1-.8.7-1.3 1.6-1.3.8 0 1.4.5 1.5 1.3h-3.1zM13 7.8h3.6v.9H13v-.9zM0 5.4h8.3c2.4 0 4.1 1.2 4.1 3.2 0 1.2-.6 2.2-1.6 2.7 1.4.5 2.1 1.6 2.1 3.1 0 2.3-1.9 3.8-4.6 3.8H0V5.4z"/></svg>',
+        instagram: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>',
+        dribbble: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M19.13 5.09C15.22 9.14 10 10.44 2.25 10.94"/><path d="M21.75 12.84c-6.62-1.41-12.14 1-16.38 6.32"/><path d="M8.56 2.75c4.37 6 6 9.42 8 17.72"/></svg>',
+        twitter: '<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>',
+        youtube: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17"/><polygon points="10 15 15 12 10 9 10 15"/></svg>'
+      };
+
       const links = [];
-      if (settings.socialLinkedIn) links.push({ name: 'LinkedIn', url: settings.socialLinkedIn, icon: 'in' });
-      if (settings.socialBehance) links.push({ name: 'Behance', url: settings.socialBehance, icon: 'Be' });
-      if (settings.socialInstagram) links.push({ name: 'Instagram', url: settings.socialInstagram, icon: '📸' });
-      if (settings.socialDribbble) links.push({ name: 'Dribbble', url: settings.socialDribbble, icon: '🎯' });
-      if (settings.socialTwitter) links.push({ name: 'Twitter / X', url: settings.socialTwitter, icon: '𝕏' });
-      if (settings.socialYoutube) links.push({ name: 'YouTube', url: settings.socialYoutube, icon: '▶' });
+      if (settings.socialLinkedIn && settings.socialLinkedIn.trim()) links.push({ name: 'LinkedIn', url: settings.socialLinkedIn.trim(), icon: svgIcons.linkedin });
+      if (settings.socialBehance && settings.socialBehance.trim()) links.push({ name: 'Behance', url: settings.socialBehance.trim(), icon: svgIcons.behance });
+      if (settings.socialInstagram && settings.socialInstagram.trim()) links.push({ name: 'Instagram', url: settings.socialInstagram.trim(), icon: svgIcons.instagram });
+      if (settings.socialDribbble && settings.socialDribbble.trim()) links.push({ name: 'Dribbble', url: settings.socialDribbble.trim(), icon: svgIcons.dribbble });
+      if (settings.socialTwitter && settings.socialTwitter.trim()) links.push({ name: 'Twitter / X', url: settings.socialTwitter.trim(), icon: svgIcons.twitter });
+      if (settings.socialYoutube && settings.socialYoutube.trim()) links.push({ name: 'YouTube', url: settings.socialYoutube.trim(), icon: svgIcons.youtube });
 
       // Fallback defaults if none configured yet
       if (!links.length) {
         links.push(
-          { name: 'LinkedIn', url: 'https://linkedin.com', icon: 'in' },
-          { name: 'Behance', url: 'https://behance.net', icon: 'Be' },
-          { name: 'Instagram', url: 'https://instagram.com', icon: '📸' }
+          { name: 'LinkedIn', url: 'https://linkedin.com', icon: svgIcons.linkedin },
+          { name: 'Behance', url: 'https://behance.net', icon: svgIcons.behance },
+          { name: 'Instagram', url: 'https://instagram.com', icon: svgIcons.instagram }
         );
       }
 
       socialContainer.innerHTML = links.map(item => `
         <a class="social-link-pill" href="${item.url}" target="_blank" rel="noopener noreferrer">
-          <span>${item.icon}</span> ${item.name}
+          ${item.icon}
+          <span>${item.name}</span>
         </a>
       `).join('');
     }
@@ -802,4 +826,100 @@ document.querySelectorAll('.big-arrow').forEach((arrow) => {
   }
 })();
 
+// Active Navigation Sync (Uniform orange dot on active page)
+(() => {
+  const initActiveNav = () => {
+    const rawPath = (window.location.pathname.split('/').pop() || 'index.html').toLowerCase();
+    const currentPath = rawPath.replace('.html', '');
+    const navLinks = document.querySelectorAll('.site-header nav a');
+    if (!navLinks.length) return;
+
+    navLinks.forEach(link => {
+      const rawHref = (link.getAttribute('href') || '').split('/').pop() || '';
+      const cleanHref = rawHref.replace('.html', '').toLowerCase();
+
+      if (
+        (cleanHref === 'work' && currentPath.includes('work')) ||
+        (cleanHref === 'about' && currentPath.includes('about')) ||
+        (cleanHref === 'playground' && currentPath.includes('playground')) ||
+        ((cleanHref === 'blog' || cleanHref === 'journal') && (currentPath.includes('blog') || currentPath.includes('journal')))
+      ) {
+        link.classList.add('selected');
+      } else if (currentPath && currentPath !== 'index') {
+        link.classList.remove('selected');
+      }
+    });
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initActiveNav);
+  } else {
+    initActiveNav();
+  }
+})();
+
+// Bento & Story Cards Subtle Interactive Hover Depth
+(() => {
+  const initInteractiveDepthCards = () => {
+    const cards = document.querySelectorAll('.bento-card, .story-card');
+    if (!cards.length) return;
+
+    cards.forEach(card => {
+      card.addEventListener('mousemove', (e) => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+
+        const art = card.querySelector('.art-svg, .story-art-svg');
+        if (art) {
+          art.style.transform = `scale(1.06) translate(${(x - centerX) * 0.025}px, ${(y - centerY) * 0.025}px)`;
+        }
+      });
+
+      card.addEventListener('mouseleave', () => {
+        const art = card.querySelector('.art-svg, .story-art-svg');
+        if (art) {
+          art.style.transform = '';
+        }
+      });
+    });
+
+    // Principle Cards 3D Interactive Polish
+    const principleCards = document.querySelectorAll('.principle-card');
+    principleCards.forEach(pCard => {
+      pCard.addEventListener('mousemove', e => {
+        const rect = pCard.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+        const rotateX = ((y - centerY) / centerY) * -5;
+        const rotateY = ((x - centerX) / centerX) * 5;
+
+        pCard.style.transform = `perspective(800px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-6px)`;
+        
+        const badge = pCard.querySelector('.card-floating-badge, .card-hero-num-badge');
+        if (badge) {
+          badge.style.transform = `scale(1.12) translate(${(x - centerX) * 0.06}px, ${(y - centerY) * 0.06}px)`;
+        }
+      });
+
+      pCard.addEventListener('mouseleave', () => {
+        pCard.style.transform = '';
+        const badge = pCard.querySelector('.card-floating-badge, .card-hero-num-badge');
+        if (badge) {
+          badge.style.transform = '';
+        }
+      });
+    });
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initInteractiveDepthCards);
+  } else {
+    initInteractiveDepthCards();
+  }
+})();
 

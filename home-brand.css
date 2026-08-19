@@ -3,7 +3,7 @@
 body{font-family:Manrope,Arial,sans-serif!important;letter-spacing:-.015em}
 h1,h2,h3{font-family:Manrope,Arial,sans-serif!important;font-weight:700}
 h1 em,h2 em,h3 em,.hero h1 em,.work-hero h1 em,.about-intro h1 em,.pg-hero h1 em,.blog-hero h1 em,.content-section h2 em,.pg-section-header h2 em,.article-area h2 em,.work-copy h2 em,footer h2 em,.footer-intro h2 em{font-family:'Georgia',serif!important;font-style:italic!important;font-weight:400!important;color:var(--accent,#ff4e1b)!important}
-.label{font-family:'DM Mono',monospace!important;letter-spacing:1.5px!important;text-transform:uppercase!important;color:var(--accent,#ff4e1b)!important}
+.label{font-family:'DM Mono',monospace!important;font-size:11px!important;font-weight:700!important;letter-spacing:1.5px!important;text-transform:uppercase!important;color:var(--accent,#ff4e1b)!important}
 .work-hero h1,.about-intro h1,.pg-hero h1,.blog-hero h1,.hero h1{font-size:var(--home-display)!important;line-height:1.1!important;letter-spacing:-3.6px!important}
 .work-copy h2{letter-spacing:-3.5px}
 .content-section h2,.pg-heading h2,.article-area h2,.pg-section-header h2{font-size:var(--home-section)!important;letter-spacing:-1.8px!important}

@@ -5,10 +5,11 @@
   // Ensure header navigation is always uniform and correctly highlighted
   document.querySelectorAll('.site-header nav').forEach(nav => {
     nav.innerHTML = Object.entries(routes).map(([name, url]) => `<a href="${url}">${name}</a>`).join('');
-    const currentPath = location.pathname.split('/').pop() || 'index.html';
+    const rawPath = location.pathname.split('/').pop() || 'index.html';
+    const currentPath = rawPath.replace('.html', '').toLowerCase();
     const active = [...nav.querySelectorAll('a')].find(link => {
-      const href = link.getAttribute('href');
-      return href === currentPath || (href === 'blog.html' && (currentPath === 'journal' || currentPath === 'blog'));
+      const cleanHref = (link.getAttribute('href') || '').replace('.html', '').toLowerCase();
+      return cleanHref === currentPath || (cleanHref === 'blog' && currentPath === 'journal');
     });
     if (active) active.classList.add('selected');
     nav.classList.add('is-ready');

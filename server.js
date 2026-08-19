@@ -773,21 +773,89 @@ const removeMilestone = async id => {
   return { ok: true };
 };
 
-const reorderMilestones = async orderedItems => {
-  if (Array.isArray(orderedItems)) {
-    for (let index = 0; index < orderedItems.length; index++) {
-      const item = orderedItems[index];
-      if (item && item.id) {
-        try {
-          await supabase(`portfolio_milestones?id=eq.${encodeURIComponent(item.id)}`, {
-            method: 'PATCH',
-            body: JSON.stringify({ display_order: index + 1 })
-          });
-        } catch (e) { }
-      }
+const defaultTools = [
+  { id: 't1', name: 'Figma', category: 'UI/UX · Prototyping\nDesign Systems', icon_type: 'figma', custom_icon_url: '', display_order: 1 },
+  { id: 't2', name: 'FigJam', category: 'Workshops · User Flows\nMapping', icon_type: 'figjam', custom_icon_url: '', display_order: 2 },
+  { id: 't3', name: 'Adobe Photoshop', category: 'Visual Design ·\nImage Editing', icon_type: 'photoshop', custom_icon_url: '', display_order: 3 },
+  { id: 't4', name: 'Adobe Illustrator', category: 'Branding · Illustration\nGraphics', icon_type: 'illustrator', custom_icon_url: '', display_order: 4 },
+  { id: 't5', name: 'Adobe After Effects', category: 'Motion · Visual\nContent', icon_type: 'aftereffects', custom_icon_url: '', display_order: 5 },
+  { id: 't6', name: 'Framer', category: 'Web Design ·\nPrototyping', icon_type: 'framer', custom_icon_url: '', display_order: 6 },
+  { id: 't7', name: 'Notion', category: 'Documentation ·\nPlanning', icon_type: 'notion', custom_icon_url: '', display_order: 7 },
+  { id: 't8', name: 'AI Tools', category: 'Ideation · Content\nVisual Exploration', icon_type: 'aitools', custom_icon_url: '', display_order: 8 }
+];
+
+const toTool = r => ({
+  id: r.id,
+  name: r.name,
+  category: r.category || '',
+  icon_type: r.icon_type || 'figma',
+  custom_icon_url: r.custom_icon_url || '',
+  display_order: r.display_order || 0
+});
+
+const getTools = async () => {
+  try {
+    const rows = await supabase('portfolio_tools?select=*&order=display_order.asc,created_at.asc');
+    if (Array.isArray(rows) && rows.length > 0) {
+      return rows.map(toTool);
     }
+    for (const item of defaultTools) {
+      await supabase('portfolio_tools', {
+        method: 'POST',
+        body: JSON.stringify({
+          id: item.id,
+          name: item.name,
+          category: item.category,
+          icon_type: item.icon_type,
+          custom_icon_url: item.custom_icon_url,
+          display_order: item.display_order
+        })
+      }).catch(() => { });
+    }
+    return defaultTools;
+  } catch (e) {
+    console.error('Supabase getTools error:', e.message);
+    return defaultTools;
   }
-  return getMilestones();
+};
+
+const saveTool = async incoming => {
+  const payload = {
+    name: incoming.name || 'Untitled Tool',
+    category: incoming.category || '',
+    icon_type: incoming.icon_type || incoming.iconType || 'figma',
+    custom_icon_url: incoming.custom_icon_url || incoming.customIconUrl || '',
+    display_order: incoming.display_order || incoming.displayOrder || 0
+  };
+
+  try {
+    if (incoming.id) {
+      await supabase(`portfolio_tools?id=eq.${encodeURIComponent(incoming.id)}`, {
+        method: 'PATCH',
+        body: JSON.stringify(payload)
+      });
+      return { id: incoming.id, ...incoming };
+    } else {
+      const res = await supabase('portfolio_tools', {
+        method: 'POST',
+        headers: { Prefer: 'return=representation' },
+        body: JSON.stringify(payload)
+      });
+      return Array.isArray(res) && res[0] ? toTool(res[0]) : { id: Date.now().toString(), ...incoming };
+    }
+  } catch (e) {
+    console.error('Supabase saveTool error:', e.message);
+    return { id: Date.now().toString(), ...incoming };
+  }
+};
+
+const removeTool = async id => {
+  try {
+    await supabase(`portfolio_tools?id=eq.${encodeURIComponent(id)}`, { method: 'DELETE' });
+  } catch (e) {
+    console.error('Supabase removeTool error:', e.message);
+  }
+  return { ok: true };
 };
 
 http.createServer(async (req, res) => {
@@ -874,6 +942,17 @@ http.createServer(async (req, res) => {
     if (url.pathname.startsWith('/api/milestones/') && req.method === 'DELETE') {
       const id = url.pathname.split('/').pop();
       await removeMilestone(id);
+      return json(res, 200, { ok: true });
+    }
+    if (url.pathname === '/api/tools' && req.method === 'GET') return json(res, 200, await getTools());
+    if (url.pathname === '/api/tools' && req.method === 'POST') {
+      const incoming = await body(req);
+      if (!incoming.name || !incoming.name.trim()) return json(res, 400, { error: 'Tool Name is required.' });
+      return json(res, 201, await saveTool(incoming));
+    }
+    if (url.pathname.startsWith('/api/tools/') && req.method === 'DELETE') {
+      const id = url.pathname.split('/').pop();
+      await removeTool(id);
       return json(res, 200, { ok: true });
     }
     if (url.pathname === '/api/messages' && req.method === 'GET') return json(res, 200, await getMessages());

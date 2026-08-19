@@ -53,6 +53,7 @@ const prevMedia = $('#prev-media');
 let allProjectsData = [];
 
 const escapeHtml = str => String(str || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' })[c]);
+const cleanImgUrl = url => String(url || '').trim();
 
 const API_BASE_URLS = ['', 'http://127.0.0.1:4173', 'http://localhost:4173'];
 
@@ -78,6 +79,7 @@ async function apiFetch(path, options = {}) {
       else if (path === '/api/testimonials') table = 'portfolio_testimonials?select=*&order=created_at.desc';
       else if (path === '/api/brands') table = 'portfolio_brands?select=*&order=created_at.desc';
       else if (path === '/api/milestones') table = 'portfolio_milestones?select=*&order=display_order.asc,created_at.desc';
+      else if (path === '/api/tools') table = 'portfolio_tools?select=*&order=display_order.asc,created_at.asc';
       else if (path === '/api/settings') table = 'portfolio_settings?id=eq.global&select=*';
 
       if (table) {
@@ -102,6 +104,15 @@ async function apiFetch(path, options = {}) {
               platform: row.platform || '',
               journalType: row.journal_type || 'link',
               createdAt: row.created_at
+            }));
+          } else if (path === '/api/tools') {
+            data = (raw || []).map(row => ({
+              id: row.id,
+              name: row.name,
+              category: row.category || '',
+              icon_type: row.icon_type || 'figma',
+              custom_icon_url: row.custom_icon_url || '',
+              display_order: row.display_order || 0
             }));
           } else if (path === '/api/settings') {
             data = (Array.isArray(raw) && raw[0] && raw[0].settings) ? raw[0].settings : { email: 'abikrishna15@gmail.com' };
@@ -129,6 +140,7 @@ async function apiFetch(path, options = {}) {
         else if (path === '/api/milestones') payload = staticData.milestones || [];
         else if (path === '/api/testimonials') payload = staticData.testimonials || [];
         else if (path === '/api/brands') payload = staticData.brands || [];
+        else if (path === '/api/tools') payload = staticData.tools || [];
         else if (path === '/api/messages') payload = staticData.messages || [];
 
         return {
@@ -1156,37 +1168,68 @@ const renderMessagesList = () => {
 };
 
 const fetchMessages = async () => {
-  let messages = [];
+  let serverMessages = [];
+  let localMessages = [];
 
-  // 1. Fetch from server API
+  // 1. Fetch from server API / Supabase
   try {
     const res = await apiFetch('/api/messages');
     if (res.ok) {
       const data = await res.json();
-      if (Array.isArray(data)) messages = data;
+      if (Array.isArray(data)) serverMessages = data;
     }
   } catch (err) {}
 
-  // 2. Merge local client submissions from browser localStorage
+  // 2. Read local client submissions from browser localStorage
   try {
     const localSaved = localStorage.getItem('ak_submitted_messages');
     if (localSaved) {
       const parsed = JSON.parse(localSaved);
-      if (Array.isArray(parsed)) {
-        messages = [...parsed, ...messages];
-      }
+      if (Array.isArray(parsed)) localMessages = parsed;
     }
   } catch (e) {}
 
-  // Deduplicate by message ID or timestamp
-  const seen = new Set();
-  allMessagesData = messages.filter(m => {
-    const key = m.id || `${m.name}-${m.createdAt}`;
-    if (seen.has(key)) return false;
-    seen.add(key);
-    return true;
-  });
+  // 3. Smart Deduplication: Server records take absolute priority
+  // Match duplicate entries by ID OR normalized content fingerprint (name + email + message text)
+  const seenIds = new Set();
+  const seenFingerprints = new Set();
+  const unified = [];
 
+  // Add all server messages first
+  for (const m of serverMessages) {
+    if (!m) continue;
+    const id = String(m.id || '');
+    const fingerprint = `${(m.name || '').trim().toLowerCase()}|${(m.email || '').trim().toLowerCase()}|${(m.message || '').trim().toLowerCase()}`;
+    if (id) seenIds.add(id);
+    if (fingerprint.length > 2) seenFingerprints.add(fingerprint);
+    unified.push(m);
+  }
+
+  // Filter local messages: only add if NOT already synced to server
+  const remainingLocal = [];
+  for (const m of localMessages) {
+    if (!m) continue;
+    const id = String(m.id || '');
+    const fingerprint = `${(m.name || '').trim().toLowerCase()}|${(m.email || '').trim().toLowerCase()}|${(m.message || '').trim().toLowerCase()}`;
+    if (seenIds.has(id) || seenFingerprints.has(fingerprint)) {
+      // Already synced to server, skip
+      continue;
+    }
+    seenIds.add(id);
+    seenFingerprints.add(fingerprint);
+    unified.push(m);
+    remainingLocal.push(m);
+  }
+
+  // Update local storage to only keep un-synced entries, preventing stale duplicates
+  try {
+    localStorage.setItem('ak_submitted_messages', JSON.stringify(remainingLocal));
+  } catch (e) {}
+
+  // Sort latest first
+  unified.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+
+  allMessagesData = unified;
   renderMessagesList();
   updateMessagesCountBadge();
 };
@@ -1332,7 +1375,7 @@ function restoreTabState() {
   // 3. Restore Config Subtab
   try {
     const savedSubtab = localStorage.getItem(STORAGE_KEY_CONFIG_SUBTAB);
-    if (savedSubtab && ['heroes', 'topics', 'journal-topics', 'brands', 'achievements', 'resume', 'social', 'stats'].includes(savedSubtab)) {
+    if (savedSubtab && ['heroes', 'tools', 'topics', 'journal-topics', 'brands', 'achievements', 'resume', 'social', 'stats'].includes(savedSubtab)) {
       setActiveConfigSubtab(savedSubtab);
     }
   } catch (e) {}
@@ -1884,6 +1927,406 @@ if (saveMilestoneBtn) {
 }
 
 fetchMilestones();
+
+// =====================================================
+// =====================================================
+// Toolkit & Tools Studio Manager (About Page Section 7)
+// =====================================================
+const STORAGE_KEY_TOOLS = 'ak_portfolio_tools';
+const STORAGE_KEY_TOOLS_INIT = 'ak_portfolio_tools_initialized';
+let allToolsData = [];
+
+const defaultAdminToolsList = [
+  { id: 't1', name: 'Figma', category: 'UI/UX · Prototyping | Design Systems', icon_type: 'figma', display_order: 1 },
+  { id: 't2', name: 'FigJam', category: 'Workshops · User Flows | Mapping', icon_type: 'figjam', display_order: 2 },
+  { id: 't3', name: 'Adobe Photoshop', category: 'Visual Design · | Image Editing', icon_type: 'photoshop', display_order: 3 },
+  { id: 't4', name: 'Adobe Illustrator', category: 'Branding · Illustration | Graphics', icon_type: 'illustrator', display_order: 4 },
+  { id: 't5', name: 'Adobe After Effects', category: 'Motion · Visual | Content', icon_type: 'aftereffects', display_order: 5 },
+  { id: 't6', name: 'Framer', category: 'Web Design · | Prototyping', icon_type: 'framer', display_order: 6 },
+  { id: 't7', name: 'Notion', category: 'Documentation · | Planning', icon_type: 'notion', display_order: 7 },
+  { id: 't8', name: 'AI Tools', category: 'Ideation · Content | Visual Exploration', icon_type: 'aitools', display_order: 8 }
+];
+
+const saveToolsToStorage = (tools) => {
+  try {
+    localStorage.setItem(STORAGE_KEY_TOOLS, JSON.stringify(tools));
+    localStorage.setItem(STORAGE_KEY_TOOLS_INIT, 'true');
+  } catch (e) {}
+};
+
+const loadToolsFromStorage = () => {
+  try {
+    const isInit = localStorage.getItem(STORAGE_KEY_TOOLS_INIT) === 'true';
+    const raw = localStorage.getItem(STORAGE_KEY_TOOLS);
+    if (isInit && raw !== null) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) return parsed;
+    }
+  } catch (e) {}
+  return null;
+};
+
+async function syncToolToBackend(tool, isDelete = false) {
+  // 1. Try local server API endpoints
+  for (const base of API_BASE_URLS) {
+    try {
+      const url = base ? `${base}/api/tools${isDelete ? `/${encodeURIComponent(tool.id)}` : ''}` : `/api/tools${isDelete ? `/${encodeURIComponent(tool.id)}` : ''}`;
+      const res = await fetch(url, {
+        method: isDelete ? 'DELETE' : 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: isDelete ? undefined : JSON.stringify(tool)
+      });
+      if (res.ok) return true;
+    } catch (e) {}
+  }
+
+  // 2. Try Supabase REST API directly if configured
+  if (window.ABIKRISHNA_SUPABASE && window.ABIKRISHNA_SUPABASE.url) {
+    try {
+      const { url: sbUrl, anonKey } = window.ABIKRISHNA_SUPABASE;
+      if (isDelete) {
+        await fetch(`${sbUrl}/rest/v1/portfolio_tools?id=eq.${encodeURIComponent(tool.id)}`, {
+          method: 'DELETE',
+          headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}` }
+        });
+      } else {
+        await fetch(`${sbUrl}/rest/v1/portfolio_tools`, {
+          method: 'POST',
+          headers: {
+            apikey: anonKey,
+            Authorization: `Bearer ${anonKey}`,
+            'Content-Type': 'application/json',
+            Prefer: 'resolution=merge-duplicates'
+          },
+          body: JSON.stringify({
+            id: tool.id,
+            name: tool.name,
+            category: tool.category || '',
+            icon_type: tool.icon_type || 'figma',
+            custom_icon_url: tool.custom_icon_url || '',
+            display_order: tool.display_order || 0
+          })
+        });
+      }
+    } catch (e) {}
+  }
+}
+
+const showToolNotification = (msg, isError = false) => {
+  const statusEl = $('#tool-save-status');
+  if (statusEl) {
+    statusEl.textContent = msg;
+    statusEl.style.display = 'block';
+    statusEl.style.background = isError ? '#ffebeb' : '#eefbf3';
+    statusEl.style.color = isError ? '#d32f2f' : '#0d7f44';
+    statusEl.style.borderColor = isError ? '#f5c6cb' : '#b7ebd0';
+    setTimeout(() => {
+      if (statusEl) statusEl.style.display = 'none';
+    }, 3500);
+  }
+};
+
+const getAdminToolBadgeHtml = (iconType, customUrl, name) => {
+  try {
+    const type = (iconType || 'figma').toLowerCase();
+    const safeCustomUrl = typeof cleanImgUrl === 'function' ? cleanImgUrl(customUrl) : String(customUrl || '').trim();
+    if (type === 'custom-image' || (safeCustomUrl && safeCustomUrl.length > 0)) {
+      return `<div class="tool-app-badge" style="width:40px;height:40px;border-radius:10px;background:#ffffff;border:1px solid #ece5dd;overflow:hidden;display:grid;place-items:center;flex-shrink:0;"><img src="${escapeHtml(safeCustomUrl)}" alt="${escapeHtml(name)}" style="width:24px;height:24px;object-fit:contain;" onerror="this.style.display='none'" /></div>`;
+    }
+    if (type === 'figma') {
+      return `<div class="tool-app-badge badge-figma" style="width:40px;height:40px;border-radius:10px;display:grid;place-items:center;flex-shrink:0;background:#1e1e1e;">
+        <svg width="18" height="26" viewBox="0 0 38 57" fill="none">
+          <path d="M19 28.5C19 23.2533 23.2533 19 28.5 19C33.7467 19 38 23.2533 38 28.5C38 33.7467 33.7467 38 28.5 38C23.2533 38 19 33.7467 19 28.5Z" fill="#1ABCFE"/>
+          <path d="M0 47.5C0 42.2533 4.25329 38 9.5 38H19V47.5C19 52.7467 14.7467 57 9.5 57C4.25329 57 0 52.7467 0 47.5Z" fill="#0ACF83"/>
+          <path d="M19 0V19H28.5C33.7467 19 38 14.7467 38 9.5C38 4.25329 33.7467 0 28.5 0H19Z" fill="#FF7262"/>
+          <path d="M0 9.5C0 14.7467 4.25329 19 9.5 19H19V0H9.5C4.25329 0 0 4.25329 0 9.5Z" fill="#F24E1E"/>
+          <path d="M0 28.5C0 33.7467 4.25329 38 9.5 38H19V19H9.5C4.25329 19 0 23.2533 0 28.5Z" fill="#A259FF"/>
+        </svg>
+      </div>`;
+    }
+    if (type === 'figjam') {
+      return `<div class="tool-app-badge badge-figjam" style="width:40px;height:40px;border-radius:10px;display:grid;place-items:center;flex-shrink:0;background:linear-gradient(135deg,#8a3ffc 0%,#6929c4 100%);">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="m12 19 7-7 3 3-7 7-3-3z"/>
+          <path d="m18 13-1.5-7.5L2 2l3.5 14.5L13 18"/>
+          <path d="m2 2 7.586 7.586"/>
+        </svg>
+      </div>`;
+    }
+    if (type === 'photoshop') {
+      return `<div class="tool-app-badge badge-photoshop" style="width:40px;height:40px;border-radius:10px;display:grid;place-items:center;flex-shrink:0;background:#001e36;"><span style="color:#31a8ff;font-weight:900;font-size:16px;">Ps</span></div>`;
+    }
+    if (type === 'illustrator') {
+      return `<div class="tool-app-badge badge-illustrator" style="width:40px;height:40px;border-radius:10px;display:grid;place-items:center;flex-shrink:0;background:#330000;"><span style="color:#ff9a00;font-weight:900;font-size:16px;">Ai</span></div>`;
+    }
+    if (type === 'aftereffects') {
+      return `<div class="tool-app-badge badge-aftereffects" style="width:40px;height:40px;border-radius:10px;display:grid;place-items:center;flex-shrink:0;background:#00005b;"><span style="color:#9999ff;font-weight:900;font-size:16px;">Ae</span></div>`;
+    }
+    if (type === 'framer') {
+      return `<div class="tool-app-badge badge-framer" style="width:40px;height:40px;border-radius:10px;display:grid;place-items:center;flex-shrink:0;background:#000000;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="#ffffff">
+          <path d="M4 0h16v8h-8zM4 8h8l8 8H4zM4 16h8v8z"/>
+        </svg>
+      </div>`;
+    }
+    if (type === 'notion') {
+      return `<div class="tool-app-badge badge-notion" style="width:40px;height:40px;border-radius:10px;display:grid;place-items:center;flex-shrink:0;background:#ffffff;border:1.5px solid #ece5dd;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="#000000">
+          <path d="M4.459 4.208c.746.606 1.026.56 2.428.466l11.459-.699c1.073-.093 1.353-.466 1.026-1.166L17.75 1.55C17.377.944 16.724.711 15.65.757L2.454 1.737C1.474 1.83 1.147 2.296 1.474 3.042l2.985 1.166zm1.306 3.172v13.62c0 .933.56 1.306 1.586 1.213l13.71-.84c1.026-.093 1.353-.653 1.353-1.586V6.167c0-.933-.466-1.306-1.4-1.213l-13.85.84c-.933.093-1.399.653-1.399 1.586zm11.365.886c.093.513 0 1.026-.513 1.073l-.933.093v8.583c-.606.373-1.166.56-1.633.56-.746 0-1.026-.233-1.54-.886l-4.29-6.389v6.11c.56.093 1.026.233 1.026.746 0 .513-.42.56-.98.606l-2.844.187c-.093-.513.047-1.026.56-1.073l.886-.093V9.293c-.466-.093-.933-.14-1.306-.14-.513 0-.606-.233-.606-.606 0-.466.327-.56.886-.606l3.03-.187 4.572 6.808v-5.69c-.466-.093-.933-.14-1.306-.14-.513 0-.606-.233-.606-.606 0-.466.327-.56.886-.606l2.844-.187c.093.513 0 .98-.187 1.026z"/>
+        </svg>
+      </div>`;
+    }
+    if (type === 'aitools') {
+      return `<div class="tool-app-badge badge-aitools" style="width:40px;height:40px;border-radius:10px;display:grid;place-items:center;flex-shrink:0;background:#ffffff;border:1.5px solid #ffe6da;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+          <path d="M12 2L14.39 8.26L21 9.27L16.2 13.97L17.34 20.73L12 17.27L6.66 20.73L7.8 13.97L3 9.27L9.61 8.26L12 2Z" fill="url(#ai-star-grad-adm)"/>
+          <defs>
+            <linearGradient id="ai-star-grad-adm" x1="3" y1="2" x2="21" y2="20.73" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#FF7A00"/>
+              <stop offset="1" stop-color="#FF381E"/>
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>`;
+    }
+    if (type === 'spline') {
+      return `<div class="tool-app-badge" style="width:40px;height:40px;border-radius:10px;background:#0e1117;border:1px solid #232733;color:#00f5d4;font-family:'DM Mono',monospace;font-weight:900;font-size:14px;display:grid;place-items:center;flex-shrink:0;">Sp</div>`;
+    }
+    if (type === 'rive') {
+      return `<div class="tool-app-badge" style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#ff5a5f,#ff2a54);color:#fff;font-weight:900;font-size:16px;display:grid;place-items:center;flex-shrink:0;">R</div>`;
+    }
+    if (type === 'blender') {
+      return `<div class="tool-app-badge" style="width:40px;height:40px;border-radius:10px;background:#ea7600;color:#fff;font-weight:900;font-size:15px;display:grid;place-items:center;flex-shrink:0;">Bl</div>`;
+    }
+    if (type === 'webflow') {
+      return `<div class="tool-app-badge" style="width:40px;height:40px;border-radius:10px;background:#146ef5;color:#fff;font-weight:900;font-size:16px;display:grid;place-items:center;flex-shrink:0;">W</div>`;
+    }
+    if (type === 'vscode') {
+      return `<div class="tool-app-badge" style="width:40px;height:40px;border-radius:10px;background:#0065a9;color:#fff;font-family:'DM Mono',monospace;font-weight:900;font-size:13px;display:grid;place-items:center;flex-shrink:0;">VS</div>`;
+    }
+    if (type === 'github') {
+      return `<div class="tool-app-badge" style="width:40px;height:40px;border-radius:10px;background:#181717;color:#fff;font-weight:900;font-size:14px;display:grid;place-items:center;flex-shrink:0;">Gh</div>`;
+    }
+    if (type === 'linear') {
+      return `<div class="tool-app-badge" style="width:40px;height:40px;border-radius:10px;background:#5e6ad2;color:#fff;font-weight:900;font-size:15px;display:grid;place-items:center;flex-shrink:0;">L</div>`;
+    }
+    if (type === 'miro') {
+      return `<div class="tool-app-badge" style="width:40px;height:40px;border-radius:10px;background:#ffd02f;color:#050038;font-weight:900;font-size:16px;display:grid;place-items:center;flex-shrink:0;">M</div>`;
+    }
+    if (type === 'sketch') {
+      return `<div class="tool-app-badge" style="width:40px;height:40px;border-radius:10px;background:#fdb300;color:#fff;font-weight:900;font-size:16px;display:grid;place-items:center;flex-shrink:0;">◆</div>`;
+    }
+    return `<div class="tool-app-badge" style="width:40px;height:40px;border-radius:10px;background:#fff5f0;border:1px solid #ffe6da;color:var(--accent,#ff4e1b);font-weight:800;font-size:14px;display:grid;place-items:center;flex-shrink:0;">${escapeHtml((name || 'T').slice(0,2).toUpperCase())}</div>`;
+  } catch (err) {
+    return `<div class="tool-app-badge" style="width:40px;height:40px;border-radius:10px;background:#fff5f0;border:1px solid #ffe6da;color:var(--accent,#ff4e1b);font-weight:800;font-size:14px;display:grid;place-items:center;flex-shrink:0;">${escapeHtml((name || 'T').slice(0,2).toUpperCase())}</div>`;
+  }
+};
+
+const fetchTools = async () => {
+  // 1. If user has already saved or customized tools in localStorage, use that state permanently!
+  const localSaved = loadToolsFromStorage();
+  if (localSaved !== null) {
+    allToolsData = localSaved;
+    renderToolsList();
+    return;
+  }
+
+  // 2. First-time initialization only: Try API / Supabase
+  try {
+    const res = await apiFetch('/api/tools');
+    if (res.ok) {
+      const remoteData = await res.json();
+      if (Array.isArray(remoteData) && remoteData.length) {
+        allToolsData = remoteData;
+        saveToolsToStorage(allToolsData);
+        renderToolsList();
+        return;
+      }
+    }
+  } catch (err) {}
+
+  // 3. Fallback to default initial list on first launch
+  allToolsData = [...defaultAdminToolsList];
+  saveToolsToStorage(allToolsData);
+  renderToolsList();
+};
+
+const renderToolsList = () => {
+  const container = $('#tools-admin-list');
+  const countNum = $('#tools-count-num');
+  if (countNum) countNum.textContent = String(allToolsData.length);
+  if (!container) return;
+
+  if (!allToolsData.length) {
+    container.innerHTML = '<p style="color:#74716e;font-size:13px;padding:16px;grid-column:1/-1;">No tools in your toolkit yet. Use the form above to add your first tool!</p>';
+    return;
+  }
+
+  container.innerHTML = allToolsData.map((tool, idx) => {
+    try {
+      const rawCat = tool.category || '';
+      const lines = rawCat.split(/[\n|]/).map(l => l.trim()).filter(Boolean);
+      const subtext = lines.join(' · ') || 'Toolkit App';
+      const badgeHtml = getAdminToolBadgeHtml(tool.icon_type || tool.iconType, tool.custom_icon_url || tool.customIconUrl, tool.name);
+
+      return `
+        <div style="background:#ffffff;border:1px solid #ebe5df;border-radius:16px;padding:16px;display:flex;flex-direction:column;justify-content:space-between;gap:12px;box-shadow:0 2px 10px rgba(0,0,0,0.02);">
+          <div style="display:flex;align-items:center;gap:12px;">
+            ${badgeHtml}
+            <div style="min-width:0;flex:1;">
+              <strong style="display:block;font-size:14.5px;color:#121211;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHtml(tool.name)}</strong>
+              <small style="color:#74716e;font-size:11.5px;display:block;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHtml(subtext)}</small>
+            </div>
+          </div>
+
+          <div style="display:flex;align-items:center;justify-content:flex-end;gap:8px;padding-top:10px;border-top:1px solid #f2ede8;">
+            <button type="button" data-edit-tool="${escapeHtml(tool.id)}" style="padding:6px 14px;border:1px solid #dfddda;background:#ffffff;color:#121211;border-radius:99px;font-size:11.5px;font-weight:700;cursor:pointer;">✏️ Edit</button>
+            <button type="button" data-remove-tool="${escapeHtml(tool.id)}" style="padding:6px 14px;border:1px solid #ff3b30;color:#ff3b30;background:#ffffff;border-radius:99px;font-size:11.5px;font-weight:700;cursor:pointer;">🗑️ Delete</button>
+          </div>
+        </div>
+      `;
+    } catch (err) {
+      return '';
+    }
+  }).join('');
+
+  // Wire Edit Handlers
+  container.querySelectorAll('[data-edit-tool]').forEach(btn => {
+    btn.onclick = (e) => {
+      e.preventDefault();
+      const toolId = btn.dataset.editTool;
+      const tool = allToolsData.find(t => String(t.id) === String(toolId));
+      if (!tool) return;
+
+      $('#tool-id-input').value = tool.id;
+      $('#tool-name-input').value = tool.name || '';
+      $('#tool-category-input').value = tool.category || '';
+      const iconSelect = $('#tool-icon-select');
+      if (iconSelect) {
+        iconSelect.value = tool.icon_type || tool.iconType || 'figma';
+        const customWrap = $('#tool-custom-img-wrap');
+        if (customWrap) {
+          customWrap.style.display = (iconSelect.value === 'custom-image') ? 'block' : 'none';
+        }
+      }
+      $('#tool-custom-url').value = tool.custom_icon_url || tool.customIconUrl || '';
+      $('#tool-form-title').textContent = `✏️ Edit Tool: ${tool.name}`;
+      $('#save-tool-btn').textContent = '💾 Update Tool';
+      const cancelBtn = $('#cancel-tool-edit-btn');
+      if (cancelBtn) cancelBtn.style.display = 'inline-block';
+      $('#tool-name-input').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    };
+  });
+
+  // Wire Remove Handlers
+  container.querySelectorAll('[data-remove-tool]').forEach(btn => {
+    btn.onclick = async (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const toolId = btn.dataset.removeTool;
+      if (!confirm('Are you sure you want to remove this tool from your toolkit?')) return;
+
+      // Immediately remove from local state & storage
+      allToolsData = allToolsData.filter(t => String(t.id) !== String(toolId));
+      saveToolsToStorage(allToolsData);
+      renderToolsList();
+      showToolNotification('🗑️ Tool removed from toolkit');
+
+      // Background sync
+      syncToolToBackend({ id: toolId }, true);
+    };
+  });
+};
+
+// Toggle Custom Image section when dropdown changes
+const toolIconSelect = $('#tool-icon-select');
+if (toolIconSelect) {
+  toolIconSelect.onchange = () => {
+    const customWrap = $('#tool-custom-img-wrap');
+    if (customWrap) {
+      customWrap.style.display = (toolIconSelect.value === 'custom-image') ? 'block' : 'none';
+    }
+  };
+}
+
+// Reset Tool Form Helper
+const resetToolForm = () => {
+  $('#tool-id-input').value = '';
+  $('#tool-name-input').value = '';
+  $('#tool-category-input').value = '';
+  $('#tool-custom-url').value = '';
+  if ($('#tool-custom-file')) $('#tool-custom-file').value = '';
+  if ($('#tool-icon-select')) $('#tool-icon-select').value = 'figma';
+  const customWrap = $('#tool-custom-img-wrap');
+  if (customWrap) customWrap.style.display = 'none';
+  $('#tool-form-title').textContent = 'Add / Edit Tool';
+  $('#save-tool-btn').textContent = '✨ Save Tool to Toolkit';
+  const cancelBtn = $('#cancel-tool-edit-btn');
+  if (cancelBtn) cancelBtn.style.display = 'none';
+};
+
+const cancelToolEditBtn = $('#cancel-tool-edit-btn');
+if (cancelToolEditBtn) {
+  cancelToolEditBtn.onclick = resetToolForm;
+}
+
+const saveToolBtn = $('#save-tool-btn');
+if (saveToolBtn) {
+  saveToolBtn.onclick = async e => {
+    if (e) { e.preventDefault(); e.stopPropagation(); }
+    const nameVal = $('#tool-name-input').value.trim();
+    if (!nameVal) {
+      showToolNotification('Tool Name is required.', true);
+      return;
+    }
+
+    let customUrl = $('#tool-custom-url').value.trim();
+    const fileElem = $('#tool-custom-file');
+    if (fileElem && fileElem.files && fileElem.files[0]) {
+      try {
+        customUrl = await fileToUrl(fileElem.files[0]);
+      } catch (err) {
+        showToolNotification('Failed to process image file.', true);
+        return;
+      }
+    }
+
+    const editId = $('#tool-id-input').value;
+    const isEdit = Boolean(editId);
+    const toolId = editId || `tool-${Date.now()}`;
+
+    const payload = {
+      id: toolId,
+      name: nameVal,
+      category: $('#tool-category-input').value.trim() || '',
+      icon_type: $('#tool-icon-select').value || 'figma',
+      custom_icon_url: customUrl,
+      display_order: isEdit ? (allToolsData.find(t => String(t.id) === String(toolId))?.display_order || 1) : (allToolsData.length + 1)
+    };
+
+    // 1. Instantly update memory & localStorage
+    if (isEdit) {
+      const idx = allToolsData.findIndex(t => String(t.id) === String(toolId));
+      if (idx !== -1) allToolsData[idx] = { ...allToolsData[idx], ...payload };
+      else allToolsData.push(payload);
+    } else {
+      allToolsData.push(payload);
+    }
+
+    saveToolsToStorage(allToolsData);
+    renderToolsList();
+    resetToolForm();
+
+    // 2. Perform backend & Supabase sync in background
+    syncToolToBackend(payload, false);
+
+    // 3. User feedback inline notification
+    const statusMsg = isEdit ? '✓ Tool updated successfully!' : '✓ New tool added to Toolkit!';
+    showToolNotification(statusMsg);
+  };
+}
+
+fetchTools();
 
 // -------------------------------------------------------------
 // Mobile Sidebar Drawer Controller

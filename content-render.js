@@ -44,50 +44,54 @@
   const defaultWorkItems = [
     {
       id: 'w1',
-      title: 'Hanioo — Real-Time Interpreter Marketplace',
-      category: 'work|main|Product Design',
+      title: 'Flubn.',
+      subtitle: 'An influencer Platform',
+      category: 'work|main|PRODUCT DESIGN',
+      description: 'Flubn connects brands and creators in one seamless platform — discover, collaborate and grow impact together.',
+      url: 'https://flubn.com',
+      productUrl: 'https://flubn.com',
+      image: '',
+      featured: true,
+      tags: 'Product | 2025 - 2026 | APP',
+      tools: 'Figma | Next.js | Tailwind | Microcharts'
+    },
+    {
+      id: 'w2',
+      title: 'Hanioo.',
+      subtitle: 'Real-Time Interpreter Marketplace',
+      category: 'work|main|PRODUCT DESIGN',
       description: 'An on-demand interpreter booking ecosystem connecting global clients with certified multi-lingual specialists in under 30 seconds.',
       url: 'https://www.behance.net/gallery/248442393/Hanioo-Interpretation-Application',
       productUrl: 'https://hanioo.com',
       image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1200&q=95',
       featured: true,
-      tags: 'Product Design | Mobile & Web | Real-Time Dispatch | Design System',
-      tools: 'Figma | React Native | Next.js | WebSockets'
-    },
-    {
-      id: 'w2',
-      title: 'Flubn — AI Creator Studio & Video Monetization',
-      category: 'work|main|UI/UX Strategy',
-      description: 'Empowering digital creators with automated video editing, multi-track timelines, and audience monetization tools.',
-      url: 'https://flubn.com',
-      productUrl: 'https://flubn.com',
-      image: 'https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?auto=format&fit=crop&w=1200&q=95',
-      featured: true,
-      tags: 'UI/UX Strategy | Creator Tools | AI Workflows | Video Editor',
-      tools: 'Figma | WebGL | Canvas API | Tailwind'
+      tags: 'Product | 2024 - 2025 | Mobile & Web',
+      tools: 'Figma | React Native | WebSockets'
     },
     {
       id: 'w3',
-      title: 'FinScale — Enterprise Liquidity & Wealth Analytics',
-      category: 'work|main|Fintech Product',
+      title: 'FinScale.',
+      subtitle: 'Enterprise Liquidity Analytics',
+      category: 'work|main|FINTECH PRODUCT',
       description: 'High-density financial analytics platform engineered for portfolio managers, tracking real-time asset flows and predictive yields.',
       url: 'https://behance.net',
       productUrl: '',
       image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1200&q=95',
       featured: true,
-      tags: 'Fintech | Data Visualization | Dark Mode UI | Enterprise Dashboard',
-      tools: 'Figma | D3.js | Design Tokens | Microcharts'
+      tags: 'Product | 2024 | Web Dashboard',
+      tools: 'Figma | D3.js | Design Tokens'
     },
     {
       id: 'w4',
-      title: 'Portagam — Global Digital Asset Exchange',
-      category: 'work|main|Design Systems',
+      title: 'Portagam.',
+      subtitle: 'Digital Asset Exchange',
+      category: 'work|main|DESIGN SYSTEMS',
       description: 'A curated marketplace and collaborative workspace for 3D artists, UI creators, and digital brand designers.',
       url: 'https://dribbble.com',
       productUrl: '',
       image: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=1200&q=95',
       featured: false,
-      tags: 'Design Systems | Asset Marketplace | Web Application | 3D Assets',
+      tags: 'Design System | 2023 - 2024 | Web App',
       tools: 'Figma | Three.js | Token Engine'
     }
   ];
@@ -288,6 +292,7 @@
         else if (path === '/api/testimonials') table = 'portfolio_testimonials?select=*&order=created_at.desc';
         else if (path === '/api/brands') table = 'portfolio_brands?select=*&order=created_at.desc';
         else if (path === '/api/milestones') table = 'portfolio_milestones?select=*&order=display_order.asc,created_at.desc';
+        else if (path === '/api/tools') table = 'portfolio_tools?select=*&order=display_order.asc,created_at.asc';
         else if (path === '/api/settings') table = 'portfolio_settings?id=eq.global&select=*';
 
         if (table) {
@@ -314,6 +319,15 @@
                 platform: row.platform || '',
                 journalType: row.journal_type || 'link',
                 createdAt: row.created_at
+              }));
+            } else if (path === '/api/tools') {
+              payload = (raw || []).map(row => ({
+                id: row.id,
+                name: row.name,
+                category: row.category || '',
+                icon_type: row.icon_type || 'figma',
+                custom_icon_url: row.custom_icon_url || '',
+                display_order: row.display_order || 0
               }));
             } else if (path === '/api/settings') {
               payload = (Array.isArray(raw) && raw[0] && raw[0].settings) ? raw[0].settings : {};
@@ -343,6 +357,8 @@
             return { ok: true, status: 200, json: async () => staticData.testimonials, text: async () => JSON.stringify(staticData.testimonials) };
           } else if (path === '/api/brands' && staticData.brands && staticData.brands.length) {
             return { ok: true, status: 200, json: async () => staticData.brands, text: async () => JSON.stringify(staticData.brands) };
+          } else if (path === '/api/tools' && staticData.tools && staticData.tools.length) {
+            return { ok: true, status: 200, json: async () => staticData.tools, text: async () => JSON.stringify(staticData.tools) };
           }
         }
       } catch (e) {}
@@ -369,107 +385,8 @@
     return { ok: false, json: async () => (path === '/api/settings' ? defaultSettings : []) };
   }
 
-  // Default fallback articles (displayed when no CMS journal items are created yet)
-  const defaultJournalArticles = [
-    {
-      id: 'art-1',
-      title: 'Building Design Systems That Scale Across Multi-Platform Products',
-      description: 'A deep dive into token architecture, component governance, and maintaining design consistency across web and mobile ecosystems.',
-      category: 'journal|main|Product Design',
-      createdAt: '2026-05-12T00:00:00.000Z',
-      readTime: '8 min read',
-      platform: 'Design Systems',
-      featured: true,
-      image: 'https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?auto=format&fit=crop&w=800&q=80',
-      journalType: 'blog',
-      tags: 'Design System | Tokens | Scalability | Architecture',
-      contentBody: '<h2>The Architecture of Modern Design Systems</h2><p>Design systems are the operational backbone of high-velocity product teams. In this article, we explore how to structure design tokens, enforce semantic naming conventions, and establish component lifecycles that bridge the gap between Figma and production code.</p>'
-    },
-    {
-      id: 'art-2',
-      title: 'Micro-Interactions and the Psychology of Fluid UI Motion',
-      description: 'How subtle animation curves, tactile haptics, and spatial physics transform static interfaces into intuitive experiences.',
-      category: 'journal|main|UX / UI Design',
-      createdAt: '2026-04-28T00:00:00.000Z',
-      readTime: '6 min read',
-      platform: 'Motion Design',
-      featured: false,
-      image: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=800&q=80',
-      journalType: 'blog',
-      tags: 'Motion | Micro-interactions | UI | Physics',
-      contentBody: '<h2>Crafting Intentional Motion</h2><p>Motion in digital interfaces should never be ornamental. Every easing curve and transition duration communicates physical affordance, hierarchy, and spatial continuity.</p>'
-    },
-    {
-      id: 'art-3',
-      title: 'From Discovery to Delivery: The 6-Stage Product Design Framework',
-      description: 'A pragmatic walkthrough of how user research, problem definition, rapid prototyping, and developer handoff come together.',
-      category: 'journal|main|Process',
-      createdAt: '2026-04-15T00:00:00.000Z',
-      readTime: '10 min read',
-      platform: 'Process & Strategy',
-      featured: false,
-      image: 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?auto=format&fit=crop&w=800&q=80',
-      journalType: 'blog',
-      tags: 'Framework | Strategy | Discovery | UX Process',
-      contentBody: '<h2>The Product Design Framework</h2><p>Great product design is a disciplined balance between user empathy and business execution. Here is the framework refined over 4.5+ years of shipping digital products.</p>'
-    },
-    {
-      id: 'art-4',
-      title: 'Designing for AI Interfaces: Beyond Chatbots and Prompts',
-      description: 'Exploring canvas-based generative workflows, proactive agent suggestions, and human-in-the-loop UX patterns.',
-      category: 'journal|main|Opinion',
-      createdAt: '2026-03-30T00:00:00.000Z',
-      readTime: '7 min read',
-      platform: 'AI & Future UX',
-      featured: false,
-      image: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800&q=80',
-      journalType: 'blog',
-      tags: 'Generative AI | AI UX | Interface Design | Future Tech',
-      contentBody: '<h2>The Next Era of AI Interfaces</h2><p>Conversational chat is only the first step. The future of AI tools lies in spatial canvases, proactive agent suggestions, and context-aware workspace tools.</p>'
-    },
-    {
-      id: 'art-5',
-      title: 'The Modern Product Designer Toolstack in 2026',
-      description: 'An overview of the tools, plugins, AI assistants, and code prototyping setups that power daily design workflows.',
-      category: 'journal|main|Tools',
-      createdAt: '2026-03-14T00:00:00.000Z',
-      readTime: '5 min read',
-      platform: 'Tools & Workflow',
-      featured: false,
-      image: 'https://images.unsplash.com/photo-1581291518633-83b4ebd1d83e?auto=format&fit=crop&w=800&q=80',
-      journalType: 'blog',
-      tags: 'Figma | Tooling | AI Plugins | Prototyping',
-      contentBody: '<h2>Our Daily Tooling Ecosystem</h2><p>A breakdown of the modern design stack: from Figma and Origami Studio to code prototyping and AI augmentation.</p>'
-    },
-    {
-      id: 'art-6',
-      title: 'Lessons from 4.5+ Years as a Product Designer: Growth, Craft & Strategy',
-      description: 'Reflections on career milestones, communicating design value to stakeholders, and cultivating obsessive craft.',
-      category: 'journal|main|Career',
-      createdAt: '2026-02-20T00:00:00.000Z',
-      readTime: '9 min read',
-      platform: 'Career Reflections',
-      featured: false,
-      image: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=800&q=80',
-      journalType: 'blog',
-      tags: 'Career | Senior Design | Leadership | Stakeholders',
-      contentBody: '<h2>Career Reflections in Product Design</h2><p>Key lessons learned from starting as a junior UI designer to leading end-to-end product experiences across complex domains.</p>'
-    },
-    {
-      id: 'art-7',
-      title: 'Cognitive Biases in Digital Product Design: Ethics and Friction',
-      description: 'Understanding how anchoring, loss aversion, and cognitive load shape user decision making—and designing ethically.',
-      category: 'journal|main|Design Thinking',
-      createdAt: '2026-01-18T00:00:00.000Z',
-      readTime: '8 min read',
-      platform: 'Design Psychology',
-      featured: false,
-      image: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=800&q=80',
-      journalType: 'blog',
-      tags: 'Psychology | Ethics | Behavioral Economics | Heuristics',
-      contentBody: '<h2>Ethical Psychology in Product UX</h2><p>How behavioral economics and user psychology inform interface decisions while maintaining transparent, user-first integrity.</p>'
-    }
-  ];
+  // Default fallback articles (empty by default so only user published articles appear)
+  const defaultJournalArticles = [];
 
   function formatStatLabel(rawText) {
     if (!rawText) return '';
@@ -489,45 +406,49 @@
   const applySettingsToPage = data => {
     if (!data) return;
     const map = {
-      homeHeroImage: '.portrait-wrap img',
+      homeHeroImage: '.portrait-wrap img, .hero-visual img',
       homeCenterImage: '.about-image img',
       aboutHeroImage: '.about-portrait img',
-      workHeroImage: '.work-hero img',
-      playgroundHeroImage: '.playground-hero img',
-      journalHeroImage: '.journal-hero img'
+      workHeroImage: '#work-hero-img, .work-hero-visual img, .work-hero img',
+      playgroundHeroImage: '#pg-hero-img, .pg-hero-visual img, .pg-hero img, .playground-hero img',
+      journalHeroImage: '#journal-hero-img, .journal-hero-visual img, .journal-hero img'
     };
     Object.entries(map).forEach(([key, selector]) => {
-      if (data[key] && document.querySelector(selector)) {
-        document.querySelector(selector).src = cleanImgUrl(data[key]);
+      if (data[key]) {
+        document.querySelectorAll(selector).forEach(img => {
+          img.src = cleanImgUrl(data[key]);
+          if (img.style.display === 'none') img.style.display = 'block';
+        });
       }
     });
 
     const posMap = {
-      homeHeroPosition: '.portrait-wrap img',
+      homeHeroPosition: '.portrait-wrap img, .hero-visual img',
       homeCenterPosition: '.about-image img',
       aboutHeroPosition: '.about-portrait img',
-      workHeroPosition: '.work-hero img',
-      playgroundHeroPosition: '.playground-hero img',
-      journalHeroPosition: '.journal-hero img'
+      workHeroPosition: '#work-hero-img, .work-hero-visual img, .work-hero img',
+      playgroundHeroPosition: '#pg-hero-img, .pg-hero-visual img, .pg-hero img, .playground-hero img',
+      journalHeroPosition: '#journal-hero-img, .journal-hero-visual img, .journal-hero img'
     };
     Object.entries(posMap).forEach(([key, selector]) => {
-      if (data[key] && document.querySelector(selector)) {
-        document.querySelector(selector).style.objectPosition = data[key];
-        document.querySelector(selector).style.objectFit = 'cover';
+      if (data[key]) {
+        document.querySelectorAll(selector).forEach(img => {
+          img.style.objectPosition = data[key];
+          img.style.objectFit = 'cover';
+        });
       }
     });
 
     const colorMap = {
-      homeHeroColorMode: '.portrait-wrap img',
+      homeHeroColorMode: '.portrait-wrap img, .hero-visual img',
       homeCenterColorMode: '.about-image img',
       aboutHeroColorMode: '.about-portrait img',
-      workHeroColorMode: '.work-hero img',
-      playgroundHeroColorMode: '.playground-hero img',
-      journalHeroColorMode: '.journal-hero img'
+      workHeroColorMode: '#work-hero-img, .work-hero-visual img, .work-hero img',
+      playgroundHeroColorMode: '#pg-hero-img, .pg-hero-visual img, .pg-hero img, .playground-hero img',
+      journalHeroColorMode: '#journal-hero-img, .journal-hero-visual img, .journal-hero img'
     };
     Object.entries(colorMap).forEach(([key, selector]) => {
-      const el = document.querySelector(selector);
-      if (el) {
+      document.querySelectorAll(selector).forEach(el => {
         const defaultMode = key === 'homeCenterColorMode' ? 'gray' : 'original';
         const mode = data[key] || defaultMode;
         if (mode === 'original') {
@@ -537,7 +458,7 @@
         } else if (mode === 'warm-gray') {
           el.style.filter = 'grayscale(90%) sepia(20%) contrast(1.1)';
         }
-      }
+      });
     });
 
     document.querySelectorAll('a[href^="mailto:"], .contact-links a').forEach(link => {
@@ -586,6 +507,41 @@
     if (data.journalTopics && document.getElementById('blog-filters')) {
       renderJournalFilters(data.journalTopics);
     }
+
+    // Render Footer Social Links dynamically from admin settings
+    const svgIcons = {
+      linkedin: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect width="4" height="12" x="2" y="9"/><circle cx="4" cy="4" r="2"/></svg>',
+      behance: '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M7.7 11.2c1.2 0 2-.6 2-1.7 0-1-.8-1.5-1.8-1.5H3.5v3.2h4.2zm.3 3.3c1.4 0 2.3-.7 2.3-1.8 0-1.2-1-1.8-2.3-1.8H3.5v3.6H8zm9.5-1.8c0-1.8-1.3-3.2-3.1-3.2-1.9 0-3.3 1.5-3.3 3.3 0 1.9 1.4 3.4 3.4 3.4 1.5 0 2.6-.8 3-2.1h-1.6c-.3.6-.8.9-1.4.9-1 0-1.7-.6-1.8-1.6h4.8v-.6zm-4.7-.8c.1-.8.7-1.3 1.6-1.3.8 0 1.4.5 1.5 1.3h-3.1zM13 7.8h3.6v.9H13v-.9zM0 5.4h8.3c2.4 0 4.1 1.2 4.1 3.2 0 1.2-.6 2.2-1.6 2.7 1.4.5 2.1 1.6 2.1 3.1 0 2.3-1.9 3.8-4.6 3.8H0V5.4z"/></svg>',
+      instagram: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>',
+      dribbble: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M19.13 5.09C15.22 9.14 10 10.44 2.25 10.94"/><path d="M21.75 12.84c-6.62-1.41-12.14 1-16.38 6.32"/><path d="M8.56 2.75c4.37 6 6 9.42 8 17.72"/></svg>',
+      twitter: '<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>',
+      youtube: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17"/><polygon points="10 15 15 12 10 9 10 15"/></svg>'
+    };
+
+    const links = [];
+    if (data.socialLinkedIn && data.socialLinkedIn.trim()) links.push({ name: 'LinkedIn', url: data.socialLinkedIn.trim(), icon: svgIcons.linkedin });
+    if (data.socialBehance && data.socialBehance.trim()) links.push({ name: 'Behance', url: data.socialBehance.trim(), icon: svgIcons.behance });
+    if (data.socialInstagram && data.socialInstagram.trim()) links.push({ name: 'Instagram', url: data.socialInstagram.trim(), icon: svgIcons.instagram });
+    if (data.socialDribbble && data.socialDribbble.trim()) links.push({ name: 'Dribbble', url: data.socialDribbble.trim(), icon: svgIcons.dribbble });
+    if (data.socialTwitter && data.socialTwitter.trim()) links.push({ name: 'Twitter / X', url: data.socialTwitter.trim(), icon: svgIcons.twitter });
+    if (data.socialYoutube && data.socialYoutube.trim()) links.push({ name: 'YouTube', url: data.socialYoutube.trim(), icon: svgIcons.youtube });
+
+    if (!links.length) {
+      links.push(
+        { name: 'LinkedIn', url: 'https://linkedin.com', icon: svgIcons.linkedin },
+        { name: 'Behance', url: 'https://behance.net', icon: svgIcons.behance },
+        { name: 'Instagram', url: 'https://instagram.com', icon: svgIcons.instagram }
+      );
+    }
+
+    document.querySelectorAll('#footer-social-links, .footer-social').forEach(el => {
+      el.innerHTML = links.map(item => `
+        <a class="social-link-pill" href="${item.url}" target="_blank" rel="noopener noreferrer">
+          ${item.icon}
+          <span>${item.name}</span>
+        </a>
+      `).join('');
+    });
   };
 
   const defaultPlaygroundTopics = ['UI & Motion', 'Concepts', '3D & Visuals', 'Quick Sketches', 'Just for Fun'];
@@ -870,6 +826,166 @@
     });
   }).catch(() => {});
 
+  // ─── TOOLKIT & TOOLS CMS RENDERING (about.html) ───
+  const aboutToolsGrid = document.querySelector('#about-tools-grid');
+  if (aboutToolsGrid) {
+    const defaultToolsList = [
+      { id: 't1', name: 'Figma', category: 'UI/UX · Prototyping | Design Systems', icon_type: 'figma' },
+      { id: 't2', name: 'FigJam', category: 'Workshops · User Flows | Mapping', icon_type: 'figjam' },
+      { id: 't3', name: 'Adobe Photoshop', category: 'Visual Design · | Image Editing', icon_type: 'photoshop' },
+      { id: 't4', name: 'Adobe Illustrator', category: 'Branding · Illustration | Graphics', icon_type: 'illustrator' },
+      { id: 't5', name: 'Adobe After Effects', category: 'Motion · Visual | Content', icon_type: 'aftereffects' },
+      { id: 't6', name: 'Framer', category: 'Web Design · | Prototyping', icon_type: 'framer' },
+      { id: 't7', name: 'Notion', category: 'Documentation · | Planning', icon_type: 'notion' },
+      { id: 't8', name: 'AI Tools', category: 'Ideation · Content | Visual Exploration', icon_type: 'aitools' }
+    ];
+
+    const getToolBadgeMarkup = (iconType, customUrl, name) => {
+      const type = (iconType || 'figma').toLowerCase();
+      if (type === 'custom-image' || (customUrl && customUrl.trim())) {
+        return `<div class="tool-app-badge" style="background:#ffffff;border:1.5px solid #ece5dd;overflow:hidden;"><img src="${escape(cleanImgUrl(customUrl))}" alt="${escape(name)}" style="width:28px;height:28px;object-fit:contain;" /></div>`;
+      }
+      if (type === 'figma') {
+        return `<div class="tool-app-badge badge-figma">
+          <svg width="22" height="32" viewBox="0 0 38 57" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M19 28.5C19 23.2533 23.2533 19 28.5 19C33.7467 19 38 23.2533 38 28.5C38 33.7467 33.7467 38 28.5 38C23.2533 38 19 33.7467 19 28.5Z" fill="#1ABCFE"/>
+            <path d="M0 47.5C0 42.2533 4.25329 38 9.5 38H19V47.5C19 52.7467 14.7467 57 9.5 57C4.25329 57 0 52.7467 0 47.5Z" fill="#0ACF83"/>
+            <path d="M19 0V19H28.5C33.7467 19 38 14.7467 38 9.5C38 4.25329 33.7467 0 28.5 0H19Z" fill="#FF7262"/>
+            <path d="M0 9.5C0 14.7467 4.25329 19 9.5 19H19V0H9.5C4.25329 0 0 4.25329 0 9.5Z" fill="#F24E1E"/>
+            <path d="M0 28.5C0 33.7467 4.25329 38 9.5 38H19V19H9.5C4.25329 19 0 23.2533 0 28.5Z" fill="#A259FF"/>
+          </svg>
+        </div>`;
+      }
+      if (type === 'figjam') {
+        return `<div class="tool-app-badge badge-figjam">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m12 19 7-7 3 3-7 7-3-3z"/>
+            <path d="m18 13-1.5-7.5L2 2l3.5 14.5L13 18"/>
+            <path d="m2 2 7.586 7.586"/>
+          </svg>
+        </div>`;
+      }
+      if (type === 'photoshop') {
+        return `<div class="tool-app-badge badge-photoshop"><span class="adobe-text-ps">Ps</span></div>`;
+      }
+      if (type === 'illustrator') {
+        return `<div class="tool-app-badge badge-illustrator"><span class="adobe-text-ai">Ai</span></div>`;
+      }
+      if (type === 'aftereffects') {
+        return `<div class="tool-app-badge badge-aftereffects"><span class="adobe-text-ae">Ae</span></div>`;
+      }
+      if (type === 'framer') {
+        return `<div class="tool-app-badge badge-framer">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="#ffffff">
+            <path d="M4 0h16v8h-8zM4 8h8l8 8H4zM4 16h8v8z"/>
+          </svg>
+        </div>`;
+      }
+      if (type === 'notion') {
+        return `<div class="tool-app-badge badge-notion">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="#000000">
+            <path d="M4.459 4.208c.746.606 1.026.56 2.428.466l11.459-.699c1.073-.093 1.353-.466 1.026-1.166L17.75 1.55C17.377.944 16.724.711 15.65.757L2.454 1.737C1.474 1.83 1.147 2.296 1.474 3.042l2.985 1.166zm1.306 3.172v13.62c0 .933.56 1.306 1.586 1.213l13.71-.84c1.026-.093 1.353-.653 1.353-1.586V6.167c0-.933-.466-1.306-1.4-1.213l-13.85.84c-.933.093-1.399.653-1.399 1.586zm11.365.886c.093.513 0 1.026-.513 1.073l-.933.093v8.583c-.606.373-1.166.56-1.633.56-.746 0-1.026-.233-1.54-.886l-4.29-6.389v6.11c.56.093 1.026.233 1.026.746 0 .513-.42.56-.98.606l-2.844.187c-.093-.513.047-1.026.56-1.073l.886-.093V9.293c-.466-.093-.933-.14-1.306-.14-.513 0-.606-.233-.606-.606 0-.466.327-.56.886-.606l3.03-.187 4.572 6.808v-5.69c-.466-.093-.933-.14-1.306-.14-.513 0-.606-.233-.606-.606 0-.466.327-.56.886-.606l2.844-.187c.093.513 0 .98-.187 1.026z"/>
+          </svg>
+        </div>`;
+      }
+      if (type === 'aitools') {
+        return `<div class="tool-app-badge badge-aitools">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+            <path d="M12 2L14.39 8.26L21 9.27L16.2 13.97L17.34 20.73L12 17.27L6.66 20.73L7.8 13.97L3 9.27L9.61 8.26L12 2Z" fill="url(#ai-star-grad-render)"/>
+            <defs>
+              <linearGradient id="ai-star-grad-render" x1="3" y1="2" x2="21" y2="20.73" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#FF7A00"/>
+                <stop offset="1" stop-color="#FF381E"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>`;
+      }
+      if (type === 'spline') {
+        return `<div class="tool-app-badge" style="background:#0e1117;border:1px solid #232733;color:#00f5d4;font-family:'DM Mono',monospace;font-weight:900;font-size:16px;">Sp</div>`;
+      }
+      if (type === 'rive') {
+        return `<div class="tool-app-badge" style="background:linear-gradient(135deg,#ff5a5f,#ff2a54);box-shadow:0 4px 12px rgba(255,42,84,0.3);color:#fff;font-family:'Manrope',sans-serif;font-weight:900;font-size:18px;">R</div>`;
+      }
+      if (type === 'blender') {
+        return `<div class="tool-app-badge" style="background:#ea7600;box-shadow:0 4px 12px rgba(234,118,0,0.3);color:#fff;font-family:'Manrope',sans-serif;font-weight:900;font-size:18px;">Bl</div>`;
+      }
+      if (type === 'webflow') {
+        return `<div class="tool-app-badge" style="background:#146ef5;box-shadow:0 4px 12px rgba(20,110,245,0.3);color:#fff;font-family:'Manrope',sans-serif;font-weight:900;font-size:18px;">W</div>`;
+      }
+      if (type === 'vscode') {
+        return `<div class="tool-app-badge" style="background:#0065a9;color:#fff;font-family:'DM Mono',monospace;font-weight:900;font-size:15px;">VS</div>`;
+      }
+      if (type === 'github') {
+        return `<div class="tool-app-badge" style="background:#181717;color:#fff;font-family:'Manrope',sans-serif;font-weight:900;font-size:17px;">Gh</div>`;
+      }
+      if (type === 'linear') {
+        return `<div class="tool-app-badge" style="background:#5e6ad2;box-shadow:0 4px 12px rgba(94,106,210,0.3);color:#fff;font-family:'Manrope',sans-serif;font-weight:900;font-size:18px;">L</div>`;
+      }
+      if (type === 'miro') {
+        return `<div class="tool-app-badge" style="background:#ffd02f;color:#050038;font-family:'Manrope',sans-serif;font-weight:900;font-size:18px;">M</div>`;
+      }
+      if (type === 'sketch') {
+        return `<div class="tool-app-badge" style="background:#fdb300;color:#fff;font-family:'Manrope',sans-serif;font-weight:900;font-size:18px;">◆</div>`;
+      }
+      return `<div class="tool-app-badge" style="background:#fff5f0;border:1px solid #ffe6da;color:var(--accent,#ff4e1b);font-weight:800;font-size:16px;">${escape((name || 'T').slice(0,2).toUpperCase())}</div>`;
+    };
+
+    const renderToolsGrid = (tools) => {
+      if (!Array.isArray(tools) || !tools.length) return;
+      aboutToolsGrid.innerHTML = tools.map(tool => {
+        const rawCat = tool.category || '';
+        const lines = rawCat.split(/[\n|]/).map(l => l.trim()).filter(Boolean);
+        const subtextHtml = lines.length >= 2
+          ? `<span>${escape(lines[0])}</span><span>${escape(lines.slice(1).join(' '))}</span>`
+          : `<span>${escape(rawCat)}</span>`;
+        const badgeMarkup = getToolBadgeMarkup(tool.icon_type || tool.iconType, tool.custom_icon_url || tool.customIconUrl, tool.name);
+
+        return `
+          <article class="tool-card-box reveal visible" data-tool-id="${escape(tool.id || '')}">
+            ${badgeMarkup}
+            <div class="tool-text-info">
+              <h3>${escape(tool.name)}</h3>
+              ${subtextHtml}
+            </div>
+          </article>
+        `;
+      }).join('');
+    };
+
+    // 1. Instantly render from user's customized localStorage
+    let initialTools = defaultToolsList;
+    let hasCustomTools = false;
+    try {
+      const isInit = localStorage.getItem('ak_portfolio_tools_initialized') === 'true';
+      const stored = localStorage.getItem('ak_portfolio_tools');
+      if (isInit && stored !== null) {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed)) {
+          initialTools = parsed;
+          hasCustomTools = true;
+        }
+      }
+    } catch (e) {}
+    renderToolsGrid(initialTools);
+
+    // 2. Only sync from backend if not purely static or if Supabase/API returns live table
+    if (!hasCustomTools) {
+      apiFetch('/api/tools')
+        .then(res => res.ok ? res.json() : null)
+        .then(data => {
+          if (Array.isArray(data) && data.length) {
+            renderToolsGrid(data);
+            try {
+              localStorage.setItem('ak_portfolio_tools', JSON.stringify(data));
+              localStorage.setItem('ak_portfolio_tools_initialized', 'true');
+            } catch (e) {}
+          }
+        })
+        .catch(() => {});
+    }
+  }
+
   apiFetch('/api/projects').then(response => response.ok ? response.json() : []).then(items => {
     try {
       const savedProj = JSON.parse(localStorage.getItem('custom_projects_order'));
@@ -1147,6 +1263,18 @@
 
     // 4. Work Page (work.html)
     if (document.body.classList.contains('work-page')) {
+      const defaultWorkItems = [
+        {
+          title: 'Flubn — An influencer Platform',
+          subtitle: 'An influencer Platform',
+          category: 'PRODUCT DESIGN',
+          tags: 'Product | 2025 - 2026 | APP',
+          description: 'Flubn connects brands and creators in one seamless platform — discover, collaborate and grow impact together.',
+          url: '#',
+          productUrl: ''
+        }
+      ];
+
       const projects = document.querySelector('.projects');
       const rawWork = items.filter(item => isWorkType(item));
       const workItems = rawWork.length ? rawWork : defaultWorkItems;
@@ -1155,39 +1283,260 @@
         if (workItems.length) {
           workItems.forEach((item, index) => {
             const num = String(index + 1).padStart(2, '0');
-            const tagsList = (item.tags || categoryOf(item) || 'Product Design').split('|').map(t => t.trim()).filter(Boolean);
-            const toolsList = (item.tools || '').split('|').map(t => t.trim()).filter(Boolean);
-            const tagsHtml = tagsList.length ? `<div class="tags-group">${tagsList.map(t => `<span class="meta-tag-pill">${escape(t)}</span>`).join('')}</div>` : '';
-            const toolsHtml = toolsList.length ? `<div class="tools-group">${toolsList.map(t => `<span class="tool-tag-pill"><i>⚡</i> ${escape(t)}</span>`).join('')}</div>` : '';
+            const categoryLabel = categoryOf(item) || 'PRODUCT DESIGN';
+            const isFlubn = (item.title || '').toLowerCase().includes('flubn');
+            const cleanTitle = (item.title || 'Flubn').split('—')[0].trim().replace(/\.+$/, '');
+            const subtitle = item.subtitle || (item.title.includes('—') ? item.title.split('—')[1].trim() : (isFlubn ? 'An influencer Platform' : 'Product Design & Strategy'));
 
-            const caseStudyBtn = `<a href="${escape(item.url || '#')}" ${item.url && item.url.startsWith('http') ? 'target="_blank" rel="noreferrer"' : ''} class="project-btn">View case study <b>↗</b></a>`;
-            const productBtn = item.productUrl ? `<a href="${escape(item.productUrl)}" target="_blank" rel="noreferrer" class="project-btn secondary-btn">Live Product <b>↗</b></a>` : '';
+            const tagsList = (item.tags || 'Product | 2025 - 2026 | APP').split('|').map(t => t.trim()).filter(Boolean);
+            const metaPillsHtml = tagsList.map(tag => {
+              let iconSvg = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#ff4e1b" stroke-width="2"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>`;
+              if (tag.toLowerCase().includes('product') || tag.toLowerCase().includes('design')) {
+                iconSvg = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#ff4e1b" stroke-width="2"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>`;
+              } else if (tag.toLowerCase().includes('app') || tag.toLowerCase().includes('mobile')) {
+                iconSvg = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#ff4e1b" stroke-width="2"><rect width="14" height="20" x="5" y="2" rx="2" ry="2"/><line x1="12" x2="12.01" y1="18" y2="18"/></svg>`;
+              }
+              return `<span class="work-pill">${iconSvg} ${escape(tag)}</span>`;
+            }).join('');
 
-            const mediaHtml = item.image ?
-              `<div class="work-art cms-work-art"><img src="${escape(item.image)}" alt="${escape(item.title)}"></div>` :
-              `<div class="work-art dashboard dark-dashboard"><div class="dash-nav">◉ &nbsp; ${escape(item.title)}</div><h3>${escape(item.title)}</h3></div>`;
+            let rightStageHtml = '';
+            const cleanImage = item.image ? String(item.image).trim() : '';
 
-            const categoryLabel = categoryOf(item) || 'Product Design';
+            if (cleanImage.length > 0) {
+              // Custom uploaded artwork/mockup rendered cleanly with true aspect ratio
+              rightStageHtml = `
+                <div class="work-card-right custom-card-right">
+                  <div class="work-art-img-wrap">
+                    <img src="${escape(cleanImgUrl(cleanImage))}" alt="${escape(item.title)}" class="work-showcase-img" />
+                  </div>
+                </div>
+              `;
+            } else if (isFlubn) {
+              // Rich 3D Studio Mockup (Exact match for Flubn)
+              rightStageHtml = `
+                <div class="work-card-right">
+                  <div class="studio-ambient-bg"></div>
+
+                  <!-- Decorative subtle connector paths -->
+                  <svg class="studio-connectors" viewBox="0 0 600 500" fill="none" aria-hidden="true">
+                    <path d="M 80 60 Q 200 60 250 120" stroke="#dcd3f5" stroke-width="1.5" stroke-dasharray="4 4"/>
+                    <path d="M 440 60 Q 370 100 330 160" stroke="#dcd3f5" stroke-width="1.5" stroke-dasharray="4 4"/>
+                    <path d="M 450 230 Q 380 240 340 260" stroke="#dcd3f5" stroke-width="1.5" stroke-dasharray="4 4"/>
+                    <path d="M 440 350 Q 370 340 330 320" stroke="#dcd3f5" stroke-width="1.5" stroke-dasharray="4 4"/>
+                    <path d="M 200 390 Q 250 380 280 340" stroke="#dcd3f5" stroke-width="1.5" stroke-dasharray="4 4"/>
+                  </svg>
+
+                  <div class="floating-squircle squircle-purple-top" aria-hidden="true">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                  </div>
+
+                  <div class="studio-feature-list">
+                    <h3 class="feature-headline">
+                      All-in-one<br/>
+                      <span class="headline-gradient">influencer marketing</span><br/>
+                      platform
+                    </h3>
+                    <div class="feature-items">
+                      <div class="feature-item">
+                        <span class="feature-icon-box">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ff4e1b" stroke-width="2.2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                        </span>
+                        <span>Discover creators</span>
+                      </div>
+                      <div class="feature-item">
+                        <span class="feature-icon-box">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ff4e1b" stroke-width="2.2"><path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></svg>
+                        </span>
+                        <span>Manage campaigns</span>
+                      </div>
+                      <div class="feature-item">
+                        <span class="feature-icon-box">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ff4e1b" stroke-width="2.2"><line x1="18" x2="18" y1="20" y2="10"/><line x1="12" x2="12" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="14"/></svg>
+                        </span>
+                        <span>Measure impact</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="studio-phone-mockup">
+                    <div class="phone-titanium-shell">
+                      <div class="phone-screen-glass">
+                        <div class="phone-status-bar">
+                          <span class="status-time">9:41</span>
+                          <div class="dynamic-island"></div>
+                          <div class="status-icons">
+                            <svg width="12" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M5 12.55a11 11 0 0 1 14.08 0M1.42 9a16 16 0 0 1 21.16 0M8.53 16.11a6 6 0 0 1 6.95 0M12 20h.01"/></svg>
+                            <svg width="14" height="10" viewBox="0 0 24 24" fill="currentColor"><rect width="18" height="12" x="2" y="6" rx="2"/><path d="M22 11v2"/></svg>
+                          </div>
+                        </div>
+                        <div class="app-screen-content">
+                          <div class="app-brand-lockup">
+                            <h4 class="app-logo-text">flubn<span class="dot-accent">.</span></h4>
+                            <p class="app-tagline">Connect. Collaborate.<br/>Create impact.</p>
+                          </div>
+                          <div class="app-actions-wrap">
+                            <button class="app-get-started-btn" type="button">Get Started</button>
+                            <button class="app-explore-btn" type="button">Explore</button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="studio-badge badge-top-reach">
+                    <div class="badge-header">
+                      <span class="badge-label">Campaign Reach</span>
+                      <span class="badge-percent">+24%</span>
+                    </div>
+                    <b class="badge-metric">72.5K</b>
+                    <div class="badge-sparkline">
+                      <svg viewBox="0 0 120 30" fill="none">
+                        <path d="M2 24 C 20 22, 35 15, 50 18 C 65 21, 80 8, 95 12 C 105 14, 112 5, 118 4" stroke="#ff4e1b" stroke-width="2.5" stroke-linecap="round"/>
+                        <circle cx="118" cy="4" r="3.5" fill="#ff4e1b"/>
+                      </svg>
+                    </div>
+                  </div>
+
+                  <div class="studio-badge badge-bot-creators">
+                    <span class="badge-label">Active Creators</span>
+                    <b class="badge-metric">4.8K</b>
+                    <div class="creators-avatar-stack">
+                      <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=80&q=80" alt="Creator 1"/>
+                      <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=80&q=80" alt="Creator 2"/>
+                      <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=80&q=80" alt="Creator 3"/>
+                      <span class="avatar-plus-pill">+</span>
+                    </div>
+                  </div>
+
+                  <div class="floating-squircle squircle-orange-mid" aria-hidden="true">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+                  </div>
+                  <div class="floating-squircle squircle-purple-bot" aria-hidden="true">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+                  </div>
+                  <div class="floating-squircle squircle-dark-bot" aria-hidden="true">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+                  </div>
+
+                  <span class="studio-sparkle sparkle-top-right">✦</span>
+                  <span class="studio-sparkle sparkle-bot-mid">✧</span>
+                </div>
+              `;
+            } else {
+              // Generic Fallback Device Stage
+              rightStageHtml = `
+                <div class="work-card-right custom-card-right">
+                  <div class="studio-ambient-bg"></div>
+                  <div class="studio-phone-mockup"><div class="phone-titanium-shell"><div class="phone-screen-glass"><div class="app-screen-content"><h4 class="app-logo-text">${escape(cleanTitle)}<span class="dot-accent">.</span></h4><p class="app-tagline">${escape(item.description)}</p></div></div></div></div>
+                </div>
+              `;
+            }
+
             const article = document.createElement('article');
-            article.className = 'work-item custom-project project-card reveal visible';
-            article.innerHTML = `<div class="project-info work-copy">
-              <p class="project-number">${num} · ✦ ${escape(categoryLabel.toUpperCase())}</p>
-              <h3>${escape(item.title)}</h3>
-              <p class="project-description">${escape(item.description || 'Product experience by Abikrishna.')}</p>
-              ${tagsHtml}
-              ${toolsHtml}
-              <div class="project-actions-row">
-                ${caseStudyBtn}
-                ${productBtn}
+            article.className = 'work-showcase-card reveal visible';
+            article.style.setProperty('--card-index', index);
+            article.style.setProperty('--card-total', workItems.length);
+            article.dataset.cardIndex = index;
+            article.innerHTML = `
+              <!-- Exact Smooth Curved Divider separating left and right sections -->
+              <div class="work-curve-divider-wrap" aria-hidden="true">
+                <svg class="work-curve-svg" viewBox="0 0 1000 600" preserveAspectRatio="none" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <defs>
+                    <linearGradient id="stageGrad-${index}" x1="0%" y1="0%" x2="100%" y2="100%">
+                      ${index % 2 === 1 ? `
+                        <stop offset="0%" stop-color="#1f1d1a"/>
+                        <stop offset="45%" stop-color="#191522"/>
+                        <stop offset="100%" stop-color="#111827"/>
+                      ` : `
+                        <stop offset="0%" stop-color="#fff5ed"/>
+                        <stop offset="45%" stop-color="#f6effe"/>
+                        <stop offset="100%" stop-color="#edf1ff"/>
+                      `}
+                    </linearGradient>
+                    <clipPath id="stageClip-${index}" clipPathUnits="userSpaceOnUse">
+                      <path d="M 440 0 C 430 80, 415 160, 404 220 C 392 245, 428 260, 428 300 C 428 340, 392 355, 404 380 C 415 440, 430 520, 440 600 L 1000 600 L 1000 0 Z" />
+                    </clipPath>
+                  </defs>
+
+                  <!-- Clipped Right Stage: Gradient Backdrop -->
+                  <g clip-path="url(#stageClip-${index})">
+                    <rect x="0" y="0" width="1000" height="600" fill="url(#stageGrad-${index})" />
+                  </g>
+
+                  <!-- Trailing decorative dot pattern behind the curve -->
+                  <g class="curve-dot-matrix" fill="#ff4e1b" opacity="0.2">
+                    <circle cx="410" cy="370" r="1.5"/><circle cx="430" cy="370" r="1.5"/><circle cx="450" cy="370" r="1.5"/>
+                    <circle cx="400" cy="395" r="1.5"/><circle cx="420" cy="395" r="1.5"/><circle cx="440" cy="395" r="1.5"/><circle cx="460" cy="395" r="1.5"/>
+                    <circle cx="410" cy="420" r="1.5"/><circle cx="430" cy="420" r="1.5"/><circle cx="450" cy="420" r="1.5"/><circle cx="470" cy="420" r="1.5"/>
+                    <circle cx="420" cy="445" r="1.5"/><circle cx="440" cy="445" r="1.5"/><circle cx="460" cy="445" r="1.5"/><circle cx="480" cy="445" r="1.5"/>
+                    <circle cx="430" cy="470" r="1.5"/><circle cx="450" cy="470" r="1.5"/><circle cx="470" cy="470" r="1.5"/><circle cx="490" cy="470" r="1.5"/>
+                    <circle cx="440" cy="495" r="1.5"/><circle cx="460" cy="495" r="1.5"/><circle cx="480" cy="495" r="1.5"/><circle cx="500" cy="495" r="1.5"/>
+                    <circle cx="450" cy="520" r="1.5"/><circle cx="470" cy="520" r="1.5"/><circle cx="490" cy="520" r="1.5"/><circle cx="510" cy="520" r="1.5"/>
+                  </g>
+
+                  <!-- Dividing Crisp Contour Line with peach stroke -->
+                  <path class="curve-stroke-line" d="M 440 0 C 430 80, 415 160, 404 220 C 392 245, 428 260, 428 300 C 428 340, 392 355, 404 380 C 415 440, 430 520, 440 600" fill="none" stroke="#fcd5c5" stroke-width="1.8" stroke-linecap="round"/>
+                </svg>
               </div>
-            </div>
-            ${mediaHtml}`;
+
+              <div class="work-card-left">
+                <div>
+                  <div class="work-eyebrow-row">
+                    <span class="work-eyebrow-star">✦</span>
+                    <span class="work-eyebrow-num">${num}</span>
+                    <span class="work-eyebrow-dots">· ·</span>
+                    <span class="work-eyebrow-category">${escape(categoryLabel.toUpperCase())}</span>
+                  </div>
+
+                  <h2 class="work-title">${escape(cleanTitle)}<span class="dot-accent">.</span></h2>
+                  <p class="work-subtitle">${escape(subtitle)}</p>
+
+                  <div class="work-meta-pills">
+                    ${metaPillsHtml}
+                  </div>
+
+                  <p class="work-description">
+                    ${escape(item.description || 'Flubn connects brands and creators in one seamless platform — discover, collaborate and grow impact together.')}
+                  </p>
+                </div>
+
+                <div>
+                  <div class="work-cta-wrap">
+                    <a href="${escape(item.url || '#')}" ${item.url && item.url.startsWith('http') ? 'target="_blank" rel="noreferrer"' : ''} class="work-primary-btn">
+                      <span>View case study</span>
+                      <span class="btn-arrow-circle"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17 17 7"/><path d="M7 7h10v10"/></svg></span>
+                    </a>
+                    ${item.productUrl ? `<a href="${escape(item.productUrl)}" target="_blank" rel="noreferrer" class="work-secondary-btn">Live Product <b>↗</b></a>` : ''}
+                  </div>
+
+                  <div class="work-dot-matrix" aria-hidden="true">
+                    <span></span><span></span><span></span><span></span><span></span><span></span>
+                    <span></span><span></span><span></span><span></span><span></span><span></span>
+                    <span></span><span></span><span></span><span></span><span></span><span></span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Center Notch Circular Arrow Button Nestled Inside Curve -->
+              <div class="work-card-notch">
+                <a href="${escape(item.url || '#')}" ${item.url && item.url.startsWith('http') ? 'target="_blank" rel="noreferrer"' : ''} class="notch-arrow-badge" aria-label="View ${escape(cleanTitle)}">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M5 12h14"/>
+                    <path d="m13 6 6 6-6 6"/>
+                  </svg>
+                </a>
+              </div>
+
+              ${rightStageHtml}
+            `;
 
             projects.appendChild(article);
           });
 
-        } else {
-          projects.innerHTML = '<p style="padding:60px 0;color:var(--muted);font-size:16px;">No projects uploaded yet.</p>';
+          if (typeof window.initWorkStackingCards === 'function') {
+            window.initWorkStackingCards();
+          }
+
         }
       }
     }
@@ -1416,12 +1765,21 @@
       const renderJournalPage = () => {
         const list = getArticlesData();
         const isSearching = Boolean(currentSearch && currentSearch.trim());
+        const hasCategoryFilter = currentCategory !== 'all';
 
         if (!list.length) {
           if (spotlightContainer) spotlightContainer.style.display = 'none';
-          if (blogGrid) blogGrid.style.display = 'none';
           if (paginationContainer) paginationContainer.style.display = 'none';
-          if (noResultsBox) noResultsBox.style.display = 'block';
+          if (isSearching || hasCategoryFilter) {
+            if (blogGrid) blogGrid.style.display = 'none';
+            if (noResultsBox) noResultsBox.style.display = 'block';
+          } else {
+            if (noResultsBox) noResultsBox.style.display = 'none';
+            if (blogGrid) {
+              blogGrid.style.display = 'grid';
+              blogGrid.innerHTML = '<p class="empty-msg" style="color:var(--muted);font-size:15px;grid-column:1/-1;padding:60px 0;text-align:center;">No articles published yet. Check back soon for new articles & design insights!</p>';
+            }
+          }
           return;
         }
 

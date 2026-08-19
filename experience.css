@@ -14,14 +14,13 @@ main>section:not(.hero):not(.work-hero):not(.pg-hero):not(.blog-hero):not(.about
 }
 
 .work-hero,
-.pg-hero,
 .blog-hero {
     padding-bottom: clamp(50px, 6vw, 90px) !important
 }
 
 .content-section {
-    padding-top: clamp(34px, 4vw, 62px) !important;
-    padding-bottom: clamp(34px, 4vw, 62px) !important
+    padding-top: clamp(64px, 8vh, 96px);
+    padding-bottom: clamp(64px, 8vh, 96px);
 }
 
 .experiment-grid,
@@ -203,7 +202,6 @@ footer {
     }
 
     .work-hero,
-    .pg-hero,
     .blog-hero {
         padding-bottom: 45px !important
     }

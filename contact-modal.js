@@ -407,17 +407,11 @@
       // 2. Fire-and-forget background network submission (does NOT delay UI)
       (async () => {
         try {
-          const API_TARGETS = ['/api/contact', 'http://127.0.0.1:4173/api/contact', 'http://localhost:4173/api/contact'];
-          for (const target of API_TARGETS) {
-            try {
-              const res = await fetch(target, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(newMsg)
-              });
-              if (res.ok) break;
-            } catch (e) {}
-          }
+          await fetch('/api/contact', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(newMsg)
+          });
         } catch (err) {}
 
         const recipientMail = localStorage.getItem('ak_notification_email') || 'abikrishna15@gmail.com';
@@ -450,28 +444,16 @@
       form.reset();
       form.style.display = 'none';
 
-      // 3. Render Success View with Direct Mail Action Button
+      // 3. Render Clean Success View
       if (successState) {
-        const recipientMail = localStorage.getItem('ak_notification_email') || 'abikrishna15@gmail.com';
-        const mailSubject = encodeURIComponent(`New Portfolio Inquiry: ${projectType} from ${name}`);
-        const mailBody = encodeURIComponent(`[Website Form Submission]\n\nName: ${name}\nEmail: ${email}\nCategory: ${projectType}\nDate: ${new Date().toLocaleString()}\n\nMessage:\n${message}`);
-        const mailtoUrl = `mailto:${recipientMail}?subject=${mailSubject}&body=${mailBody}`;
-
-        const safeMail = String(recipientMail).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' })[c]);
-
         successState.innerHTML = `
-          <div style="text-align:center; padding:10px 0; width:100%;">
-            <div style="width:54px; height:54px; background:#eef7f2; color:#1e7e48; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:24px; margin-bottom:14px;">✓</div>
+          <div style="text-align:center; padding:20px 0; width:100%;">
+            <div style="width:56px; height:56px; background:#eef7f2; color:#1e7e48; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:24px; margin-bottom:16px;">✓</div>
             <h3 style="font-size:22px; font-weight:800; margin:0 0 8px; color:#111;">Inquiry Received!</h3>
-            <p style="color:#666; font-size:14px; margin:0 0 20px; line-height:1.5;">Your message has been saved to the Admin Panel. You can also send a direct email copy to <strong>${safeMail}</strong> below.</p>
-            <div style="display:flex; flex-direction:column; gap:10px;">
-              <a href="${mailtoUrl}" class="primary-btn" style="display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:14px 24px; background:#111; color:#fff; border-radius:12px; text-decoration:none; font-weight:700; font-size:13px;">
-                ✉ Send Direct Email Copy ↗
-              </a>
-              <button type="button" id="sheet-done-btn" style="padding:12px 24px; background:#f0ebe5; color:#333; border:0; border-radius:12px; font-weight:700; font-size:13px; cursor:pointer;">
-                Done
-              </button>
-            </div>
+            <p style="color:#666; font-size:14px; margin:0 0 24px; line-height:1.5;">Thank you for reaching out. I’ll review your message and get back to you soon.</p>
+            <button type="button" id="sheet-done-btn" style="padding:14px 32px; background:#111; color:#fff; border:0; border-radius:12px; font-weight:700; font-size:14px; cursor:pointer; min-width:140px;">
+              Done
+            </button>
           </div>
         `;
         successState.style.display = 'flex';
