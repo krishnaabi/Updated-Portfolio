@@ -2,3 +2,4 @@
 data.json
 supabase-config.js
 node_modules/
+.wrangler/

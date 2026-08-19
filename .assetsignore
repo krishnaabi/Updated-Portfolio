@@ -1,5 +1,7 @@
 node_modules/**
+node_modules
 .git/**
+.git
 .env*
 functions/**
 supabase/**
@@ -7,5 +9,6 @@ server.js
 package.json
 package-lock.json
 wrangler.jsonc
+_worker.js
 *.md
 System.Drawing.Drawing2D.GraphicsPath
