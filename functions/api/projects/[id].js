@@ -29,7 +29,6 @@ export async function onRequest(context) {
       if (incoming.image !== undefined) payload.image_url = incoming.image;
       if (incoming.featured !== undefined) payload.featured = Boolean(incoming.featured);
       if (incoming.tags !== undefined) payload.tags = incoming.tags;
-      if (incoming.tools !== undefined) payload.tools = incoming.tools;
       if (incoming.readTime !== undefined) payload.read_time = incoming.readTime;
       if (incoming.platform !== undefined) payload.platform = incoming.platform;
       if (incoming.journalType !== undefined) payload.journal_type = incoming.journalType;
@@ -38,8 +37,9 @@ export async function onRequest(context) {
       if (incoming.category) {
         const parts = incoming.category.split('|');
         if (parts[0]) payload.content_type = parts[0];
-        if (parts[1]) payload.section = parts[1];
-        if (parts[2]) payload.category = parts[2];
+        const sec = parts[1] || 'main';
+        const cat = parts.slice(2).join('|') || parts[1] || 'Product Design';
+        payload.category = `${sec}|${cat}`;
       }
 
       const sbRes = await fetch(`${sbUrl}/rest/v1/portfolio_content?id=eq.${encodeURIComponent(id)}`, {

@@ -58,20 +58,18 @@ export async function onRequest(context) {
       const parts = (incoming.category || 'work|main|Product Design').split('|');
       const contentType = parts[0] || 'work';
       const section = parts[1] || 'main';
-      const category = parts[2] || 'Product Design';
+      const category = parts.slice(2).join('|') || parts[1] || 'Product Design';
 
       const payload = {
         title: incoming.title.trim(),
         content_type: contentType,
-        section: section,
-        category: category,
+        category: `${section}|${category}`,
         description: incoming.description || '',
         content_body: incoming.contentBody || '',
         destination_url: incoming.url || '',
         image_url: incoming.image || '',
         featured: Boolean(incoming.featured),
-        tags: incoming.tags || '',
-        tools: incoming.tools || '',
+        tags: incoming.tags || incoming.tools || '',
         read_time: incoming.readTime || '5 min read',
         platform: incoming.platform || '',
         journal_type: incoming.journalType || 'link',

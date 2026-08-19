@@ -65,24 +65,34 @@ export default {
         const res = await sbFetch('portfolio_content?select=*&order=display_order.asc,created_at.desc', {}, env);
         if (!res.ok) return json([]);
         const raw = await res.json();
-        const payload = (raw || []).map(row => ({
-          id: row.id,
-          title: row.title,
-          category: `${row.content_type || 'work'}|${row.section || 'main'}|${row.category || 'Product Design'}`,
-          description: row.description || '',
-          contentBody: row.content_body || '',
-          url: row.destination_url || '',
-          productUrl: row.product_url || '',
-          image: row.image_url || '',
-          featured: Boolean(row.featured),
-          tags: row.tags || '',
-          tools: row.tools || '',
-          readTime: row.read_time || '5 min read',
-          platform: row.platform || '',
-          journalType: row.journal_type || 'link',
-          displayOrder: row.display_order ?? 9999,
-          createdAt: row.created_at
-        }));
+        const payload = (raw || []).map(row => {
+          const rawCat = row.category || 'Product Design';
+          let sec = 'main';
+          let cat = rawCat;
+          if (rawCat.includes('|')) {
+            const parts = rawCat.split('|');
+            sec = parts[0] || 'main';
+            cat = parts.slice(1).join('|') || 'Product Design';
+          }
+          return {
+            id: row.id,
+            title: row.title,
+            category: `${row.content_type || 'work'}|${sec}|${cat}`,
+            description: row.description || '',
+            contentBody: row.content_body || '',
+            url: row.destination_url || '',
+            productUrl: row.destination_url || '',
+            image: row.image_url || '',
+            featured: Boolean(row.featured),
+            tags: row.tags || '',
+            tools: row.tags || '',
+            readTime: row.read_time || '5 min read',
+            platform: row.platform || '',
+            journalType: row.journal_type || 'link',
+            displayOrder: row.display_order ?? 9999,
+            createdAt: row.created_at
+          };
+        });
         return json(payload);
       }
 
@@ -93,20 +103,19 @@ export default {
         const parts = (incoming.category || 'work|main|Product Design').split('|');
         const contentType = parts[0] || 'work';
         const section = parts[1] || 'main';
-        const category = parts[2] || 'Product Design';
+        const category = parts.slice(2).join('|') || parts[1] || 'Product Design';
+        const combinedCategory = `${section}|${category}`;
 
         const row = {
           title: incoming.title.trim(),
           content_type: contentType,
-          section: section,
-          category: category,
+          category: combinedCategory,
           description: incoming.description || '',
           content_body: incoming.contentBody || '',
-          destination_url: incoming.url || '',
-          image_url: incoming.image || '',
+          destination_url: incoming.url || incoming.destinationUrl || '',
+          image_url: incoming.image || incoming.imageUrl || '',
           featured: Boolean(incoming.featured),
-          tags: incoming.tags || '',
-          tools: incoming.tools || '',
+          tags: incoming.tags || incoming.tools || '',
           read_time: incoming.readTime || '5 min read',
           platform: incoming.platform || '',
           journal_type: incoming.journalType || 'link',
@@ -151,8 +160,9 @@ export default {
         if (incoming.category !== undefined) {
           const parts = incoming.category.split('|');
           updatePayload.content_type = parts[0] || 'work';
-          updatePayload.section = parts[1] || 'main';
-          updatePayload.category = parts[2] || 'Product Design';
+          const sec = parts[1] || 'main';
+          const cat = parts.slice(2).join('|') || parts[1] || 'Product Design';
+          updatePayload.category = `${sec}|${cat}`;
         }
         if (incoming.description !== undefined) updatePayload.description = incoming.description;
         if (incoming.contentBody !== undefined) updatePayload.content_body = incoming.contentBody;
@@ -160,7 +170,6 @@ export default {
         if (incoming.image !== undefined) updatePayload.image_url = incoming.image;
         if (incoming.featured !== undefined) updatePayload.featured = Boolean(incoming.featured);
         if (incoming.tags !== undefined) updatePayload.tags = incoming.tags;
-        if (incoming.tools !== undefined) updatePayload.tools = incoming.tools;
         if (incoming.readTime !== undefined) updatePayload.read_time = incoming.readTime;
         if (incoming.platform !== undefined) updatePayload.platform = incoming.platform;
         if (incoming.journalType !== undefined) updatePayload.journal_type = incoming.journalType;
