@@ -803,13 +803,13 @@ const updateHeroPreview = name => {
 
   imgPrev.style.setProperty('object-position', pos, 'important');
 
-  if (colorMode === 'original') {
-    imgPrev.style.filter = 'none';
-  } else if (colorMode === 'gray') {
-    imgPrev.style.filter = 'grayscale(100%) contrast(1.1)';
-  } else if (colorMode === 'warm-gray') {
-    imgPrev.style.filter = 'grayscale(90%) sepia(20%) contrast(1.1)';
+  let filterVal = 'none';
+  if (colorMode === 'gray' || colorMode === 'monochrome' || colorMode === 'classic-gray') {
+    filterVal = 'grayscale(100%) contrast(1.1)';
+  } else if (colorMode === 'warm-gray' || colorMode === 'warm-vintage' || colorMode === 'vintage') {
+    filterVal = 'grayscale(90%) sepia(20%) contrast(1.1)';
   }
+  imgPrev.style.setProperty('filter', filterVal, 'important');
 
   if (file) {
     const reader = new FileReader();
@@ -1075,7 +1075,7 @@ assetsForm.onsubmit = async event => {
     if (settings.resumeUrl && assetsForm.elements.resumeUrl) assetsForm.elements.resumeUrl.value = settings.resumeUrl;
     if (settings.spotlightImageUrl && assetsForm.elements.spotlightImageUrl) assetsForm.elements.spotlightImageUrl.value = settings.spotlightImageUrl;
     setAssetStatus('✦ Assets, Showcase & Settings saved live!');
-    ['home', 'about', 'work', 'playground', 'journal'].forEach(updateHeroPreview);
+    ['home', 'center', 'about', 'work', 'playground', 'journal'].forEach(updateHeroPreview);
   } catch (err) {
     setAssetStatus('Could not save settings.', true);
   }

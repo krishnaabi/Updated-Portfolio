@@ -549,13 +549,36 @@ document.querySelectorAll('.big-arrow').forEach((arrow) => {
     if (!res.ok) return;
     const settings = await res.json();
 
-    // Dynamic Hero Images & Focal Repositioning from Admin Settings
+    // Helper function to apply color filter safely
+    const applyColorFilter = (elements, mode, defaultMode = 'original') => {
+      const activeMode = mode || defaultMode;
+      let filterVal = 'none';
+      if (activeMode === 'gray' || activeMode === 'monochrome' || activeMode === 'classic-gray') {
+        filterVal = 'grayscale(100%) contrast(1.1)';
+      } else if (activeMode === 'warm-gray' || activeMode === 'warm-vintage' || activeMode === 'vintage') {
+        filterVal = 'grayscale(90%) sepia(20%) contrast(1.1)';
+      }
+      elements.forEach(el => {
+        el.style.setProperty('filter', filterVal, 'important');
+      });
+    };
+
+    // Dynamic Hero Images & Focal Repositioning & Color Modes from Admin Settings
     if (settings.homeHeroImage) {
       document.querySelectorAll('.portrait-wrap img, .hero-visual img').forEach(img => {
         img.src = settings.homeHeroImage;
         if (settings.homeHeroPosition) img.style.setProperty('object-position', settings.homeHeroPosition, 'important');
       });
     }
+    applyColorFilter(document.querySelectorAll('.portrait-wrap img, .hero-visual img'), settings.homeHeroColorMode, 'original');
+
+    if (settings.homeCenterImage) {
+      document.querySelectorAll('.about-image img').forEach(img => {
+        img.src = settings.homeCenterImage;
+        if (settings.homeCenterPosition) img.style.setProperty('object-position', settings.homeCenterPosition, 'important');
+      });
+    }
+    applyColorFilter(document.querySelectorAll('.about-image img'), settings.homeCenterColorMode, 'gray');
 
     if (settings.aboutHeroImage) {
       document.querySelectorAll('.about-portrait img').forEach(img => {
@@ -563,33 +586,34 @@ document.querySelectorAll('.big-arrow').forEach((arrow) => {
         if (settings.aboutHeroPosition) img.style.setProperty('object-position', settings.aboutHeroPosition, 'important');
       });
     }
+    applyColorFilter(document.querySelectorAll('.about-portrait img'), settings.aboutHeroColorMode, 'original');
 
     if (settings.workHeroImage) {
-      const workImg = document.querySelector('#work-hero-img');
-      if (workImg) {
+      document.querySelectorAll('#work-hero-img, .work-hero-visual img, .work-hero img').forEach(workImg => {
         workImg.src = settings.workHeroImage;
         workImg.style.display = 'block';
         if (settings.workHeroPosition) workImg.style.setProperty('object-position', settings.workHeroPosition, 'important');
-      }
+      });
     }
+    applyColorFilter(document.querySelectorAll('#work-hero-img, .work-hero-visual img, .work-hero img'), settings.workHeroColorMode, 'original');
 
     if (settings.playgroundHeroImage) {
-      const pgImg = document.querySelector('#pg-hero-img');
-      if (pgImg) {
+      document.querySelectorAll('#pg-hero-img, .pg-hero-visual img, .pg-hero img, .playground-hero img').forEach(pgImg => {
         pgImg.src = settings.playgroundHeroImage;
         pgImg.style.display = 'block';
         if (settings.playgroundHeroPosition) pgImg.style.setProperty('object-position', settings.playgroundHeroPosition, 'important');
-      }
+      });
     }
+    applyColorFilter(document.querySelectorAll('#pg-hero-img, .pg-hero-visual img, .pg-hero img, .playground-hero img'), settings.playgroundHeroColorMode, 'original');
 
     if (settings.journalHeroImage) {
-      const journalImg = document.querySelector('#journal-hero-img');
-      if (journalImg) {
+      document.querySelectorAll('#journal-hero-img, .journal-hero-visual img, .journal-hero img').forEach(journalImg => {
         journalImg.src = settings.journalHeroImage;
         journalImg.style.display = 'block';
         if (settings.journalHeroPosition) journalImg.style.setProperty('object-position', settings.journalHeroPosition, 'important');
-      }
+      });
     }
+    applyColorFilter(document.querySelectorAll('#journal-hero-img, .journal-hero-visual img, .journal-hero img'), settings.journalHeroColorMode, 'original');
 
 
 

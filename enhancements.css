@@ -2104,7 +2104,6 @@ footer h2 {
   object-fit: cover;
   object-position: center;
   opacity: 1 !important;
-  filter: none !important;
   display: block;
 }
 

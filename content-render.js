@@ -449,8 +449,8 @@
     Object.entries(posMap).forEach(([key, selector]) => {
       if (data[key]) {
         document.querySelectorAll(selector).forEach(img => {
-          img.style.objectPosition = data[key];
-          img.style.objectFit = 'cover';
+          img.style.setProperty('object-position', data[key], 'important');
+          img.style.setProperty('object-fit', 'cover', 'important');
         });
       }
     });
@@ -467,13 +467,15 @@
       document.querySelectorAll(selector).forEach(el => {
         const defaultMode = key === 'homeCenterColorMode' ? 'gray' : 'original';
         const mode = data[key] || defaultMode;
-        if (mode === 'original') {
-          el.style.filter = 'none';
-        } else if (mode === 'gray') {
-          el.style.filter = 'grayscale(100%) contrast(1.1)';
-        } else if (mode === 'warm-gray') {
-          el.style.filter = 'grayscale(90%) sepia(20%) contrast(1.1)';
+        let filterVal = 'none';
+        if (mode === 'gray' || mode === 'monochrome' || mode === 'classic-gray') {
+          filterVal = 'grayscale(100%) contrast(1.1)';
+        } else if (mode === 'warm-gray' || mode === 'warm-vintage' || mode === 'vintage') {
+          filterVal = 'grayscale(90%) sepia(20%) contrast(1.1)';
+        } else {
+          filterVal = 'none';
         }
+        el.style.setProperty('filter', filterVal, 'important');
       });
     });
 
