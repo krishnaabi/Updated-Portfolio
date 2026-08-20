@@ -118,7 +118,7 @@ export default {
           tags: incoming.tags || incoming.tools || '',
           read_time: incoming.readTime || '5 min read',
           platform: incoming.platform || '',
-          journal_type: incoming.journalType || 'link',
+          journal_type: incoming.playgroundType || incoming.journalType || 'link',
           display_order: incoming.displayOrder ?? 9999,
           created_at: incoming.date ? new Date(incoming.date).toISOString() : new Date().toISOString()
         };
@@ -172,7 +172,9 @@ export default {
         if (incoming.tags !== undefined) updatePayload.tags = incoming.tags;
         if (incoming.readTime !== undefined) updatePayload.read_time = incoming.readTime;
         if (incoming.platform !== undefined) updatePayload.platform = incoming.platform;
-        if (incoming.journalType !== undefined) updatePayload.journal_type = incoming.journalType;
+        if (incoming.journalType !== undefined || incoming.playgroundType !== undefined) {
+          updatePayload.journal_type = incoming.playgroundType || incoming.journalType;
+        }
         if (incoming.displayOrder !== undefined) updatePayload.display_order = incoming.displayOrder;
         if (incoming.date !== undefined && incoming.date) {
           try {
@@ -555,6 +557,11 @@ export default {
         else if (host.includes('hashnode.dev') || host.includes('hashnode.com')) defaultPlatform = 'Hashnode';
         else if (host.includes('behance.net')) defaultPlatform = 'Behance';
         else if (host.includes('dribbble.com')) defaultPlatform = 'Dribbble';
+        else if (host.includes('figma.com')) defaultPlatform = 'Figma';
+        else if (host.includes('codepen.io')) defaultPlatform = 'CodePen';
+        else if (host.includes('framer.com') || host.includes('framer.website')) defaultPlatform = 'Framer';
+        else if (host.includes('github.com') || host.includes('github.io')) defaultPlatform = 'GitHub';
+        else if (host.includes('spline.design')) defaultPlatform = 'Spline 3D';
 
         let title = '';
         let description = '';

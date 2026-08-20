@@ -126,6 +126,21 @@
             </div>
           </div>
 
+          <!-- Playground Format Switcher (Playground Only) -->
+          <div id="playground-type-wrapper" class="form-group" style="display:none;">
+            <label class="group-label">Playground Exploration Format</label>
+            <div class="format-toggle-bar">
+              <label class="format-radio active" id="pg-radio-external">
+                <input type="radio" name="playgroundType" value="external" checked>
+                <span>🚀 External Prototype / Demo (Figma, Dribbble, CodePen, Live Link)</span>
+              </label>
+              <label class="format-radio" id="pg-radio-internal">
+                <input type="radio" name="playgroundType" value="internal">
+                <span>🎨 Built-in Interactive Study / Modal Showcase</span>
+              </label>
+            </div>
+          </div>
+
           <!-- Playground Area Selector (Playground Only) -->
           <div id="playground-section-wrapper" class="form-group" style="display:none;">
             <label class="group-label">Playground Area</label>
@@ -1127,7 +1142,7 @@
   </main>
 
   <script src="supabase-config.js"></script>
-  <script src="admin.js?v=32"></script>
+  <script src="admin.js?v=33"></script>
 </body>
 
 </html>

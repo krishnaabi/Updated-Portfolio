@@ -31,11 +31,57 @@
   const card = item => {
     const cat = categoryOf(item);
     const className = { 'Concepts': 'concept', 'UI Explorations': 'ui', 'UI & Motion': 'ui', '3D & Visuals': '3d', 'Animations': 'animation', 'Other': 'other' }[cat] || 'other';
+    
+    // Check if internal or external
+    const isInternal = item.playgroundType === 'internal' || item.journalType === 'internal' || !item.url || item.url === '#';
+    const isExternal = !isInternal && item.url && item.url.startsWith('http');
+
+    // Detect Platform & Icon
+    let platformName = '';
+    let platformIcon = '🚀';
+    if (isExternal) {
+      const u = item.url.toLowerCase();
+      if (u.includes('figma.com')) { platformName = 'Figma Prototype'; platformIcon = '⚡'; }
+      else if (u.includes('dribbble.com')) { platformName = 'Dribbble'; platformIcon = '🏀'; }
+      else if (u.includes('behance.net')) { platformName = 'Behance'; platformIcon = '🎨'; }
+      else if (u.includes('codepen.io')) { platformName = 'CodePen'; platformIcon = '💻'; }
+      else if (u.includes('framer.com') || u.includes('framer.website')) { platformName = 'Framer'; platformIcon = '✨'; }
+      else if (u.includes('github.com') || u.includes('github.io')) { platformName = 'GitHub'; platformIcon = '🐙'; }
+      else if (u.includes('spline.design')) { platformName = 'Spline 3D'; platformIcon = '🔮'; }
+      else if (item.platform) { platformName = item.platform; platformIcon = '🌐'; }
+      else { platformName = 'Live Demo'; platformIcon = '🌐'; }
+    }
+
+    const actionText = isExternal ? `Explore on ${platformName || 'Live'} <b>↗</b>` : 'View Study Details <b>↗</b>';
+    const toolBadge = (item.tools || item.tags) ? (item.tools || item.tags).split('|')[0].trim() : '';
+
     const article = document.createElement('article');
-    article.className = `play-card ${className} reveal visible cms-injected-item`;
+    article.className = `play-card ${className} ${isExternal ? 'is-external' : 'is-internal'} reveal visible cms-injected-item`;
     article.dataset.category = cat.toLowerCase();
     article.dataset.id = item.id || '';
-    article.innerHTML = `<a href="${escape(item.url || '#')}" ${item.url && item.url.startsWith('http') ? 'target="_blank" rel="noreferrer"' : ''} class="cms-link"><div class="card-art cms-art">${item.image ? `<img src="${escape(cleanImgUrl(item.image))}" alt="${escape(item.title)}">` : '<strong>✦</strong>'}</div><div class="card-text"><small>${escape(cat)}</small><h3>${escape(item.title)}</h3><p>${escape(item.description || 'Dashboard concept exploring dark mode data visualization and micro charts.')}</p><div class="card-link-row">View Exploration <b>↗</b></div></div></a>`;
+    article.dataset.isExternal = isExternal ? '1' : '0';
+    if (item.url) article.dataset.url = item.url;
+
+    article.innerHTML = `
+      <div class="cms-link" role="button" tabindex="0">
+        <div class="card-art cms-art">
+          ${item.image ? `<img src="${escape(cleanImgUrl(item.image))}" alt="${escape(item.title)}">` : '<strong>✦</strong>'}
+          ${isExternal ? `<span class="pg-platform-pill">${platformIcon} ${escape(platformName)}</span>` : `<span class="pg-internal-pill">✦ Interactive Study</span>`}
+        </div>
+        <div class="card-text">
+          <div class="card-meta-row">
+            <small>${escape(cat)}</small>
+            ${toolBadge ? `<span class="card-tools-pill">${escape(toolBadge)}</span>` : ''}
+          </div>
+          <h3>${escape(item.title)}</h3>
+          <p>${escape(item.description || 'Dashboard concept exploring dark mode data visualization and micro charts.')}</p>
+          <div class="card-link-row">
+            <span>${actionText}</span>
+          </div>
+        </div>
+      </div>
+    `;
+
     return article;
   };
 
@@ -1105,14 +1151,23 @@
       let funCount = 0;
 
       playgroundItems.forEach(item => {
+        const isInternal = item.playgroundType === 'internal' || item.journalType === 'internal' || !item.url || item.url === '#';
+        const isExternal = !isInternal && item.url && item.url.startsWith('http');
+
         if (sectionOf(item) === 'sketches' && sketchGrid) {
           const sketch = document.createElement('a');
-          sketch.href = item.url || '#';
-          if (item.url && item.url.startsWith('http')) sketch.target = '_blank';
+          sketch.href = isExternal ? item.url : '#';
+          if (isExternal) sketch.target = '_blank';
           sketch.className = 'cms-sketch cms-injected-item';
           sketch.dataset.category = 'sketches';
           sketch.dataset.id = item.id || '';
           sketch.innerHTML = item.image ? `<img src="${escape(cleanImgUrl(item.image))}" alt="${escape(item.title)}"><span>${escape(item.title)}</span>` : `<i>✦<br>${escape(item.title)}</i>`;
+          if (!isExternal) {
+            sketch.addEventListener('click', e => {
+              e.preventDefault();
+              if (window.__openPlaygroundModal) window.__openPlaygroundModal(item);
+            });
+          }
           sketchGrid.appendChild(sketch);
           sketchCount++;
         } else if (sectionOf(item) === 'fun' && funGrid) {
@@ -1120,7 +1175,16 @@
           fun.className = 'fun-card cms-injected-item';
           fun.dataset.category = 'fun';
           fun.dataset.id = item.id || '';
-          fun.innerHTML = `<a href="${escape(item.url || '#')}" ${item.url && item.url.startsWith('http') ? 'target="_blank" rel="noreferrer"' : ''} class="cms-link"><div class="fun-art cms-fun">${item.image ? `<img src="${escape(cleanImgUrl(item.image))}" alt="${escape(item.title)}">` : '✦'}</div><div class="fun-text"><h3>${escape(item.title)}</h3><p>${escape(item.description || 'A playful creative study.')}</p><small>${escape(categoryOf(item))}</small></div></a>`;
+          fun.innerHTML = `<a href="${isExternal ? escape(item.url) : '#'}" ${isExternal ? 'target="_blank" rel="noreferrer"' : ''} class="cms-link"><div class="fun-art cms-fun">${item.image ? `<img src="${escape(cleanImgUrl(item.image))}" alt="${escape(item.title)}">` : '✦'}</div><div class="fun-text"><h3>${escape(item.title)}</h3><p>${escape(item.description || 'A playful creative study.')}</p><small>${escape(categoryOf(item))}</small></div></a>`;
+          if (!isExternal) {
+            const link = fun.querySelector('.cms-link');
+            if (link) {
+              link.addEventListener('click', e => {
+                e.preventDefault();
+                if (window.__openPlaygroundModal) window.__openPlaygroundModal(item);
+              });
+            }
+          }
           funGrid.appendChild(fun);
           funCount++;
         } else if (experimentGrid) {
@@ -1592,6 +1656,50 @@
     if (sharedModalClose) sharedModalClose.onclick = closeSharedModal;
     if (sharedModalBackdrop) sharedModalBackdrop.onclick = closeSharedModal;
     document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSharedModal(); });
+
+    const openPlaygroundModal = (item) => {
+      if (!sharedModal || !sharedModalBody) return;
+      const catTag = categoryOf(item) || 'Playground';
+      const tools = item.tools || item.tags || '';
+      const toolsList = tools.split('|').map(t => t.trim()).filter(Boolean);
+      const dateStr = item.createdAt ? new Date(item.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Recent Study';
+      const isExternal = item.url && item.url.startsWith('http');
+
+      const toolsHtml = toolsList.length ? `
+        <div class="modal-tools-wrap" style="display:flex;flex-wrap:wrap;gap:8px;margin:16px 0 24px;">
+          ${toolsList.map(t => `<span style="padding:5px 12px;background:#f5f0eb;border:1px solid #e2dbd4;border-radius:99px;font-size:11.5px;font-weight:700;color:var(--ink,#111);font-family:'DM Mono',monospace;">⚡ ${escape(t)}</span>`).join('')}
+        </div>
+      ` : '';
+
+      const imgMarkup = item.image ? `<img src="${escape(cleanImgUrl(item.image))}" alt="${escape(item.title)}" class="modal-image" style="width:100%;max-height:480px;object-fit:cover;border-radius:18px;margin-bottom:24px;">` : '';
+
+      const ctaMarkup = isExternal ? `
+        <div class="modal-external-cta" style="margin-top:28px;padding-top:20px;border-top:1px solid #eee;">
+          <a href="${escape(item.url)}" target="_blank" rel="noreferrer" class="btn" style="display:inline-flex;align-items:center;gap:8px;padding:12px 24px;background:var(--ink,#111);color:#fff;border-radius:99px;font-weight:800;text-decoration:none;font-size:13px;">Launch Live Exploration on ${escape(item.platform || 'Platform')} <b>↗</b></a>
+        </div>
+      ` : '';
+
+      sharedModalBody.innerHTML = `
+        <div class="modal-header-meta" style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+          <span class="modal-cat-tag" style="background:var(--accent,#e34c26);color:#fff;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:800;letter-spacing:0.5px;text-transform:uppercase;">${escape(catTag)}</span>
+          <span style="font-family:'DM Mono',monospace;font-size:12px;color:var(--muted,#666);font-weight:600;">📅 ${escape(dateStr)}</span>
+        </div>
+        <h1 class="modal-title" style="font-size:28px;font-weight:800;letter-spacing:-0.8px;margin:0 0 16px;color:var(--ink,#111);line-height:1.2;">${escape(item.title)}</h1>
+        ${toolsHtml}
+        ${imgMarkup}
+        <div class="modal-body-text" style="font-size:15px;line-height:1.75;color:#333;">
+          ${item.contentBody ? renderBodyShared(item, item.contentBody) : `<p style="font-size:16px;line-height:1.8;color:#444;">${escape(item.description || 'Interactive experiment exploring digital product design, motion parameters, and visual system frameworks.')}</p>`}
+          ${ctaMarkup}
+        </div>
+      `;
+
+      sharedModal.classList.add('active');
+      sharedModal.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+    };
+
+    // Attach playground items to window for click lookup
+    window.__openPlaygroundModal = openPlaygroundModal;
 
     // Wire up static homepage article cards (fallback HTML with data-id, not yet replaced by JS)
     const staticArticleMap = {};

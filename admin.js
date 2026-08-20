@@ -28,6 +28,7 @@ const workFieldsGroup = $('#work-fields-group');
 const featuredLabel = $('#featured-field-label');
 
 const journalTypeWrapper = $('#journal-type-wrapper');
+const playgroundTypeWrapper = $('#playground-type-wrapper');
 const playgroundSectionWrapper = $('#playground-section-wrapper');
 const journalFieldsGroup = $('#journal-fields-group');
 const journalBlogBodyGroup = $('#journal-blog-body-group');
@@ -348,6 +349,10 @@ function refreshFields() {
   const journalMode = journalModeEl ? journalModeEl.value : 'link';
   const isInternalBlog = isJournal && journalMode === 'blog';
 
+  const pgModeEl = document.querySelector('input[name="playgroundType"]:checked');
+  const pgMode = pgModeEl ? pgModeEl.value : 'external';
+  const isInternalPlayground = isPlayground && pgMode === 'internal';
+
   // Section Headers
   if (formTitleHeading && formSubtitle) {
     const isEditing = Boolean(editingIdInput.value);
@@ -367,6 +372,7 @@ function refreshFields() {
   }
 
   // Section visibility toggles
+  if (playgroundTypeWrapper) playgroundTypeWrapper.style.display = isPlayground ? 'block' : 'none';
   if (playgroundSectionWrapper) playgroundSectionWrapper.style.display = isPlayground ? 'block' : 'none';
   if (journalTypeWrapper) journalTypeWrapper.style.display = isJournal ? 'block' : 'none';
   if (journalFieldsGroup) {
@@ -377,7 +383,7 @@ function refreshFields() {
   }
   if (journalBlogBodyGroup) journalBlogBodyGroup.style.display = isInternalBlog ? 'block' : 'none';
 
-  if (workFieldsGroup) workFieldsGroup.style.display = isWork ? 'block' : 'none';
+  if (workFieldsGroup) workFieldsGroup.style.display = (isWork || isPlayground) ? 'block' : 'none';
   if (featuredLabel) featuredLabel.style.display = isPlayground ? 'none' : 'flex';
 
   // URL Field: hide entirely for internal blog, show for all others
@@ -388,12 +394,25 @@ function refreshFields() {
       contentUrl.removeAttribute('required');
     } else {
       urlFieldWrapper.style.display = 'block';
-      if (urlFieldLabel) urlFieldLabel.textContent = isJournal ? 'External Article URL' : (isWork ? 'Case Study Link (URL)' : 'Link / Destination URL');
-      contentUrl.placeholder = isJournal ? 'https://medium.com/@username/article-title' : (isWork ? 'https://... or #casestudy' : 'https://...');
-      contentUrl.setAttribute('required', 'required');
+      if (isJournal) {
+        if (urlFieldLabel) urlFieldLabel.textContent = 'External Article URL';
+        contentUrl.placeholder = 'https://medium.com/@username/article-title';
+        contentUrl.setAttribute('required', 'required');
+      } else if (isPlayground) {
+        if (urlFieldLabel) urlFieldLabel.textContent = isInternalPlayground ? 'Interactive Prototype / Demo Link (Optional)' : 'External Prototype Link (Figma, Dribbble, CodePen, Live Demo)';
+        contentUrl.placeholder = isInternalPlayground ? 'https://... (optional) or leave blank for internal modal' : 'https://dribbble.com/shots/... or https://figma.com/proto/... or https://codepen.io/...';
+        if (isInternalPlayground) contentUrl.removeAttribute('required');
+        else contentUrl.setAttribute('required', 'required');
+      } else {
+        if (urlFieldLabel) urlFieldLabel.textContent = 'Case Study Link (URL)';
+        contentUrl.placeholder = 'https://... or #casestudy';
+        contentUrl.setAttribute('required', 'required');
+      }
     }
   }
-  if (autoFetchBtn) autoFetchBtn.style.display = (isJournal && journalMode === 'link') ? 'inline-flex' : 'none';
+
+  const canAutoFetch = (isJournal && journalMode === 'link') || (isPlayground && pgMode === 'external');
+  if (autoFetchBtn) autoFetchBtn.style.display = canAutoFetch ? 'inline-flex' : 'none';
 
   // Category visibility toggle: Hide for Quick Sketches & Just for Fun (Experiments ONLY gets Category)
   const categoryWrapper = $('#category-group-wrapper');
@@ -429,10 +448,19 @@ function refreshFields() {
 
 if (section) section.onchange = refreshFields;
 
-// Format Radio Buttons Switcher
+// Format Radio Buttons Switcher (Journal)
 document.querySelectorAll('input[name="journalType"]').forEach(radio => {
   radio.onchange = () => {
-    document.querySelectorAll('.format-radio').forEach(lbl => lbl.classList.remove('active'));
+    document.querySelectorAll('#journal-type-wrapper .format-radio').forEach(lbl => lbl.classList.remove('active'));
+    radio.closest('.format-radio').classList.add('active');
+    refreshFields();
+  };
+});
+
+// Format Radio Buttons Switcher (Playground)
+document.querySelectorAll('input[name="playgroundType"]').forEach(radio => {
+  radio.onchange = () => {
+    document.querySelectorAll('#playground-type-wrapper .format-radio').forEach(lbl => lbl.classList.remove('active'));
     radio.closest('.format-radio').classList.add('active');
     refreshFields();
   };
@@ -609,8 +637,17 @@ function startEditing(id) {
   const rBtn = document.querySelector(`input[name="journalType"][value="${jType}"]`);
   if (rBtn) {
     rBtn.checked = true;
-    document.querySelectorAll('.format-radio').forEach(lbl => lbl.classList.remove('active'));
+    document.querySelectorAll('#journal-type-wrapper .format-radio').forEach(lbl => lbl.classList.remove('active'));
     rBtn.closest('.format-radio').classList.add('active');
+  }
+
+  // Set Playground Type Radio
+  const pgType = item.playgroundType || (item.journalType === 'internal' ? 'internal' : (item.url && item.url.startsWith('http') ? 'external' : 'internal'));
+  const pgRadioBtn = document.querySelector(`input[name="playgroundType"][value="${pgType}"]`);
+  if (pgRadioBtn) {
+    pgRadioBtn.checked = true;
+    document.querySelectorAll('#playground-type-wrapper .format-radio').forEach(lbl => lbl.classList.remove('active'));
+    pgRadioBtn.closest('.format-radio').classList.add('active');
   }
 
   if (itemSection && section) section.value = itemSection;
@@ -938,6 +975,26 @@ contentForm.onsubmit = async event => {
       else if (sectionName === 'fun') finalCategory = 'Just for fun';
     }
 
+    const pgModeElNow = document.querySelector('input[name="playgroundType"]:checked');
+    const pgModeNow = pgModeElNow ? pgModeElNow.value : 'external';
+
+    // Auto-detect platform for external links
+    let detectedPlatform = '';
+    if (urlVal && urlVal.startsWith('http')) {
+      const u = urlVal.toLowerCase();
+      if (u.includes('figma.com')) detectedPlatform = 'Figma Prototype';
+      else if (u.includes('dribbble.com')) detectedPlatform = 'Dribbble';
+      else if (u.includes('behance.net')) detectedPlatform = 'Behance';
+      else if (u.includes('codepen.io')) detectedPlatform = 'CodePen';
+      else if (u.includes('framer.com') || u.includes('framer.website')) detectedPlatform = 'Framer';
+      else if (u.includes('github.com') || u.includes('github.io')) detectedPlatform = 'GitHub';
+      else if (u.includes('spline.design')) detectedPlatform = 'Spline 3D';
+      else if (u.includes('linkedin.com')) detectedPlatform = 'LinkedIn';
+      else if (u.includes('medium.com')) detectedPlatform = 'Medium';
+      else if (u.includes('substack.com')) detectedPlatform = 'Substack';
+      else detectedPlatform = 'Live Demo';
+    }
+
     const payload = {
       title: titleVal,
       description: descVal,
@@ -950,8 +1007,9 @@ contentForm.onsubmit = async event => {
       tags: data.tags || '',
       tools: data.tools || '',
       readTime: data.readTime || '5 min read',
-      platform: '',
-      journalType: journalModeNow,
+      platform: detectedPlatform,
+      journalType: targetType === 'journal' ? journalModeNow : (targetType === 'playground' ? pgModeNow : 'link'),
+      playgroundType: targetType === 'playground' ? pgModeNow : '',
       date: targetType === 'journal' ? (dateVal || data.date || getTodayDateString()) : (data.date || '')
     };
 
