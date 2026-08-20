@@ -29,15 +29,30 @@ const featuredLabel = $('#featured-field-label');
 
 const journalTypeWrapper = $('#journal-type-wrapper');
 const playgroundTypeWrapper = $('#playground-type-wrapper');
-const playgroundSectionWrapper = $('#playground-section-wrapper');
 const journalFieldsGroup = $('#journal-fields-group');
 const journalBlogBodyGroup = $('#journal-blog-body-group');
 
-const pgInternalFieldsGroup = $('#pg-internal-fields-group');
+// Playground Dedicated Groups & Fields
+const pgInternalGroup = $('#playground-internal-fields-group');
+const pgHeroImageUrl = $('#pg-hero-image-url');
+const pgHeroImageFile = $('#pg-hero-image-file');
 const pgExperimentQuestion = $('#pg-experiment-question');
+const pgShortExplanation = $('#pg-short-explanation');
+const pgInternalCategory = $('#pg-internal-category');
 const pgDesignThinking = $('#pg-design-thinking');
 const pgGalleryUrls = $('#pg-gallery-urls');
+const pgTools = $('#pg-tools');
 const pgConclusion = $('#pg-conclusion');
+
+const pgExternalGroup = $('#playground-external-fields-group');
+const pgExtTitle = $('#pg-ext-title');
+const pgExtDescription = $('#pg-ext-description');
+const pgExtCategory = $('#pg-ext-category');
+const pgExtLink = $('#pg-ext-link');
+const autoFetchPgExtBtn = $('#auto-fetch-pg-ext-btn');
+const fetchStatusPgExtMsg = $('#fetch-status-pg-ext-msg');
+
+const workJournalGeneralGroup = $('#work-journal-general-fields-group');
 
 const contentUrl = $('#content-url');
 const urlFieldGroup = $('#url-field-group');
@@ -389,211 +404,75 @@ function refreshFields() {
 
   // Section visibility toggles
   if (playgroundTypeWrapper) playgroundTypeWrapper.style.display = isPlayground ? 'block' : 'none';
-  if (playgroundSectionWrapper) playgroundSectionWrapper.style.display = 'none'; // Hide section selector, streamline playground
   if (journalTypeWrapper) journalTypeWrapper.style.display = isJournal ? 'block' : 'none';
-  if (featuredLabel) featuredLabel.style.display = (isPlayground) ? 'none' : 'flex';
+  if (featuredLabel) featuredLabel.style.display = isPlayground ? 'none' : 'flex';
 
-  const categoryWrapper = $('#category-group-wrapper');
-  const pgToggleBtn = $('#toggle-pg-topic-manager-btn');
   const pgInlineBox = $('#playground-inline-topics-box');
   const journalToggleBtn = $('#toggle-journal-topic-manager-btn');
   const journalInlineBox = $('#journal-inline-topics-box');
-  const descGroupLabel = $('#description-field-group')?.querySelector('.group-label');
 
   if (isPlayground) {
     // ══════════════════════════════════════════════════════
     // PLAYGROUND TAB (Internal vs External)
     // ══════════════════════════════════════════════════════
-    if (tagsLabel) tagsLabel.style.display = 'none';
-    const prodUrlWrapper = $('#product-url-field-label');
-    if (prodUrlWrapper) prodUrlWrapper.style.display = 'none';
-    if (journalFieldsGroup) journalFieldsGroup.style.display = 'none';
-    if (journalBlogBodyGroup) journalBlogBodyGroup.style.display = 'none';
-
-    if (categoryWrapper) {
-      categoryWrapper.style.display = 'block';
-      const cLbl = categoryWrapper.querySelector('.group-label');
-      if (cLbl) cLbl.textContent = isInternalPlayground ? 'Category tag — Interaction / Typography' : 'Category tag';
-    }
-    if (pgToggleBtn) pgToggleBtn.style.display = 'inline-block';
-    if (journalToggleBtn) journalToggleBtn.style.display = 'none';
+    if (workJournalGeneralGroup) workJournalGeneralGroup.style.display = 'none';
 
     if (isInternalPlayground) {
-      // ── INTERNAL PLAYGROUND (ONLY 8 REQUESTED FIELDS) ──
-      // 1. Hero visual (Cover Image)
-      if (coverImageUrlGroup) coverImageUrlGroup.style.display = 'block';
-      if (coverImageFileGroup) coverImageFileGroup.style.display = 'block';
-      const cUrlLbl = $('#cover-image-url-label');
-      if (cUrlLbl) cUrlLbl.textContent = 'Hero visual (Cover Image URL)';
-      const cFileLbl = $('#cover-image-file-label');
-      if (cFileLbl) cFileLbl.textContent = 'Or Upload Hero Visual File';
-
-      // 2. The experiment question, 5. Design thinking, 6. Additional images gallery, 8. Conclusion/learning
-      if (pgInternalFieldsGroup) pgInternalFieldsGroup.style.display = 'block';
-
-      // 3. Short explanation
-      if (descriptionFieldGroup) descriptionFieldGroup.style.display = 'block';
-      if (descGroupLabel) descGroupLabel.textContent = 'Short explanation';
-      if (contentDescription) contentDescription.placeholder = 'Short explanation of what this exploration investigates...';
-
-      // 7. Tools
-      if (workFieldsGroup) workFieldsGroup.style.display = 'block';
-      const toolsWrapper = $('#tools-field-label');
-      if (toolsWrapper) {
-        toolsWrapper.style.display = 'block';
-        const tLbl = toolsWrapper.querySelector('.group-label');
-        if (tLbl) tLbl.textContent = 'Tools (e.g. Figma | Spline 3D | Framer | Three.js)';
-      }
-
-      // Hide all non-requested fields
-      if (titleFieldGroup) titleFieldGroup.style.display = 'none';
-      if (contentTitle) contentTitle.removeAttribute('required');
-      if (urlFieldGroup) {
-        urlFieldGroup.style.display = 'none';
-        contentUrl.removeAttribute('required');
-      }
-      if (autoFetchBtn) autoFetchBtn.style.display = 'none';
+      if (pgInternalGroup) pgInternalGroup.style.display = 'block';
+      if (pgExternalGroup) pgExternalGroup.style.display = 'none';
     } else {
-      // ── EXTERNAL PLAYGROUND (ONLY 4 REQUESTED FIELDS: Title, Description, Category tag, Link) ──
-      // 1. Title
-      if (titleFieldGroup) {
-        titleFieldGroup.style.display = 'block';
-        if (titleFieldLabel) titleFieldLabel.textContent = 'Title';
-        if (contentTitle) {
-          contentTitle.placeholder = 'Prototype or exploration title';
-          contentTitle.setAttribute('required', 'required');
-        }
-      }
-
-      // 2. Description
-      if (descriptionFieldGroup) {
-        descriptionFieldGroup.style.display = 'block';
-        if (descGroupLabel) descGroupLabel.textContent = 'Description';
-        if (contentDescription) contentDescription.placeholder = 'Brief description of the prototype or demo...';
-      }
-
-      // 4. Link
-      if (urlFieldGroup) {
-        urlFieldGroup.style.display = 'block';
-        if (urlFieldLabel) urlFieldLabel.textContent = 'Link';
-        if (contentUrl) {
-          contentUrl.placeholder = 'https://dribbble.com/shots/... or https://figma.com/proto/... or https://codepen.io/...';
-          contentUrl.setAttribute('required', 'required');
-        }
-      }
-      if (autoFetchBtn) autoFetchBtn.style.display = 'inline-flex';
-
-      // Hide all internal and extra things
-      if (coverImageUrlGroup) coverImageUrlGroup.style.display = 'none';
-      if (coverImageFileGroup) coverImageFileGroup.style.display = 'none';
-      if (pgInternalFieldsGroup) pgInternalFieldsGroup.style.display = 'none';
-      if (workFieldsGroup) workFieldsGroup.style.display = 'none';
+      if (pgInternalGroup) pgInternalGroup.style.display = 'none';
+      if (pgExternalGroup) pgExternalGroup.style.display = 'block';
     }
-  } else if (isWork) {
-    // Standard Work Fields
-    if (journalFieldsGroup) journalFieldsGroup.style.display = 'none';
-    if (journalBlogBodyGroup) journalBlogBodyGroup.style.display = 'none';
-    if (pgInternalFieldsGroup) pgInternalFieldsGroup.style.display = 'none';
+  } else {
+    // ══════════════════════════════════════════════════════
+    // WORK & JOURNAL TABS
+    // ══════════════════════════════════════════════════════
+    if (pgInternalGroup) pgInternalGroup.style.display = 'none';
+    if (pgExternalGroup) pgExternalGroup.style.display = 'none';
+    if (pgInlineBox) pgInlineBox.style.display = 'none';
+    if (workJournalGeneralGroup) workJournalGeneralGroup.style.display = 'block';
 
-    if (titleFieldGroup) {
-      titleFieldGroup.style.display = 'block';
-      if (titleFieldLabel) titleFieldLabel.textContent = 'Title / Project Name';
-      if (contentTitle) contentTitle.setAttribute('required', 'required');
-    }
-    if (descriptionFieldGroup) {
-      descriptionFieldGroup.style.display = 'block';
-      if (descGroupLabel) descGroupLabel.textContent = 'Description / Excerpt';
-    }
-    if (urlFieldGroup) {
-      urlFieldGroup.style.display = 'block';
+    if (isWork) {
+      if (workFieldsGroup) workFieldsGroup.style.display = 'block';
+      if (journalFieldsGroup) journalFieldsGroup.style.display = 'none';
+      if (journalBlogBodyGroup) journalBlogBodyGroup.style.display = 'none';
+      if (urlFieldGroup) urlFieldGroup.style.display = 'block';
       if (urlFieldLabel) urlFieldLabel.textContent = 'Case Study Link (URL)';
-      if (contentUrl) {
-        contentUrl.placeholder = 'https://... or #casestudy';
-        contentUrl.setAttribute('required', 'required');
+      if (autoFetchBtn) autoFetchBtn.style.display = 'none';
+      if (journalToggleBtn) journalToggleBtn.style.display = 'none';
+      if (journalInlineBox) journalInlineBox.style.display = 'none';
+    } else if (isJournal) {
+      if (workFieldsGroup) workFieldsGroup.style.display = 'none';
+      if (journalFieldsGroup) {
+        journalFieldsGroup.style.display = 'grid';
+        if ($('#journal-date') && !$('#journal-date').value) $('#journal-date').value = getTodayDateString();
       }
+      if (journalBlogBodyGroup) journalBlogBodyGroup.style.display = isInternalBlog ? 'block' : 'none';
+      if (urlFieldGroup) urlFieldGroup.style.display = isInternalBlog ? 'none' : 'block';
+      if (urlFieldLabel) urlFieldLabel.textContent = 'External Article URL';
+      if (autoFetchBtn) autoFetchBtn.style.display = isInternalBlog ? 'none' : 'inline-flex';
+      if (journalToggleBtn) journalToggleBtn.style.display = 'inline-block';
     }
-    if (coverImageUrlGroup) coverImageUrlGroup.style.display = 'block';
-    if (coverImageFileGroup) coverImageFileGroup.style.display = 'block';
-    const cUrlLbl = $('#cover-image-url-label');
-    if (cUrlLbl) cUrlLbl.textContent = 'Cover Image URL (optional)';
-    const cFileLbl = $('#cover-image-file-label');
-    if (cFileLbl) cFileLbl.textContent = 'Or Upload Cover Image File';
-
-    if (workFieldsGroup) workFieldsGroup.style.display = 'block';
-    if (tagsLabel) tagsLabel.style.display = 'block';
-    const toolsWrapper = $('#tools-field-label');
-    if (toolsWrapper) {
-      toolsWrapper.style.display = 'block';
-      const tLbl = toolsWrapper.querySelector('.group-label');
-      if (tLbl) tLbl.textContent = 'Tools / Tech Stack (optional)';
-    }
-    const prodUrlWrapper = $('#product-url-field-label');
-    if (prodUrlWrapper) prodUrlWrapper.style.display = 'block';
-    if (categoryWrapper) {
-      categoryWrapper.style.display = 'block';
-      const cLbl = categoryWrapper.querySelector('.group-label');
-      if (cLbl) cLbl.textContent = 'Category';
-    }
-    if (pgToggleBtn) pgToggleBtn.style.display = 'none';
-    if (journalToggleBtn) journalToggleBtn.style.display = 'none';
-    if (autoFetchBtn) autoFetchBtn.style.display = 'none';
-  } else if (isJournal) {
-    // Standard Journal Fields
-    if (journalFieldsGroup) {
-      journalFieldsGroup.style.display = 'grid';
-      if ($('#journal-date') && !$('#journal-date').value) {
-        $('#journal-date').value = getTodayDateString();
-      }
-    }
-    if (journalBlogBodyGroup) journalBlogBodyGroup.style.display = isInternalBlog ? 'block' : 'none';
-    if (pgInternalFieldsGroup) pgInternalFieldsGroup.style.display = 'none';
-    if (workFieldsGroup) workFieldsGroup.style.display = 'none';
-
-    if (titleFieldGroup) {
-      titleFieldGroup.style.display = 'block';
-      if (titleFieldLabel) titleFieldLabel.textContent = 'Article Title';
-      if (contentTitle) contentTitle.setAttribute('required', 'required');
-    }
-    if (descriptionFieldGroup) {
-      descriptionFieldGroup.style.display = 'block';
-      if (descGroupLabel) descGroupLabel.textContent = 'Summary / Excerpt';
-    }
-    if (coverImageUrlGroup) coverImageUrlGroup.style.display = 'block';
-    if (coverImageFileGroup) coverImageFileGroup.style.display = 'block';
-    const cUrlLbl = $('#cover-image-url-label');
-    if (cUrlLbl) cUrlLbl.textContent = 'Cover Image URL (optional)';
-    const cFileLbl = $('#cover-image-file-label');
-    if (cFileLbl) cFileLbl.textContent = 'Or Upload Cover Image File';
-
-    if (urlFieldGroup) {
-      if (isInternalBlog) {
-        urlFieldGroup.style.display = 'none';
-        if (contentUrl) contentUrl.removeAttribute('required');
-      } else {
-        urlFieldGroup.style.display = 'block';
-        if (urlFieldLabel) urlFieldLabel.textContent = 'External Article URL';
-        if (contentUrl) {
-          contentUrl.placeholder = 'https://medium.com/@username/article-title';
-          contentUrl.setAttribute('required', 'required');
-        }
-      }
-    }
-    if (categoryWrapper) {
-      categoryWrapper.style.display = 'block';
-      const cLbl = categoryWrapper.querySelector('.group-label');
-      if (cLbl) cLbl.textContent = 'Category';
-    }
-    if (pgToggleBtn) pgToggleBtn.style.display = 'none';
-    if (journalToggleBtn) journalToggleBtn.style.display = 'inline-block';
-    if (autoFetchBtn) autoFetchBtn.style.display = (journalMode === 'link') ? 'inline-flex' : 'none';
   }
 
   // Populate categories
-  const currentCatVal = category.value;
-  const list = categories[selectedType] || categories.work;
-  category.innerHTML = list.map(val => `<option value="${escapeHtml(val)}">${escapeHtml(val)}</option>`).join('');
-  if (currentCatVal && list.includes(currentCatVal)) {
-    category.value = currentCatVal;
+  const currentPgTopics = categories.playground || defaultPlaygroundTopics;
+  if (pgInternalCategory) {
+    const curVal = pgInternalCategory.value;
+    pgInternalCategory.innerHTML = currentPgTopics.map(val => `<option value="${escapeHtml(val)}">${escapeHtml(val)}</option>`).join('');
+    if (curVal && currentPgTopics.includes(curVal)) pgInternalCategory.value = curVal;
+  }
+  if (pgExtCategory) {
+    const curVal = pgExtCategory.value;
+    pgExtCategory.innerHTML = currentPgTopics.map(val => `<option value="${escapeHtml(val)}">${escapeHtml(val)}</option>`).join('');
+    if (curVal && currentPgTopics.includes(curVal)) pgExtCategory.value = curVal;
+  }
+  if (category) {
+    const list = categories[selectedType] || categories.work;
+    const curVal = category.value;
+    category.innerHTML = list.map(val => `<option value="${escapeHtml(val)}">${escapeHtml(val)}</option>`).join('');
+    if (curVal && list.includes(curVal)) category.value = curVal;
   }
 
   updateLivePreview();
@@ -622,15 +501,39 @@ document.querySelectorAll('input[name="playgroundType"]').forEach(radio => {
 // Real-Time Live Preview Updater
 function updateLivePreview() {
   if (!prevTitle) return;
-  const titleVal = $('#content-title')?.value.trim() || 'Project or Article Title';
-  const descVal = $('#content-description')?.value.trim() || 'Your description summary will appear here dynamically as you type.';
-  const catVal = category?.value || 'PRODUCT DESIGN';
-  const timeVal = $('#journal-readtime')?.value.trim() || '◷ 5 min read';
-  const imgUrl = $('#content-image-url')?.value.trim();
+  const selectedType = typeInput.value || 'work';
+  const pgMode = (document.querySelector('input[name="playgroundType"]:checked')?.value) || 'internal';
+
+  let titleVal = '';
+  let descVal = '';
+  let catVal = '';
+  let timeVal = '';
+  let imgUrl = '';
+
+  if (selectedType === 'playground') {
+    if (pgMode === 'internal') {
+      titleVal = $('#pg-experiment-question')?.value.trim() || 'Experiment Question';
+      descVal = $('#pg-short-explanation')?.value.trim() || 'Short explanation of what this exploration investigates...';
+      catVal = $('#pg-internal-category')?.value || 'Interaction';
+      imgUrl = $('#pg-hero-image-url')?.value.trim();
+      timeVal = '✦ INTERACTIVE STUDY';
+    } else {
+      titleVal = $('#pg-ext-title')?.value.trim() || 'External Prototype Title';
+      descVal = $('#pg-ext-description')?.value.trim() || 'Brief description of the external prototype...';
+      catVal = $('#pg-ext-category')?.value || 'Interaction';
+      timeVal = '↗ EXTERNAL LINK';
+    }
+  } else {
+    titleVal = $('#content-title')?.value.trim() || 'Project or Article Title';
+    descVal = $('#content-description')?.value.trim() || 'Your description summary will appear here dynamically as you type.';
+    catVal = category?.value || 'PRODUCT DESIGN';
+    timeVal = $('#journal-readtime')?.value.trim() || '◷ 5 min read';
+    imgUrl = $('#content-image-url')?.value.trim();
+  }
 
   prevTitle.textContent = titleVal;
   prevDesc.textContent = descVal;
-  prevCat.textContent = catVal.toUpperCase();
+  prevCat.textContent = (catVal || 'INTERACTION').toUpperCase();
   prevTime.textContent = timeVal;
 
   if (imgUrl) {
@@ -640,7 +543,9 @@ function updateLivePreview() {
   }
 }
 
-['#content-title', '#content-description', '#content-category', '#journal-readtime', '#content-image-url'].forEach(sel => {
+['#content-title', '#content-description', '#content-category', '#journal-readtime', '#content-image-url',
+ '#pg-experiment-question', '#pg-short-explanation', '#pg-internal-category', '#pg-hero-image-url',
+ '#pg-ext-title', '#pg-ext-description', '#pg-ext-category'].forEach(sel => {
   const el = $(sel);
   if (el) {
     el.oninput = updateLivePreview;
@@ -770,6 +675,53 @@ if (autoFetchBtn) {
   };
 }
 
+// Auto-Fetch Handler for External Playground
+if (autoFetchPgExtBtn) {
+  autoFetchPgExtBtn.onclick = async () => {
+    let targetUrl = pgExtLink?.value.trim();
+    if (!targetUrl) {
+      alert('Please enter a prototype link first (e.g. Figma, Dribbble, CodePen, Live demo).');
+      return;
+    }
+    if (!/^https?:\/\//i.test(targetUrl)) {
+      targetUrl = 'https://' + targetUrl;
+      if (pgExtLink) pgExtLink.value = targetUrl;
+    }
+
+    if (fetchStatusPgExtMsg) fetchStatusPgExtMsg.textContent = 'Extracting prototype title & details... ⏳';
+    autoFetchPgExtBtn.disabled = true;
+
+    try {
+      const microRes = await fetch(`https://api.microlink.io?url=${encodeURIComponent(targetUrl)}&screenshot=false&meta=true`);
+      if (microRes.ok) {
+        const microJson = await microRes.json();
+        if (microJson.status === 'success' && microJson.data) {
+          const md = microJson.data;
+          if (md.title && pgExtTitle) pgExtTitle.value = md.title;
+          if (md.description && pgExtDescription) pgExtDescription.value = md.description;
+        }
+      }
+    } catch (e) {}
+
+    if (fetchStatusPgExtMsg) fetchStatusPgExtMsg.textContent = '✦ Details auto-fetched!';
+    setTimeout(() => {
+      if (fetchStatusPgExtMsg) fetchStatusPgExtMsg.textContent = '';
+      autoFetchPgExtBtn.disabled = false;
+    }, 3000);
+  };
+}
+
+// Playground Topic Manager Toggles
+const togglePgTopics = () => {
+  const box = $('#playground-inline-topics-box');
+  if (!box) return;
+  const isHidden = box.style.display === 'none' || !box.style.display;
+  box.style.display = isHidden ? 'block' : 'none';
+  if (isHidden) renderPlaygroundTopicsChips();
+};
+if ($('#toggle-pg-topic-manager-btn')) $('#toggle-pg-topic-manager-btn').onclick = togglePgTopics;
+if ($('#toggle-pg-ext-topic-manager-btn')) $('#toggle-pg-ext-topic-manager-btn').onclick = togglePgTopics;
+
 // Start Editing Item
 function startEditing(id) {
   const item = allProjectsData.find(p => String(p.id) === String(id));
@@ -778,7 +730,6 @@ function startEditing(id) {
   const categoryRaw = item.category || 'work|main|Product Design';
   const catParts = categoryRaw.split('|');
   const targetType = catParts[0] || 'work';
-  const itemSection = catParts.length > 2 ? catParts[1] : 'main';
   const itemCategoryName = catParts.length > 2 ? catParts.slice(2).join('|') : catParts.slice(1).join('|');
 
   // Select tab segment
@@ -795,69 +746,85 @@ function startEditing(id) {
   }
 
   // Set Playground Type Radio
-  const pgType = item.playgroundType || (item.journalType === 'internal' ? 'internal' : (item.url && item.url.startsWith('http') ? 'external' : 'internal'));
-  const pgRadioBtn = document.querySelector(`input[name="playgroundType"][value="${pgType}"]`);
+  let parsedPg = null;
+  if (targetType === 'playground' && item.contentBody) {
+    try { parsedPg = JSON.parse(item.contentBody); } catch {}
+  }
+  const isInternalPg = Boolean(parsedPg) || item.playgroundType === 'internal' || (!item.url || !item.url.startsWith('http'));
+  const pgRadioBtn = document.querySelector(`input[name="playgroundType"][value="${isInternalPg ? 'internal' : 'external'}"]`);
   if (pgRadioBtn) {
     pgRadioBtn.checked = true;
     document.querySelectorAll('#playground-type-wrapper .format-radio').forEach(lbl => lbl.classList.remove('active'));
     pgRadioBtn.closest('.format-radio').classList.add('active');
   }
 
-  if (itemSection && section) section.value = itemSection;
-
   refreshFields();
 
-  if (itemCategoryName && category) {
-    const list = categories[targetType] || categories.work;
-    if (!list.includes(itemCategoryName)) {
-      const opt = document.createElement('option');
-      opt.value = itemCategoryName;
-      opt.textContent = itemCategoryName;
-      category.appendChild(opt);
-    }
-    category.value = itemCategoryName;
-  }
-
-  if ($('#content-title')) $('#content-title').value = item.title || '';
-  if ($('#content-description')) $('#content-description').value = item.description || '';
-  if ($('#journal-content-body')) $('#journal-content-body').value = item.contentBody || '';
-
-  // Populate Playground Internal Fields
-  if (pgExperimentQuestion) pgExperimentQuestion.value = '';
-  if (pgDesignThinking) pgDesignThinking.value = '';
-  if (pgGalleryUrls) pgGalleryUrls.value = '';
-  if (pgConclusion) pgConclusion.value = '';
-
-  if (targetType === 'playground' && item.contentBody) {
-    try {
-      const parsed = JSON.parse(item.contentBody);
-      if (parsed && typeof parsed === 'object') {
-        if (pgExperimentQuestion) pgExperimentQuestion.value = parsed.question || '';
-        if (pgDesignThinking) pgDesignThinking.value = parsed.designThinking || '';
-        if (pgGalleryUrls) pgGalleryUrls.value = Array.isArray(parsed.gallery) ? parsed.gallery.join('\n') : (parsed.gallery || '');
-        if (pgConclusion) pgConclusion.value = parsed.conclusion || '';
+  if (targetType === 'playground') {
+    if (isInternalPg) {
+      if (pgHeroImageUrl) pgHeroImageUrl.value = item.image || '';
+      if (pgExperimentQuestion) pgExperimentQuestion.value = (parsedPg && parsedPg.question) ? parsedPg.question : (item.title || '');
+      if (pgShortExplanation) pgShortExplanation.value = (parsedPg && parsedPg.explanation) ? parsedPg.explanation : (item.description || '');
+      if (pgInternalCategory) {
+        if (itemCategoryName && !categories.playground.includes(itemCategoryName)) {
+          const opt = document.createElement('option');
+          opt.value = itemCategoryName;
+          opt.textContent = itemCategoryName;
+          pgInternalCategory.appendChild(opt);
+        }
+        pgInternalCategory.value = itemCategoryName || 'Interaction';
       }
-    } catch {
-      if (pgDesignThinking) pgDesignThinking.value = item.contentBody || '';
+      if (pgDesignThinking) pgDesignThinking.value = (parsedPg && parsedPg.designThinking) ? parsedPg.designThinking : '';
+      if (pgGalleryUrls) pgGalleryUrls.value = (parsedPg && Array.isArray(parsedPg.gallery)) ? parsedPg.gallery.join('\n') : ((parsedPg && parsedPg.gallery) || '');
+      if (pgTools) pgTools.value = (parsedPg && parsedPg.tools) ? parsedPg.tools : (item.tools || '');
+      if (pgConclusion) pgConclusion.value = (parsedPg && parsedPg.conclusion) ? parsedPg.conclusion : '';
+    } else {
+      if (pgExtTitle) pgExtTitle.value = item.title || '';
+      if (pgExtDescription) pgExtDescription.value = item.description || '';
+      if (pgExtCategory) {
+        if (itemCategoryName && !categories.playground.includes(itemCategoryName)) {
+          const opt = document.createElement('option');
+          opt.value = itemCategoryName;
+          opt.textContent = itemCategoryName;
+          pgExtCategory.appendChild(opt);
+        }
+        pgExtCategory.value = itemCategoryName || 'Interaction';
+      }
+      if (pgExtLink) pgExtLink.value = item.url || '';
     }
-  }
-  if ($('#content-url')) $('#content-url').value = item.url || '';
-  if ($('#content-product-url')) $('#content-product-url').value = item.productUrl || '';
-  if ($('#content-tags')) $('#content-tags').value = item.tags || '';
-  if ($('#content-tools')) $('#content-tools').value = item.tools || '';
-  if ($('#content-image-url')) $('#content-image-url').value = item.image || '';
-  if ($('#journal-readtime')) $('#journal-readtime').value = item.readTime || '';
-  if ($('#content-featured')) $('#content-featured').checked = Boolean(item.featured);
-  if ($('#journal-date')) {
-    const rawDate = item.createdAt || item.date;
-    if (rawDate) {
-      try {
-        $('#journal-date').value = new Date(rawDate).toISOString().split('T')[0];
-      } catch {
+  } else {
+    if (itemCategoryName && category) {
+      const list = categories[targetType] || categories.work;
+      if (!list.includes(itemCategoryName)) {
+        const opt = document.createElement('option');
+        opt.value = itemCategoryName;
+        opt.textContent = itemCategoryName;
+        category.appendChild(opt);
+      }
+      category.value = itemCategoryName;
+    }
+
+    if ($('#content-title')) $('#content-title').value = item.title || '';
+    if ($('#content-description')) $('#content-description').value = item.description || '';
+    if ($('#journal-content-body')) $('#journal-content-body').value = item.contentBody || '';
+    if ($('#content-url')) $('#content-url').value = item.url || '';
+    if ($('#content-product-url')) $('#content-product-url').value = item.productUrl || '';
+    if ($('#content-tags')) $('#content-tags').value = item.tags || '';
+    if ($('#content-tools')) $('#content-tools').value = item.tools || '';
+    if ($('#content-image-url')) $('#content-image-url').value = item.image || '';
+    if ($('#journal-readtime')) $('#journal-readtime').value = item.readTime || '';
+    if ($('#content-featured')) $('#content-featured').checked = Boolean(item.featured);
+    if ($('#journal-date')) {
+      const rawDate = item.createdAt || item.date;
+      if (rawDate) {
+        try {
+          $('#journal-date').value = new Date(rawDate).toISOString().split('T')[0];
+        } catch {
+          $('#journal-date').value = getTodayDateString();
+        }
+      } else {
         $('#journal-date').value = getTodayDateString();
       }
-    } else {
-      $('#journal-date').value = getTodayDateString();
     }
   }
 
@@ -1090,15 +1057,12 @@ contentForm.onsubmit = async event => {
   const editId = editingIdInput.value;
   const isEditing = Boolean(editId);
 
-  // --- Inline Validation ---
-  const titleVal = ($('#content-title')?.value || '').trim();
-  const descVal = ($('#content-description')?.value || '').trim();
-  const urlVal = ($('#content-url')?.value || '').trim();
-  const contentBodyVal = ($('#journal-content-body')?.value || '').trim();
   const targetType = typeInput.value || 'work';
   const journalModeNow = (document.querySelector('input[name="journalType"]:checked')?.value) || 'link';
   const isInternalBlogNow = targetType === 'journal' && journalModeNow === 'blog';
   const isExternalJournal = targetType === 'journal' && journalModeNow === 'link';
+  const pgModeElNow = document.querySelector('input[name="playgroundType"]:checked');
+  const pgModeNow = pgModeElNow ? pgModeElNow.value : 'internal';
 
   const showError = (msg) => {
     status.textContent = '⚠ ' + msg;
@@ -1106,32 +1070,118 @@ contentForm.onsubmit = async event => {
     setTimeout(() => { status.textContent = ''; status.style.color = ''; }, 4000);
   };
 
-  if (!titleVal) return showError('Title is required.');
-  if (!descVal) return showError('Description / Excerpt is required.');
-  if (isExternalJournal) {
-    if (!urlVal) return showError('External Article URL is required for external articles.');
-    if (!/^https?:\/\//i.test(urlVal)) return showError('URL must start with https:// — e.g. https://medium.com/...');
-  }
-  if (!isInternalBlogNow && !isExternalJournal && targetType !== 'journal' && !urlVal) {
-    return showError('Link / Destination URL is required.');
-  }
-  if (isInternalBlogNow && !contentBodyVal) return showError('Full Article Content is required for internal blog posts.');
+  let payload = null;
 
-  // Date validation
-  const dateVal = ($('#journal-date')?.value || '').trim();
-  if (dateVal) {
-    const parsedDate = new Date(dateVal);
-    const yr = parsedDate.getFullYear();
-    const currentYear = new Date().getFullYear();
-    if (isNaN(parsedDate.getTime()) || yr < 2000 || yr > currentYear + 1) {
-      return showError(`Publish date year must be between 2000 and ${currentYear + 1}. You entered year ${yr || 'unknown'}.`);
+  if (targetType === 'playground') {
+    if (pgModeNow === 'internal') {
+      const qVal = (pgExperimentQuestion ? pgExperimentQuestion.value : '').trim();
+      const explVal = (pgShortExplanation ? pgShortExplanation.value : '').trim();
+      const catVal = (pgInternalCategory ? pgInternalCategory.value : 'Interaction').trim();
+      const dtVal = (pgDesignThinking ? pgDesignThinking.value : '').trim();
+      const galVal = (pgGalleryUrls ? pgGalleryUrls.value : '').trim();
+      const toolsVal = (pgTools ? pgTools.value : '').trim();
+      const conclVal = (pgConclusion ? pgConclusion.value : '').trim();
+
+      if (!qVal && !explVal) {
+        return showError('Experiment Question or Short Explanation is required.');
+      }
+
+      let heroImg = (pgHeroImageUrl ? pgHeroImageUrl.value : '').trim();
+      if (pgHeroImageFile && pgHeroImageFile.files && pgHeroImageFile.files[0]) {
+        try {
+          heroImg = await fileToUrl(pgHeroImageFile.files[0]);
+        } catch (uploadErr) {
+          return showError('Hero visual upload failed: ' + uploadErr.message);
+        }
+      }
+
+      const pgData = {
+        question: qVal,
+        explanation: explVal,
+        designThinking: dtVal,
+        gallery: galVal ? galVal.split(/[\n,]+/).map(s => s.trim()).filter(Boolean) : [],
+        tools: toolsVal,
+        conclusion: conclVal
+      };
+
+      const titleForStudy = qVal ? qVal.replace(/^["']|["']$/g, '').slice(0, 80) : (explVal ? explVal.slice(0, 50) : `${catVal} Exploration`);
+
+      payload = {
+        title: titleForStudy,
+        description: explVal,
+        contentBody: JSON.stringify(pgData),
+        category: `playground|experiments|${catVal}`,
+        image: heroImg,
+        tools: toolsVal,
+        url: '',
+        featured: false,
+        playgroundType: 'internal'
+      };
+    } else {
+      // External Playground
+      const extTitle = (pgExtTitle ? pgExtTitle.value : '').trim();
+      const extDesc = (pgExtDescription ? pgExtDescription.value : '').trim();
+      const extCat = (pgExtCategory ? pgExtCategory.value : 'Interaction').trim();
+      const extLink = (pgExtLink ? pgExtLink.value : '').trim();
+
+      if (!extTitle) return showError('Title is required.');
+      if (!extLink) return showError('Link is required.');
+      if (!extDesc) return showError('Description is required.');
+
+      let detectedPlatform = '';
+      if (extLink.startsWith('http')) {
+        const u = extLink.toLowerCase();
+        if (u.includes('figma.com')) detectedPlatform = 'Figma Prototype';
+        else if (u.includes('dribbble.com')) detectedPlatform = 'Dribbble';
+        else if (u.includes('behance.net')) detectedPlatform = 'Behance';
+        else if (u.includes('codepen.io')) detectedPlatform = 'CodePen';
+        else if (u.includes('framer.com') || u.includes('framer.website')) detectedPlatform = 'Framer';
+        else if (u.includes('github.com') || u.includes('github.io')) detectedPlatform = 'GitHub';
+        else if (u.includes('spline.design')) detectedPlatform = 'Spline 3D';
+        else detectedPlatform = 'Live Demo';
+      }
+
+      payload = {
+        title: extTitle,
+        description: extDesc,
+        contentBody: '',
+        category: `playground|experiments|${extCat}`,
+        url: extLink,
+        image: '',
+        platform: detectedPlatform,
+        featured: false,
+        playgroundType: 'external'
+      };
     }
-  }
+  } else {
+    // Standard Work & Journal Validations
+    const titleVal = ($('#content-title')?.value || '').trim();
+    const descVal = ($('#content-description')?.value || '').trim();
+    const urlVal = ($('#content-url')?.value || '').trim();
+    const contentBodyVal = ($('#journal-content-body')?.value || '').trim();
 
-  status.textContent = isEditing ? 'Saving changes…' : 'Publishing…';
-  status.style.color = '';
+    if (!titleVal) return showError('Title is required.');
+    if (!descVal) return showError('Description / Excerpt is required.');
+    if (isExternalJournal) {
+      if (!urlVal) return showError('External Article URL is required for external articles.');
+      if (!/^https?:\/\//i.test(urlVal)) return showError('URL must start with https:// — e.g. https://medium.com/...');
+    }
+    if (!isInternalBlogNow && !isExternalJournal && targetType !== 'journal' && !urlVal) {
+      return showError('Link / Destination URL is required.');
+    }
+    if (isInternalBlogNow && !contentBodyVal) return showError('Full Article Content is required for internal blog posts.');
 
-  try {
+    // Date validation
+    const dateVal = ($('#journal-date')?.value || '').trim();
+    if (dateVal) {
+      const parsedDate = new Date(dateVal);
+      const yr = parsedDate.getFullYear();
+      const currentYear = new Date().getFullYear();
+      if (isNaN(parsedDate.getTime()) || yr < 2000 || yr > currentYear + 1) {
+        return showError(`Publish date year must be between 2000 and ${currentYear + 1}. You entered year ${yr || 'unknown'}.`);
+      }
+    }
+
     const data = Object.fromEntries(new FormData(contentForm));
     let image = data.imageUrl || '';
     const fileElem = $('#content-image-file');
@@ -1139,80 +1189,30 @@ contentForm.onsubmit = async event => {
       image = await fileToUrl(fileElem.files[0]);
     }
 
-    const sectionName = targetType === 'playground' ? (section ? section.value : 'main') : 'main';
-    const isFeatured = targetType === 'playground' ? false : Boolean($('#content-featured')?.checked);
+    const isFeatured = Boolean($('#content-featured')?.checked);
+    const finalCategory = data.category || (targetType === 'work' ? 'Product Design' : 'Design Thinking');
 
-    let finalCategory = data.category || 'Product Design';
-    if (targetType === 'playground') {
-      if (sectionName === 'sketches') finalCategory = 'Quick sketches';
-      else if (sectionName === 'fun') finalCategory = 'Just for fun';
-    }
-
-    const pgModeElNow = document.querySelector('input[name="playgroundType"]:checked');
-    const pgModeNow = pgModeElNow ? pgModeElNow.value : 'external';
-
-    // Auto-detect platform for external links
-    let detectedPlatform = '';
-    if (urlVal && urlVal.startsWith('http')) {
-      const u = urlVal.toLowerCase();
-      if (u.includes('figma.com')) detectedPlatform = 'Figma Prototype';
-      else if (u.includes('dribbble.com')) detectedPlatform = 'Dribbble';
-      else if (u.includes('behance.net')) detectedPlatform = 'Behance';
-      else if (u.includes('codepen.io')) detectedPlatform = 'CodePen';
-      else if (u.includes('framer.com') || u.includes('framer.website')) detectedPlatform = 'Framer';
-      else if (u.includes('github.com') || u.includes('github.io')) detectedPlatform = 'GitHub';
-      else if (u.includes('spline.design')) detectedPlatform = 'Spline 3D';
-      else if (u.includes('linkedin.com')) detectedPlatform = 'LinkedIn';
-      else if (u.includes('medium.com')) detectedPlatform = 'Medium';
-      else if (u.includes('substack.com')) detectedPlatform = 'Substack';
-      else detectedPlatform = 'Live Demo';
-    }
-
-    let finalTitle = titleVal;
-    let finalContentBody = '';
-    let finalUrl = urlVal || '';
-
-    if (isInternalBlogNow) {
-      finalContentBody = contentBodyVal;
-      finalUrl = '';
-    } else if (targetType === 'playground') {
-      if (pgModeNow === 'internal') {
-        const qVal = pgExperimentQuestion ? pgExperimentQuestion.value.trim() : '';
-        finalTitle = qVal ? qVal.replace(/^["']|["']$/g, '').slice(0, 70) : (descVal ? descVal.slice(0, 50) : `${finalCategory} Study`);
-        finalUrl = '';
-        const pgData = {
-          question: qVal,
-          explanation: descVal,
-          designThinking: (pgDesignThinking ? pgDesignThinking.value.trim() : ''),
-          gallery: (pgGalleryUrls ? pgGalleryUrls.value.split(/[\n,]+/).map(s => s.trim()).filter(Boolean) : []),
-          conclusion: (pgConclusion ? pgConclusion.value.trim() : ''),
-          tools: (data.tools || '')
-        };
-        finalContentBody = JSON.stringify(pgData);
-      } else {
-        finalTitle = titleVal;
-        finalContentBody = '';
-      }
-    }
-
-    const payload = {
-      title: finalTitle,
+    payload = {
+      title: titleVal,
       description: descVal,
-      contentBody: finalContentBody,
-      url: finalUrl,
+      contentBody: isInternalBlogNow ? contentBodyVal : '',
+      url: isInternalBlogNow ? '' : (urlVal || ''),
       productUrl: data.productUrl || '',
       image,
-      category: `${targetType}|${sectionName}|${finalCategory}`,
+      category: `${targetType}|main|${finalCategory}`,
       featured: isFeatured,
       tags: data.tags || '',
       tools: data.tools || '',
       readTime: data.readTime || '5 min read',
-      platform: detectedPlatform,
-      journalType: targetType === 'journal' ? journalModeNow : (targetType === 'playground' ? pgModeNow : 'link'),
-      playgroundType: targetType === 'playground' ? pgModeNow : '',
+      journalType: targetType === 'journal' ? journalModeNow : 'link',
       date: targetType === 'journal' ? (dateVal || data.date || getTodayDateString()) : (data.date || '')
     };
+  }
 
+  status.textContent = isEditing ? 'Saving changes…' : 'Publishing…';
+  status.style.color = '';
+
+  try {
     let response;
     if (isEditing) {
       response = await apiFetch(`/api/projects/${editId}`, {
@@ -1230,20 +1230,25 @@ contentForm.onsubmit = async event => {
 
     if (!response.ok) {
       const errData = await response.json().catch(() => ({}));
-      throw new Error(errData.error || 'Save failed');
+      throw new Error(errData.error || errData.message || 'Operation failed');
     }
 
+    status.textContent = isEditing ? '✦ Changes saved successfully!' : '✦ Item published successfully!';
+    status.style.color = 'var(--accent, #ff4e1b)';
     editingIdInput.value = '';
     submitBtn.innerHTML = 'Publish Item <b>↗</b>';
     if (cancelEditBtn) cancelEditBtn.style.display = 'none';
-
     contentForm.reset();
+    if ($('#journal-date')) $('#journal-date').value = getTodayDateString();
     refreshFields();
-    status.textContent = isEditing ? '✦ Changes saved live!' : '✦ Published successfully! Content is live on your website.';
-    status.style.color = '';
     await load();
-  } catch (err) {
-    status.textContent = `⚠ Could not save: ${err.message || 'Server error'}`;
+
+    setTimeout(() => {
+      status.textContent = '';
+      status.style.color = '';
+    }, 4000);
+  } catch (error) {
+    status.textContent = '⚠ ' + (error.message || 'Error saving item.');
     status.style.color = '#e33';
   }
 };

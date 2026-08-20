@@ -123,46 +123,127 @@
                 <input type="radio" name="journalType" value="blog">
                 <span>✍️ Internal Blog Post / Case Study</span>
               </label>
-            </div>
-          </div>
-
-          <!-- Playground Format Switcher (Playground Only) -->
+             <!-- Playground Format Switcher (Playground Only) -->
           <div id="playground-type-wrapper" class="form-group" style="display:none;">
-            <label class="group-label">Playground Exploration Format</label>
+            <label class="group-label">Playground Type</label>
             <div class="format-toggle-bar">
-              <label class="format-radio active" id="pg-radio-external">
-                <input type="radio" name="playgroundType" value="external" checked>
-                <span>🚀 External Prototype / Demo (Figma, Dribbble, CodePen, Live Link)</span>
+              <label class="format-radio active" id="pg-radio-internal">
+                <input type="radio" name="playgroundType" value="internal" checked>
+                <span>🎨 Internal Playground (Dedicated Case Study Page)</span>
               </label>
-              <label class="format-radio" id="pg-radio-internal">
-                <input type="radio" name="playgroundType" value="internal">
-                <span>🎨 Built-in Interactive Study / Modal Showcase</span>
+              <label class="format-radio" id="pg-radio-external">
+                <input type="radio" name="playgroundType" value="external">
+                <span>🚀 External Playground (Redirect to External Link)</span>
               </label>
             </div>
           </div>
 
-          <!-- Playground Area Selector (Playground Only) -->
-          <div id="playground-section-wrapper" class="form-group" style="display:none;">
-            <label class="group-label">Playground Area</label>
-            <select name="section" id="content-section">
-              <option value="experiments">Experiments</option>
-              <option value="sketches">Quick sketches</option>
-              <option value="fun">Just for fun</option>
-            </select>
+          <!-- ══════════════════════════════════════════════════════════ -->
+          <!-- 1. INTERNAL PLAYGROUND (EXACT 8 REQUIRED FIELDS ONLY) -->
+          <!-- ══════════════════════════════════════════════════════════ -->
+          <div id="playground-internal-fields-group" style="display:none;">
+            <!-- 1. Hero Visual -->
+            <div class="form-group">
+              <label class="group-label">Hero Visual</label>
+              <input name="pgHeroImageUrl" id="pg-hero-image-url" placeholder="Paste image URL (https://...) or upload below...">
+              <div style="margin-top:8px;">
+                <input name="pgHeroImageFile" type="file" accept="image/*" id="pg-hero-image-file">
+                <small class="recommended-size">💡 Recommended size: <b>1200 × 800 px</b> (3:2 landscape ratio, max 5 MB)</small>
+              </div>
+            </div>
+
+            <!-- 2. Experiment Question -->
+            <div class="form-group">
+              <label class="group-label">Experiment Question</label>
+              <input name="pgExperimentQuestion" id="pg-experiment-question"
+                placeholder="The main question or idea behind the experiment (e.g. How can we make data visualization tactile in dark mode?)...">
+            </div>
+
+            <!-- 3. Short Explanation -->
+            <div class="form-group">
+              <label class="group-label">Short Explanation</label>
+              <textarea name="pgShortExplanation" id="pg-short-explanation"
+                placeholder="Brief description of the experiment..."></textarea>
+            </div>
+
+            <!-- 4. Category Tag -->
+            <div class="form-group">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                <label class="group-label" style="margin-bottom:0;">Category Tag (e.g. Interaction, Typography)</label>
+                <button type="button" id="toggle-pg-topic-manager-btn" class="topic-mgr-toggle-btn">
+                  ⚙️ Manage Topics
+                </button>
+              </div>
+              <select name="pgInternalCategory" id="pg-internal-category"></select>
+            </div>
+
+            <!-- 5. Design Thinking -->
+            <div class="form-group">
+              <label class="group-label">Design Thinking</label>
+              <textarea name="pgDesignThinking" id="pg-design-thinking" style="height:140px;"
+                placeholder="The thinking/process behind the experiment (Supports markdown)..."></textarea>
+            </div>
+
+            <!-- 6. Additional Images - Gallery -->
+            <div class="form-group">
+              <label class="group-label">Additional Images — Gallery</label>
+              <textarea name="pgGalleryUrls" id="pg-gallery-urls" style="height:80px;"
+                placeholder="Gallery of supporting visuals (Paste image URLs one per line or comma separated)..."></textarea>
+            </div>
+
+            <!-- 7. Tools -->
+            <div class="form-group">
+              <label class="group-label">Tools</label>
+              <input name="pgTools" id="pg-tools" placeholder="e.g. Figma | Spline 3D | Framer | Three.js">
+            </div>
+
+            <!-- 8. Conclusion / Learning -->
+            <div class="form-group">
+              <label class="group-label">Conclusion / Learning</label>
+              <textarea name="pgConclusion" id="pg-conclusion" style="height:110px;"
+                placeholder="Key takeaway or learning from the experiment..."></textarea>
+            </div>
           </div>
 
-          <!-- Category Selector -->
-          <div class="form-group" id="category-group-wrapper">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-              <label class="group-label" style="margin-bottom:0;">Category</label>
-              <button type="button" id="toggle-pg-topic-manager-btn" class="topic-mgr-toggle-btn" style="display:none;">
-                ⚙️ Manage Playground Topics
-              </button>
-              <button type="button" id="toggle-journal-topic-manager-btn" class="topic-mgr-toggle-btn" style="display:none;">
-                ⚙️ Manage Journal Topics
-              </button>
+          <!-- ══════════════════════════════════════════════════════════ -->
+          <!-- 2. EXTERNAL PLAYGROUND (EXACT 4 REQUIRED FIELDS ONLY) -->
+          <!-- ══════════════════════════════════════════════════════════ -->
+          <div id="playground-external-fields-group" style="display:none;">
+            <!-- 1. Title -->
+            <div class="form-group">
+              <label class="group-label">Title</label>
+              <input name="pgExtTitle" id="pg-ext-title" placeholder="e.g. Fluid Audio Visualizer">
             </div>
-            <select name="category" id="content-category"></select>
+
+            <!-- 2. Description -->
+            <div class="form-group">
+              <label class="group-label">Description</label>
+              <textarea name="pgExtDescription" id="pg-ext-description"
+                placeholder="Brief description of the external experiment..."></textarea>
+            </div>
+
+            <!-- 3. Category Tag -->
+            <div class="form-group">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                <label class="group-label" style="margin-bottom:0;">Category Tag</label>
+                <button type="button" id="toggle-pg-ext-topic-manager-btn" class="topic-mgr-toggle-btn">
+                  ⚙️ Manage Topics
+                </button>
+              </div>
+              <select name="pgExtCategory" id="pg-ext-category"></select>
+            </div>
+
+            <!-- 4. Link -->
+            <div class="form-group">
+              <label class="group-label">Link</label>
+              <div class="url-input-wrapper">
+                <input name="pgExtLink" id="pg-ext-link" placeholder="https://dribbble.com/shots/... or https://figma.com/proto/...">
+                <button type="button" id="auto-fetch-pg-ext-btn" class="auto-fetch-btn">
+                  <span>🪄</span> Auto-Fetch Details
+                </button>
+              </div>
+              <small class="fetch-status-msg" id="fetch-status-pg-ext-msg"></small>
+            </div>
           </div>
 
           <!-- Playground Inline Topics Manager -->
@@ -178,132 +259,114 @@
             </div>
           </div>
 
-          <!-- Journal Inline Topics Manager -->
-          <div id="journal-inline-topics-box" class="form-group pg-topic-manager-box" style="display:none;">
-            <div class="topic-mgr-header">
-              <span class="topic-mgr-title">📝 Journal Filter Topics</span>
-              <small class="topic-mgr-hint">Controls filter pills on Journal / Blog page & categories dropdown</small>
+          <!-- ══════════════════════════════════════════════════════════ -->
+          <!-- 3. GENERAL WORK & JOURNAL FIELDS GROUP -->
+          <!-- ══════════════════════════════════════════════════════════ -->
+          <div id="work-journal-general-fields-group">
+            <!-- Category Selector (Work & Journal) -->
+            <div class="form-group" id="category-group-wrapper">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                <label class="group-label" style="margin-bottom:0;">Category</label>
+                <button type="button" id="toggle-journal-topic-manager-btn" class="topic-mgr-toggle-btn" style="display:none;">
+                  ⚙️ Manage Journal Topics
+                </button>
+              </div>
+              <select name="category" id="content-category"></select>
             </div>
-            <div id="content-journal-topics-chips" class="topic-chips-container"></div>
-            <div class="topic-add-row">
-              <input type="text" id="content-new-journal-topic" placeholder="New topic (e.g. Design Systems, AI Strategy)..." class="topic-add-input">
-              <button type="button" id="content-add-journal-topic-btn" class="topic-add-btn">+ Add Topic</button>
+
+            <!-- Journal Inline Topics Manager -->
+            <div id="journal-inline-topics-box" class="form-group pg-topic-manager-box" style="display:none;">
+              <div class="topic-mgr-header">
+                <span class="topic-mgr-title">📝 Journal Filter Topics</span>
+                <small class="topic-mgr-hint">Controls filter pills on Journal / Blog page & categories dropdown</small>
+              </div>
+              <div id="content-journal-topics-chips" class="topic-chips-container"></div>
+              <div class="topic-add-row">
+                <input type="text" id="content-new-journal-topic" placeholder="New topic (e.g. Design Systems, AI Strategy)..." class="topic-add-input">
+                <button type="button" id="content-add-journal-topic-btn" class="topic-add-btn">+ Add Topic</button>
+              </div>
             </div>
+
+            <!-- URL Field + Auto-Fetch Button -->
+            <div class="form-group" id="url-field-group">
+              <label class="group-label" id="url-field-label">Link / Destination URL</label>
+              <div class="url-input-wrapper">
+                <input name="url" id="content-url" required placeholder="https://medium.com/@username/article-title">
+                <button type="button" id="auto-fetch-btn" class="auto-fetch-btn" style="display:none;">
+                  <span>🪄</span> Auto-Fetch Details
+                </button>
+              </div>
+              <small class="fetch-status-msg" id="fetch-status-msg"></small>
+            </div>
+
+            <!-- Title & Description -->
+            <div class="form-group" id="title-field-group">
+              <label class="group-label" id="title-field-label">Title / Project Name</label>
+              <input name="title" id="content-title" required placeholder="e.g. Haniio or Designing for Clarity">
+            </div>
+
+            <div class="form-group" id="description-field-group">
+              <label class="group-label" id="description-field-label">Description / Excerpt</label>
+              <textarea name="description" id="content-description"
+                placeholder="A brief summary or behind-the-scenes overview..."></textarea>
+            </div>
+
+            <!-- Work Tags & Tools (Work Only) -->
+            <div id="work-fields-group">
+              <div class="form-group" id="tags-field-label">
+                <label class="group-label">Category Tags / Metadata (optional)</label>
+                <input name="tags" id="content-tags" placeholder="e.g. Product | 2025-2026 | App">
+              </div>
+
+              <div class="form-group" id="tools-field-label">
+                <label class="group-label">Tools / Tech Stack (optional)</label>
+                <input name="tools" id="content-tools" placeholder="e.g. Figma | Framer | React | Photoshop">
+              </div>
+
+              <div class="form-group" id="product-url-field-label">
+                <label class="group-label">Live Product Link / URL (optional)</label>
+                <input name="productUrl" id="content-product-url"
+                  placeholder="https://app.example.com or https://myproduct.com">
+              </div>
+            </div>
+
+            <!-- Journal Metadata Group (Journal Only) -->
+            <div id="journal-fields-group" class="journal-fields-grid" style="display:none;">
+              <div class="form-group">
+                <label class="group-label">Reading Time</label>
+                <input name="readTime" id="journal-readtime" placeholder="e.g. 8 min read">
+              </div>
+              <div class="form-group">
+                <label class="group-label">Publish Date</label>
+                <input name="date" type="date" id="journal-date">
+              </div>
+            </div>
+
+            <!-- Rich Content Body Editor (Internal Blog Post Only) -->
+            <div class="form-group" id="journal-blog-body-group" style="display:none;">
+              <label class="group-label" id="content-body-label">Full Article Content (Internal Blog Post)</label>
+              <textarea name="contentBody" id="journal-content-body" style="height:180px;"
+                placeholder="Write or paste your full content body text here. Supports markdown (## headings, > quotes, - lists, images)..."></textarea>
+              <small class="help" style="color:var(--muted,#777);font-size:11.5px;margin-top:6px;display:block;">💡 Supports headings (<code>## Section Title</code>), quotes (<code>> Highlight</code>), bullet points, and markdown images (<code>![Caption](image_url)</code>).</small>
+            </div>
+
+            <!-- Cover Image Options -->
+            <div class="form-group" id="cover-image-url-group">
+              <label class="group-label" id="cover-image-url-label">Cover Image URL (optional)</label>
+              <input name="imageUrl" id="content-image-url" placeholder="https://images.unsplash.com/... or /uploads/...">
+            </div>
+
+            <div class="form-group" id="cover-image-file-group">
+              <label class="group-label" id="cover-image-file-label">Or Upload Cover Image File</label>
+              <input name="imageFile" type="file" accept="image/*" id="content-image-file">
+              <small class="recommended-size">💡 Recommended size: <b>1200 × 800 px</b> (3:2 landscape ratio, max 5 MB)</small>
+            </div>
+
+            <label class="checkbox-label" id="featured-field-label">
+              <input type="checkbox" name="featured" id="content-featured" value="true">
+              <span id="featured-label-text">✦ Feature on Home Page</span>
+            </label>
           </div>
-
-          <!-- URL Field + Auto-Fetch Button -->
-          <div class="form-group" id="url-field-group">
-            <label class="group-label" id="url-field-label">Link / Destination URL</label>
-            <div class="url-input-wrapper">
-              <input name="url" id="content-url" required placeholder="https://medium.com/@username/article-title">
-              <button type="button" id="auto-fetch-btn" class="auto-fetch-btn" style="display:none;">
-                <span>🪄</span> Auto-Fetch Details
-              </button>
-            </div>
-            <small class="fetch-status-msg" id="fetch-status-msg"></small>
-          </div>
-
-          <!-- Title & Description -->
-          <div class="form-group" id="title-field-group">
-            <label class="group-label" id="title-field-label">Title / Project Name</label>
-            <input name="title" id="content-title" required placeholder="e.g. Haniio or Designing for Clarity">
-          </div>
-
-          <div class="form-group" id="description-field-group">
-            <label class="group-label" id="description-field-label">Description / Excerpt</label>
-            <textarea name="description" id="content-description"
-              placeholder="A brief summary or behind-the-scenes overview..."></textarea>
-          </div>
-
-          <!-- Work Tags & Tools (Work Only) -->
-          <div id="work-fields-group">
-            <div class="form-group" id="tags-field-label">
-              <label class="group-label">Category Tags / Metadata (optional)</label>
-              <input name="tags" id="content-tags" placeholder="e.g. Product | 2025-2026 | App">
-            </div>
-
-            <div class="form-group" id="tools-field-label">
-              <label class="group-label">Tools / Tech Stack (optional)</label>
-              <input name="tools" id="content-tools" placeholder="e.g. Figma | Framer | React | Photoshop">
-            </div>
-
-            <div class="form-group" id="product-url-field-label">
-              <label class="group-label">Live Product Link / URL (optional)</label>
-              <input name="productUrl" id="content-product-url"
-                placeholder="https://app.example.com or https://myproduct.com">
-            </div>
-          </div>
-
-          <!-- Journal Metadata Group (Journal Only) -->
-          <div id="journal-fields-group" class="journal-fields-grid" style="display:none;">
-            <div class="form-group">
-              <label class="group-label">Reading Time</label>
-              <input name="readTime" id="journal-readtime" placeholder="e.g. 8 min read">
-            </div>
-            <div class="form-group">
-              <label class="group-label">Publish Date</label>
-              <input name="date" type="date" id="journal-date">
-            </div>
-          </div>
-
-          <!-- Playground Internal Study Dedicated Structured Fields -->
-          <div id="pg-internal-fields-group" style="display:none;">
-            <!-- The Experiment Question -->
-            <div class="form-group">
-              <label class="group-label">The Experiment Question / Core Hypothesis</label>
-              <input name="pgExperimentQuestion" id="pg-experiment-question"
-                placeholder="e.g. How can we make data visualization feel tactile and responsive in dark mode?">
-              <small class="help" style="color:var(--muted,#777);font-size:11.5px;margin-top:4px;display:block;">💡 The central design problem or hypothesis being tested in this study.</small>
-            </div>
-
-            <!-- Design Thinking & Process -->
-            <div class="form-group">
-              <label class="group-label">Design Thinking & Exploration Process</label>
-              <textarea name="pgDesignThinking" id="pg-design-thinking" style="height:140px;"
-                placeholder="Explain the UX decisions, interaction principles, spatial rules, spring physics, or motion choreography... (Supports markdown)"></textarea>
-            </div>
-
-            <!-- Additional Images - Gallery -->
-            <div class="form-group">
-              <label class="group-label">Additional Images — Gallery (Optional)</label>
-              <textarea name="pgGalleryUrls" id="pg-gallery-urls" style="height:80px;"
-                placeholder="Paste additional image URLs (one per line or comma separated) to build the interactive gallery..."></textarea>
-              <small class="help" style="color:var(--muted,#777);font-size:11.5px;margin-top:4px;display:block;">💡 Add multiple visual assets to showcase alternate states, wireframes, or high-res prototype screens.</small>
-            </div>
-
-            <!-- Conclusion / Key Learnings -->
-            <div class="form-group">
-              <label class="group-label">Your Conclusion & Key Learnings</label>
-              <textarea name="pgConclusion" id="pg-conclusion" style="height:110px;"
-                placeholder="Key takeaways, what worked, what failed, lessons learned, and next iteration steps..."></textarea>
-            </div>
-          </div>
-
-          <!-- Rich Content Body Editor (Internal Blog Post Only) -->
-          <div class="form-group" id="journal-blog-body-group" style="display:none;">
-            <label class="group-label" id="content-body-label">Full Article Content (Internal Blog Post)</label>
-            <textarea name="contentBody" id="journal-content-body" style="height:180px;"
-              placeholder="Write or paste your full content body text here. Supports markdown (## headings, > quotes, - lists, images)..."></textarea>
-            <small class="help" style="color:var(--muted,#777);font-size:11.5px;margin-top:6px;display:block;">💡 Supports headings (<code>## Section Title</code>), quotes (<code>> Highlight</code>), bullet points, and markdown images (<code>![Caption](image_url)</code>).</small>
-          </div>
-
-          <!-- Cover Image Options -->
-          <div class="form-group" id="cover-image-url-group">
-            <label class="group-label" id="cover-image-url-label">Cover Image URL (optional)</label>
-            <input name="imageUrl" id="content-image-url" placeholder="https://images.unsplash.com/... or /uploads/...">
-          </div>
-
-          <div class="form-group" id="cover-image-file-group">
-            <label class="group-label" id="cover-image-file-label">Or Upload Cover Image File</label>
-            <input name="imageFile" type="file" accept="image/*" id="content-image-file">
-            <small class="recommended-size">💡 Recommended size: <b>1200 × 800 px</b> (3:2 landscape ratio, max 5 MB)</small>
-          </div>
-
-
-          <label class="checkbox-label" id="featured-field-label">
-            <input type="checkbox" name="featured" id="content-featured" value="true">
-            <span id="featured-label-text">✦ Feature on Home Page</span>
-          </label>
 
           <input type="hidden" name="editingId" id="editing-id" value="">
           <div class="form-button-row" style="display:flex;gap:10px;">
@@ -1176,7 +1239,7 @@
   </main>
 
   <script src="supabase-config.js"></script>
-  <script src="admin.js?v=36"></script>
+  <script src="admin.js?v=37"></script>
 </body>
 
 </html>
