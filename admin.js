@@ -475,18 +475,7 @@ function refreshFields() {
     }
   }
 
-  // Populate categories
-  const currentPgTopics = categories.playground || defaultPlaygroundTopics;
-  if (pgInternalCategory) {
-    const curVal = pgInternalCategory.value;
-    pgInternalCategory.innerHTML = currentPgTopics.map(val => `<option value="${escapeHtml(val)}">${escapeHtml(val)}</option>`).join('');
-    if (curVal && currentPgTopics.includes(curVal)) pgInternalCategory.value = curVal;
-  }
-  if (pgExtCategory) {
-    const curVal = pgExtCategory.value;
-    pgExtCategory.innerHTML = currentPgTopics.map(val => `<option value="${escapeHtml(val)}">${escapeHtml(val)}</option>`).join('');
-    if (curVal && currentPgTopics.includes(curVal)) pgExtCategory.value = curVal;
-  }
+  // Populate categories for Work and Journal
   if (category) {
     const list = categories[selectedType] || categories.work;
     const curVal = category.value;
@@ -803,13 +792,7 @@ function startEditing(id) {
       if (pgExperimentQuestion) pgExperimentQuestion.value = (parsedPg && parsedPg.question) ? parsedPg.question : (item.title || '');
       if (pgShortExplanation) pgShortExplanation.value = (parsedPg && parsedPg.explanation) ? parsedPg.explanation : (item.description || '');
       if (pgInternalCategory) {
-        if (itemCategoryName && !categories.playground.includes(itemCategoryName)) {
-          const opt = document.createElement('option');
-          opt.value = itemCategoryName;
-          opt.textContent = itemCategoryName;
-          pgInternalCategory.appendChild(opt);
-        }
-        pgInternalCategory.value = itemCategoryName || 'Interaction';
+        pgInternalCategory.value = (itemCategoryName && !['experiments', 'sketches', 'fun', 'Quick sketches', 'Just for fun'].includes(itemCategoryName)) ? itemCategoryName : '';
       }
       if (pgDesignThinking) pgDesignThinking.value = (parsedPg && parsedPg.designThinking) ? parsedPg.designThinking : '';
       if (pgGalleryUrls) pgGalleryUrls.value = (parsedPg && Array.isArray(parsedPg.gallery)) ? parsedPg.gallery.join('\n') : ((parsedPg && parsedPg.gallery) || '');
@@ -819,13 +802,7 @@ function startEditing(id) {
       if (pgExtTitle) pgExtTitle.value = item.title || '';
       if (pgExtDescription) pgExtDescription.value = item.description || '';
       if (pgExtCategory) {
-        if (itemCategoryName && !categories.playground.includes(itemCategoryName)) {
-          const opt = document.createElement('option');
-          opt.value = itemCategoryName;
-          opt.textContent = itemCategoryName;
-          pgExtCategory.appendChild(opt);
-        }
-        pgExtCategory.value = itemCategoryName || 'Interaction';
+        pgExtCategory.value = (itemCategoryName && !['experiments', 'sketches', 'fun', 'Quick sketches', 'Just for fun'].includes(itemCategoryName)) ? itemCategoryName : '';
       }
       if (pgExtLink) pgExtLink.value = item.url || '';
     }

@@ -190,13 +190,8 @@
 
             <!-- 4. Category Tag -->
             <div class="form-group" id="pg-internal-category-group">
-              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-                <label class="group-label" style="margin-bottom:0;">Category Tag (e.g. Interaction, Typography)</label>
-                <button type="button" id="toggle-pg-topic-manager-btn" class="topic-mgr-toggle-btn">
-                  ⚙️ Manage Topics
-                </button>
-              </div>
-              <select name="pgInternalCategory" id="pg-internal-category"></select>
+              <label class="group-label">Category Tag (e.g. Interaction, Typography, Concepts)</label>
+              <input type="text" name="pgInternalCategory" id="pg-internal-category" placeholder="e.g. Interaction, Typography, Concepts, Motion...">
             </div>
 
             <!-- 5. Design Thinking -->
@@ -246,13 +241,8 @@
 
             <!-- 3. Category Tag -->
             <div class="form-group" id="pg-ext-category-group">
-              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-                <label class="group-label" style="margin-bottom:0;">Category Tag</label>
-                <button type="button" id="toggle-pg-ext-topic-manager-btn" class="topic-mgr-toggle-btn">
-                  ⚙️ Manage Topics
-                </button>
-              </div>
-              <select name="pgExtCategory" id="pg-ext-category"></select>
+              <label class="group-label">Category Tag (e.g. Interaction, Typography, Concepts)</label>
+              <input type="text" name="pgExtCategory" id="pg-ext-category" placeholder="e.g. Interaction, Typography, Concepts, Motion...">
             </div>
 
             <!-- 4. Link -->
@@ -265,19 +255,6 @@
                 </button>
               </div>
               <small class="fetch-status-msg" id="fetch-status-pg-ext-msg"></small>
-            </div>
-          </div>
-
-          <!-- Playground Inline Topics Manager -->
-          <div id="playground-inline-topics-box" class="form-group pg-topic-manager-box" style="display:none;">
-            <div class="topic-mgr-header">
-              <span class="topic-mgr-title">🧪 Playground Filter Topics</span>
-              <small class="topic-mgr-hint">Controls filter pills on Playground page & categories dropdown</small>
-            </div>
-            <div id="content-pg-topics-chips" class="topic-chips-container"></div>
-            <div class="topic-add-row">
-              <input type="text" id="content-new-pg-topic" placeholder="New topic (e.g. Generative AI, 3D Art)..." class="topic-add-input">
-              <button type="button" id="content-add-pg-topic-btn" class="topic-add-btn">+ Add Topic</button>
             </div>
           </div>
 
@@ -1261,7 +1238,7 @@
   </main>
 
   <script src="supabase-config.js"></script>
-  <script src="admin.js?v=40"></script>
+  <script src="admin.js?v=41"></script>
 </body>
 
 </html>
