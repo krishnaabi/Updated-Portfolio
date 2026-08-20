@@ -70,61 +70,124 @@ async function apiFetch(path, options = {}) {
     }
   }
 
-  // Fallback for GET requests using Supabase directly if local server is down
-  if ((!options.method || options.method === 'GET') && window.ABIKRISHNA_SUPABASE && window.ABIKRISHNA_SUPABASE.url) {
+  // Fallback using Supabase directly if local/worker API route fails
+  if (window.ABIKRISHNA_SUPABASE && window.ABIKRISHNA_SUPABASE.url) {
     try {
       const { url: sbUrl, anonKey } = window.ABIKRISHNA_SUPABASE;
-      let table = '';
-      if (path === '/api/projects') table = 'portfolio_content?select=*&order=display_order.asc,created_at.desc';
-      else if (path === '/api/messages') table = 'contact_messages?select=*&order=created_at.desc';
-      else if (path === '/api/testimonials') table = 'portfolio_testimonials?select=*&order=created_at.desc';
-      else if (path === '/api/brands') table = 'portfolio_brands?select=*&order=created_at.desc';
-      else if (path === '/api/milestones') table = 'portfolio_milestones?select=*&order=display_order.asc,created_at.desc';
-      else if (path === '/api/tools') table = 'portfolio_tools?select=*&order=display_order.asc,created_at.asc';
-      else if (path === '/api/settings') table = 'portfolio_settings?id=eq.global&select=*';
 
-      if (table) {
-        const sbRes = await fetch(`${sbUrl}/rest/v1/${table}`, {
+      if (!options.method || options.method === 'GET') {
+        let table = '';
+        if (path === '/api/projects') table = 'portfolio_content?select=*&order=display_order.asc,created_at.desc';
+        else if (path === '/api/messages') table = 'contact_messages?select=*&order=created_at.desc';
+        else if (path === '/api/testimonials') table = 'portfolio_testimonials?select=*&order=created_at.desc';
+        else if (path === '/api/brands') table = 'portfolio_brands?select=*&order=created_at.desc';
+        else if (path === '/api/milestones') table = 'portfolio_milestones?select=*&order=display_order.asc,created_at.desc';
+        else if (path === '/api/tools') table = 'portfolio_tools?select=*&order=display_order.asc,created_at.asc';
+        else if (path === '/api/settings') table = 'portfolio_settings?id=eq.global&select=*';
+
+        if (table) {
+          const sbRes = await fetch(`${sbUrl}/rest/v1/${table}`, {
+            headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}` }
+          });
+          if (sbRes.ok) {
+            const raw = await sbRes.json();
+            let data = raw;
+            if (path === '/api/projects') {
+              data = (raw || []).map(row => ({
+                id: row.id,
+                title: row.title,
+                category: `${row.content_type}|${row.category || 'Product Design'}`,
+                description: row.description || '',
+                contentBody: row.content_body || '',
+                url: row.destination_url || '',
+                productUrl: row.destination_url || '',
+                image: row.image_url || '',
+                featured: Boolean(row.featured),
+                tags: row.tags || '',
+                readTime: row.read_time || '5 min read',
+                platform: row.platform || '',
+                journalType: row.journal_type || 'link',
+                createdAt: row.created_at,
+                date: row.created_at
+              }));
+            } else if (path === '/api/tools') {
+              data = (raw || []).map(row => ({
+                id: row.id,
+                name: row.name,
+                category: row.category || '',
+                icon_type: row.icon_type || 'figma',
+                custom_icon_url: row.custom_icon_url || '',
+                display_order: row.display_order || 0
+              }));
+            } else if (path === '/api/settings') {
+              data = (Array.isArray(raw) && raw[0] && raw[0].settings) ? raw[0].settings : { email: 'abikrishna15@gmail.com' };
+            }
+            return {
+              ok: true,
+              status: 200,
+              json: async () => data,
+              text: async () => JSON.stringify(data)
+            };
+          }
+        }
+      } else if (path === '/api/projects' && options.method === 'POST') {
+        const bodyObj = JSON.parse(options.body || '{}');
+        const parts = (bodyObj.category || 'work|main|Product Design').split('|');
+        const payload = {
+          title: bodyObj.title,
+          content_type: parts[0] || 'work',
+          category: `${parts[1] || 'main'}|${parts.slice(2).join('|') || parts[1] || 'Product Design'}`,
+          description: bodyObj.description || '',
+          content_body: bodyObj.contentBody || '',
+          destination_url: bodyObj.url || '',
+          image_url: bodyObj.image || '',
+          featured: Boolean(bodyObj.featured),
+          tags: bodyObj.tags || bodyObj.tools || '',
+          read_time: bodyObj.readTime || '5 min read',
+          platform: bodyObj.platform || '',
+          journal_type: bodyObj.journalType || 'link',
+          created_at: bodyObj.date ? new Date(bodyObj.date).toISOString() : new Date().toISOString()
+        };
+        const sbRes = await fetch(`${sbUrl}/rest/v1/portfolio_content`, {
+          method: 'POST',
+          headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}`, 'Content-Type': 'application/json', Prefer: 'return=representation' },
+          body: JSON.stringify(payload)
+        });
+        if (sbRes.ok) return sbRes;
+      } else if (path.startsWith('/api/projects/') && options.method === 'PATCH') {
+        const id = path.split('/').pop();
+        const bodyObj = JSON.parse(options.body || '{}');
+        const payload = {};
+        if (bodyObj.title !== undefined) payload.title = bodyObj.title;
+        if (bodyObj.description !== undefined) payload.description = bodyObj.description;
+        if (bodyObj.contentBody !== undefined) payload.content_body = bodyObj.contentBody;
+        if (bodyObj.url !== undefined) payload.destination_url = bodyObj.url;
+        if (bodyObj.image !== undefined) payload.image_url = bodyObj.image;
+        if (bodyObj.featured !== undefined) payload.featured = Boolean(bodyObj.featured);
+        if (bodyObj.tags !== undefined) payload.tags = bodyObj.tags;
+        if (bodyObj.readTime !== undefined) payload.read_time = bodyObj.readTime;
+        if (bodyObj.journalType !== undefined) payload.journal_type = bodyObj.journalType;
+        if (bodyObj.date !== undefined && bodyObj.date) {
+          try { payload.created_at = new Date(bodyObj.date).toISOString(); } catch {}
+        }
+        if (bodyObj.category) {
+          const parts = bodyObj.category.split('|');
+          payload.content_type = parts[0] || 'work';
+          payload.category = `${parts[1] || 'main'}|${parts.slice(2).join('|') || parts[1] || 'Product Design'}`;
+        }
+        const sbRes = await fetch(`${sbUrl}/rest/v1/portfolio_content?id=eq.${encodeURIComponent(id)}`, {
+          method: 'PATCH',
+          headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}`, 'Content-Type': 'application/json', Prefer: 'return=representation' },
+          body: JSON.stringify(payload)
+        });
+        if (sbRes.ok) return sbRes;
+      } else if (path.startsWith('/api/projects/') && options.method === 'DELETE') {
+        const id = path.split('/').pop();
+        const sbRes = await fetch(`${sbUrl}/rest/v1/portfolio_content?id=eq.${encodeURIComponent(id)}`, {
+          method: 'DELETE',
           headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}` }
         });
-        if (sbRes.ok) {
-          const raw = await sbRes.json();
-          let data = raw;
-          if (path === '/api/projects') {
-            data = (raw || []).map(row => ({
-              id: row.id,
-              title: row.title,
-              category: `${row.content_type}|${row.category || 'Product Design'}`,
-              description: row.description || '',
-              contentBody: row.content_body || '',
-              url: row.destination_url || '',
-              image: row.image_url || '',
-              featured: Boolean(row.featured),
-              tags: row.tags || '',
-              readTime: row.read_time || '5 min read',
-              platform: row.platform || '',
-              journalType: row.journal_type || 'link',
-              createdAt: row.created_at
-            }));
-          } else if (path === '/api/tools') {
-            data = (raw || []).map(row => ({
-              id: row.id,
-              name: row.name,
-              category: row.category || '',
-              icon_type: row.icon_type || 'figma',
-              custom_icon_url: row.custom_icon_url || '',
-              display_order: row.display_order || 0
-            }));
-          } else if (path === '/api/settings') {
-            data = (Array.isArray(raw) && raw[0] && raw[0].settings) ? raw[0].settings : { email: 'abikrishna15@gmail.com' };
-          }
-          return {
-            ok: true,
-            status: 200,
-            json: async () => data,
-            text: async () => JSON.stringify(data)
-          };
-        }
+        if (sbRes.ok) return sbRes;
       }
     } catch (e) {}
   }
@@ -552,6 +615,7 @@ function renderProjectsList() {
         </div>
         <h3 class="content-row-title">${escapeHtml(item.title)}</h3>
         <div class="content-row-meta">
+          ${(item.createdAt || item.date) ? `<span class="meta-item" style="color:var(--accent,#ff4e1b);font-weight:700;">📅 ${new Date(item.createdAt || item.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>` : ''}
           ${item.readTime ? `<span class="meta-item">⏱ ${escapeHtml(item.readTime)}</span>` : ''}
           ${item.platform ? `<span class="meta-item">🌐 ${escapeHtml(item.platform)}</span>` : ''}
           ${item.tags ? `<span class="meta-item meta-tags">🏷 ${escapeHtml(item.tags)}</span>` : ''}
@@ -646,7 +710,7 @@ function renderProjectsList() {
         button.textContent = 'Removing…';
         button.disabled = true;
         try {
-          const res = await fetch(`/api/projects/${itemId}`, { method: 'DELETE' });
+          const res = await apiFetch(`/api/projects/${itemId}`, { method: 'DELETE' });
           if (res.ok) {
             await load();
           } else {
@@ -672,7 +736,7 @@ function renderProjectsList() {
       button.textContent = 'Updating…';
       button.disabled = true;
       try {
-        const res = await fetch(`/api/projects/${id}`, {
+        const res = await apiFetch(`/api/projects/${id}`, {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ featured: !currentState })
@@ -789,18 +853,18 @@ contentForm.onsubmit = async event => {
       readTime: data.readTime || '5 min read',
       platform: '',
       journalType: journalModeNow,
-      date: data.date || ''
+      date: targetType === 'journal' ? (dateVal || data.date || getTodayDateString()) : (data.date || '')
     };
 
     let response;
     if (isEditing) {
-      response = await fetch(`/api/projects/${editId}`, {
+      response = await apiFetch(`/api/projects/${editId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       });
     } else {
-      response = await fetch('/api/projects', {
+      response = await apiFetch('/api/projects', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)

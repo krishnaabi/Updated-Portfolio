@@ -120,7 +120,7 @@ export default {
           platform: incoming.platform || '',
           journal_type: incoming.journalType || 'link',
           display_order: incoming.displayOrder ?? 9999,
-          created_at: new Date().toISOString()
+          created_at: incoming.date ? new Date(incoming.date).toISOString() : new Date().toISOString()
         };
 
         const res = await sbFetch('portfolio_content', {
@@ -174,6 +174,11 @@ export default {
         if (incoming.platform !== undefined) updatePayload.platform = incoming.platform;
         if (incoming.journalType !== undefined) updatePayload.journal_type = incoming.journalType;
         if (incoming.displayOrder !== undefined) updatePayload.display_order = incoming.displayOrder;
+        if (incoming.date !== undefined && incoming.date) {
+          try {
+            updatePayload.created_at = new Date(incoming.date).toISOString();
+          } catch {}
+        }
 
         const res = await sbFetch(`portfolio_content?id=eq.${id}`, {
           method: 'PATCH',
@@ -526,6 +531,112 @@ export default {
 
         const publicUrl = `${sbUrl}/storage/v1/object/public/portfolio-images/${filename}`;
         return json({ url: publicUrl }, 201);
+      }
+
+      // ═══════════════════════════════════════════
+      // 9. METADATA AUTO-FETCH API
+      // ═══════════════════════════════════════════
+      if (path === '/api/fetch-metadata' && method === 'POST') {
+        const incoming = await request.json();
+        let targetUrl = (incoming && incoming.url ? incoming.url : '').trim();
+        if (!targetUrl) return json({ error: 'URL is required' }, 400);
+        if (!/^https?:\/\//i.test(targetUrl)) targetUrl = 'https://' + targetUrl;
+
+        let parsedUrl;
+        try { parsedUrl = new URL(targetUrl); } catch { return json({ error: 'Invalid URL' }, 400); }
+
+        const host = parsedUrl.hostname.replace(/^www\./i, '');
+        let defaultPlatform = host.split('.')[0];
+        defaultPlatform = defaultPlatform.charAt(0).toUpperCase() + defaultPlatform.slice(1);
+        if (host.includes('medium.com')) defaultPlatform = 'Medium';
+        else if (host.includes('substack.com')) defaultPlatform = 'Substack';
+        else if (host.includes('linkedin.com')) defaultPlatform = 'LinkedIn';
+        else if (host.includes('dev.to')) defaultPlatform = 'Dev.to';
+        else if (host.includes('hashnode.dev') || host.includes('hashnode.com')) defaultPlatform = 'Hashnode';
+        else if (host.includes('behance.net')) defaultPlatform = 'Behance';
+        else if (host.includes('dribbble.com')) defaultPlatform = 'Dribbble';
+
+        let title = '';
+        let description = '';
+        let image = '';
+        let platform = defaultPlatform;
+        let readTime = '5 min read';
+        let date = new Date().toISOString().split('T')[0];
+
+        try {
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 5000);
+          const res = await fetch(targetUrl, {
+            signal: controller.signal,
+            headers: {
+              'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+              'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+            }
+          });
+          clearTimeout(timeoutId);
+
+          if (res.ok) {
+            const html = await res.text();
+            const decodeHtml = str => str ? str.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#039;/g, "'").replace(/&#39;/g, "'").replace(/&nbsp;/g, ' ').trim() : '';
+            const getMeta = nameOrProp => {
+              const match = html.match(new RegExp(`<meta[^>]+(?:name|property)=["']${nameOrProp}["'][^>]+content=["']([^"']+)["']`, 'i')) ||
+                            html.match(new RegExp(`<meta[^>]+content=["']([^"']+)["'][^>]+(?:name|property)=["']${nameOrProp}["']`, 'i'));
+              return match ? decodeHtml(match[1]) : '';
+            };
+
+            title = getMeta('og:title') || getMeta('twitter:title') || getMeta('title');
+            if (!title) {
+              const tMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i);
+              if (tMatch) title = decodeHtml(tMatch[1]);
+            }
+            description = getMeta('og:description') || getMeta('twitter:description') || getMeta('description');
+            image = getMeta('og:image:secure_url') || getMeta('og:image') || getMeta('twitter:image') || getMeta('twitter:image:src');
+            const siteName = getMeta('og:site_name') || getMeta('twitter:site');
+            if (siteName) platform = siteName.replace(/^@/, '');
+            const pubDate = getMeta('article:published_time') || getMeta('og:published_time') || getMeta('date') || getMeta('pubdate');
+            if (pubDate) {
+              try { const pd = new Date(pubDate); if (!isNaN(pd.getTime())) date = pd.toISOString().split('T')[0]; } catch {}
+            }
+            const rt = getMeta('twitter:data1') || getMeta('reading_time');
+            if (rt) readTime = /min/i.test(rt) ? rt : `${rt} min read`;
+          }
+        } catch {}
+
+        if (!title || !image || !description) {
+          try {
+            const microRes = await fetch(`https://api.microlink.io?url=${encodeURIComponent(targetUrl)}&screenshot=false&meta=true`);
+            if (microRes.ok) {
+              const microData = await microRes.json();
+              if (microData.status === 'success' && microData.data) {
+                const md = microData.data;
+                if (!title && md.title) title = md.title;
+                if (!description && md.description) description = md.description;
+                if (!image && md.image?.url) image = md.image.url;
+                if (md.publisher) platform = md.publisher;
+                if (md.date) { try { const pd = new Date(md.date); if (!isNaN(pd.getTime())) date = pd.toISOString().split('T')[0]; } catch {} }
+              }
+            }
+          } catch {}
+        }
+
+        if (title) {
+          title = title.split(/\s+[|\-—–]\s+(?:Medium|Substack|LinkedIn|Dev\.to|Hashnode|UX Collective|Behance|Dribbble|TechCrunch)$/i)[0].replace(/\s+[|\-—–]\s+by\s+[^|\-—–]+$/i, '').trim();
+        }
+        if (image) {
+          try {
+            if (image.startsWith('//')) image = 'https:' + image;
+            else if (image.startsWith('/')) image = new URL(image, targetUrl).href;
+          } catch {}
+        }
+        if (!title) {
+          const pathSegs = parsedUrl.pathname.split('/').filter(Boolean);
+          const lastSeg = pathSegs.pop() || '';
+          const cleanSlug = lastSeg.replace(/-[a-f0-9]{8,12}$/i, '').replace(/[-_]/g, ' ').replace(/\d+/g, '').trim();
+          title = cleanSlug.length > 3 ? cleanSlug.charAt(0).toUpperCase() + cleanSlug.slice(1) : `Article on ${platform}`;
+        }
+        if (!description) description = `An article published on ${platform} exploring product design and UX strategy.`;
+
+        return json({ ok: true, title: title.trim(), description: description.trim(), image: (image || '').trim(), platform: platform.trim(), readTime: readTime.trim(), date });
       }
 
       return json({ error: 'Not found' }, 404);
