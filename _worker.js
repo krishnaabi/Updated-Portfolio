@@ -593,10 +593,30 @@ export default {
             image = getMeta('og:image:secure_url') || getMeta('og:image') || getMeta('twitter:image') || getMeta('twitter:image:src');
             const siteName = getMeta('og:site_name') || getMeta('twitter:site');
             if (siteName) platform = siteName.replace(/^@/, '');
-            const pubDate = getMeta('article:published_time') || getMeta('og:published_time') || getMeta('date') || getMeta('pubdate');
+            const pubDate = getMeta('article:published_time') || getMeta('og:article:published_time') || getMeta('og:published_time') || getMeta('publication_date') || getMeta('publish_date') || getMeta('parsely-pub-date') || getMeta('date') || getMeta('pubdate');
             if (pubDate) {
-              try { const pd = new Date(pubDate); if (!isNaN(pd.getTime())) date = pd.toISOString().split('T')[0]; } catch {}
+              try { const pd = new Date(pubDate); if (!isNaN(pd.getTime()) && pd.getFullYear() >= 2000) date = pd.toISOString().split('T')[0]; } catch {}
             }
+
+            // JSON-LD date
+            const jsonLdMatches = html.match(/<script[^>]+type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi);
+            if (jsonLdMatches) {
+              for (const block of jsonLdMatches) {
+                try {
+                  const clean = block.replace(/<script[^>]*>/i, '').replace(/<\/script>/i, '').trim();
+                  const parsed = JSON.parse(clean);
+                  const objs = Array.isArray(parsed) ? parsed : (parsed['@graph'] ? parsed['@graph'] : [parsed]);
+                  for (const obj of objs) {
+                    const rawDate = obj.datePublished || obj.dateCreated || obj.uploadDate || obj.dateModified;
+                    if (rawDate) {
+                      const pd = new Date(rawDate);
+                      if (!isNaN(pd.getTime()) && pd.getFullYear() >= 2000) date = pd.toISOString().split('T')[0];
+                    }
+                  }
+                } catch {}
+              }
+            }
+
             const rt = getMeta('twitter:data1') || getMeta('reading_time');
             if (rt) readTime = /min/i.test(rt) ? rt : `${rt} min read`;
           }
@@ -613,10 +633,44 @@ export default {
                 if (!description && md.description) description = md.description;
                 if (!image && md.image?.url) image = md.image.url;
                 if (md.publisher) platform = md.publisher;
-                if (md.date) { try { const pd = new Date(md.date); if (!isNaN(pd.getTime())) date = pd.toISOString().split('T')[0]; } catch {} }
+                if (md.date) { try { const pd = new Date(md.date); if (!isNaN(pd.getTime()) && pd.getFullYear() >= 2000) date = pd.toISOString().split('T')[0]; } catch {} }
               }
             }
           } catch {}
+        }
+
+        // LinkedIn Snowflake timestamp extraction (e.g. posts, activity IDs, updates)
+        if (/linkedin\.com|licdn\.com/i.test(targetUrl)) {
+          const actMatch = targetUrl.match(/(?:activity|ugcPost)[-:](\d{15,21})/i) ||
+                           targetUrl.match(/update\/urn:li:(?:activity|ugcPost):(\d{15,21})/i) ||
+                           targetUrl.match(/posts\/[^_]+_([^\/]+)-activity-(\d{15,21})/i) ||
+                           targetUrl.match(/(\d{18,20})/);
+          if (actMatch) {
+            const idStr = actMatch[2] || actMatch[1];
+            try {
+              const actId = BigInt(idStr);
+              const timeMs = Number(actId >> 22n);
+              const pd = new Date(timeMs);
+              if (!isNaN(pd.getTime()) && pd.getFullYear() >= 2008 && pd.getFullYear() <= new Date().getFullYear() + 1) {
+                date = pd.toISOString().split('T')[0];
+              }
+            } catch {}
+          }
+          const epochMatch = targetUrl.match(/\/(\d{13})(?:\?|\/|$)/);
+          if (epochMatch) {
+            try {
+              const pd = new Date(Number(epochMatch[1]));
+              if (!isNaN(pd.getTime()) && pd.getFullYear() >= 2008 && pd.getFullYear() <= new Date().getFullYear() + 1) {
+                date = pd.toISOString().split('T')[0];
+              }
+            } catch {}
+          }
+        }
+
+        // URL slug date fallback (e.g. /2024/03/15/)
+        const urlDateMatch = targetUrl.match(/(20[12]\d)[/-](0[1-9]|1[0-2])[/-](0[1-9]|[12]\d|3[01])/);
+        if (urlDateMatch && (!date || date === new Date().toISOString().split('T')[0])) {
+          date = `${urlDateMatch[1]}-${urlDateMatch[2]}-${urlDateMatch[3]}`;
         }
 
         if (title) {

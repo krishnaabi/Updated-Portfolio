@@ -180,8 +180,38 @@ export async function onRequest(context) {
               } catch {}
             }
           }
-        }
-      } catch {}
+    // LinkedIn Snowflake timestamp extraction (e.g. posts, activity IDs, updates)
+    if (/linkedin\.com|licdn\.com/i.test(targetUrl)) {
+      const actMatch = targetUrl.match(/(?:activity|ugcPost)[-:](\d{15,21})/i) ||
+                       targetUrl.match(/update\/urn:li:(?:activity|ugcPost):(\d{15,21})/i) ||
+                       targetUrl.match(/posts\/[^_]+_([^\/]+)-activity-(\d{15,21})/i) ||
+                       targetUrl.match(/(\d{18,20})/);
+      if (actMatch) {
+        const idStr = actMatch[2] || actMatch[1];
+        try {
+          const actId = BigInt(idStr);
+          const timeMs = Number(actId >> 22n);
+          const pd = new Date(timeMs);
+          if (!isNaN(pd.getTime()) && pd.getFullYear() >= 2008 && pd.getFullYear() <= new Date().getFullYear() + 1) {
+            date = pd.toISOString().split('T')[0];
+          }
+        } catch {}
+      }
+      const epochMatch = targetUrl.match(/\/(\d{13})(?:\?|\/|$)/);
+      if (epochMatch) {
+        try {
+          const pd = new Date(Number(epochMatch[1]));
+          if (!isNaN(pd.getTime()) && pd.getFullYear() >= 2008 && pd.getFullYear() <= new Date().getFullYear() + 1) {
+            date = pd.toISOString().split('T')[0];
+          }
+        } catch {}
+      }
+    }
+
+    // URL slug date fallback (e.g. /2024/03/15/)
+    const urlDateMatch = targetUrl.match(/(20[12]\d)[/-](0[1-9]|1[0-2])[/-](0[1-9]|[12]\d|3[01])/);
+    if (urlDateMatch && (!date || date === new Date().toISOString().split('T')[0])) {
+      date = `${urlDateMatch[1]}-${urlDateMatch[2]}-${urlDateMatch[3]}`;
     }
 
     // Clean title suffixes (e.g. "Article Title | Medium", "Article Title — Substack")

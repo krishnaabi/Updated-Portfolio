@@ -56,6 +56,95 @@ const escapeHtml = str => String(str || '').replace(/[&<>"']/g, c => ({ '&': '&a
 const cleanImgUrl = url => String(url || '').trim();
 const getTodayDateString = () => new Date().toISOString().split('T')[0];
 
+const extractDateFromUrlOrText = (targetUrl = '', html = '', microDate = '') => {
+  // 1. LinkedIn Snowflake timestamp extraction (handles posts, activity IDs, updates, media URLs)
+  if (/linkedin\.com|licdn\.com/i.test(targetUrl)) {
+    const actMatch = targetUrl.match(/(?:activity|ugcPost)[-:](\d{15,21})/i) ||
+                     targetUrl.match(/update\/urn:li:(?:activity|ugcPost):(\d{15,21})/i) ||
+                     targetUrl.match(/posts\/[^_]+_([^\/]+)-activity-(\d{15,21})/i) ||
+                     targetUrl.match(/(\d{18,20})/);
+    if (actMatch) {
+      const idStr = actMatch[2] || actMatch[1];
+      try {
+        const actId = BigInt(idStr);
+        const timeMs = Number(actId >> 22n);
+        const d = new Date(timeMs);
+        if (!isNaN(d.getTime()) && d.getFullYear() >= 2008 && d.getFullYear() <= new Date().getFullYear() + 1) {
+          return d.toISOString().split('T')[0];
+        }
+      } catch {}
+    }
+
+    const epochMatch = targetUrl.match(/\/(\d{13})(?:\?|\/|$)/);
+    if (epochMatch) {
+      try {
+        const d = new Date(Number(epochMatch[1]));
+        if (!isNaN(d.getTime()) && d.getFullYear() >= 2008 && d.getFullYear() <= new Date().getFullYear() + 1) {
+          return d.toISOString().split('T')[0];
+        }
+      } catch {}
+    }
+  }
+
+  // 2. Microlink date
+  if (microDate) {
+    try {
+      const d = new Date(microDate);
+      if (!isNaN(d.getTime()) && d.getFullYear() >= 2000 && d.getFullYear() <= new Date().getFullYear() + 1) {
+        return d.toISOString().split('T')[0];
+      }
+    } catch {}
+  }
+
+  // 3. HTML Meta tag extraction
+  if (html) {
+    const metaDatePatterns = [
+      /<meta[^>]+(?:name|property)=["'](?:article:published_time|og:article:published_time|og:published_time|publication_date|publish_date|parsely-pub-date|sailthru\.date|date|dc\.date|dc\.date\.issued)[\"'][^>]+content=["']([^"']+)["']/i,
+      /<meta[^>]+content=["']([^"']+)["'][^>]+(?:name|property)=["'](?:article:published_time|og:article:published_time|og:published_time|publication_date|publish_date|parsely-pub-date|sailthru\.date|date|dc\.date|dc\.date\.issued)[\"']/i,
+      /<time[^>]+datetime=["']([^"']+)["']/i
+    ];
+    for (const re of metaDatePatterns) {
+      const m = html.match(re);
+      if (m && m[1]) {
+        try {
+          const d = new Date(m[1].trim());
+          if (!isNaN(d.getTime()) && d.getFullYear() >= 2000 && d.getFullYear() <= new Date().getFullYear() + 1) {
+            return d.toISOString().split('T')[0];
+          }
+        } catch {}
+      }
+    }
+
+    const jsonLdMatches = html.match(/<script[^>]+type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi);
+    if (jsonLdMatches) {
+      for (const block of jsonLdMatches) {
+        try {
+          const clean = block.replace(/<script[^>]*>/i, '').replace(/<\/script>/i, '').trim();
+          const parsed = JSON.parse(clean);
+          const objs = Array.isArray(parsed) ? parsed : (parsed['@graph'] ? parsed['@graph'] : [parsed]);
+          for (const obj of objs) {
+            const rawDate = obj.datePublished || obj.dateCreated || obj.uploadDate || obj.dateModified;
+            if (rawDate) {
+              const d = new Date(rawDate);
+              if (!isNaN(d.getTime()) && d.getFullYear() >= 2000 && d.getFullYear() <= new Date().getFullYear() + 1) {
+                return d.toISOString().split('T')[0];
+              }
+            }
+          }
+        } catch {}
+      }
+    }
+  }
+
+  // 4. URL path date slug (e.g. /2023/11/04/ or /2024-05-12-)
+  const urlDateMatch = targetUrl.match(/(20[12]\d)[/-](0[1-9]|1[0-2])[/-](0[1-9]|[12]\d|3[01])/);
+  if (urlDateMatch) {
+    return `${urlDateMatch[1]}-${urlDateMatch[2]}-${urlDateMatch[3]}`;
+  }
+
+  return '';
+};
+
 const API_BASE_URLS = ['', 'http://127.0.0.1:4173', 'http://localhost:4173'];
 
 async function apiFetch(path, options = {}) {
@@ -470,17 +559,27 @@ if (autoFetchBtn) {
       };
     }
 
+    // Robust date extraction from URL, Snowflake ID, or returned metadata
+    let finalExtractedDate = '';
+    if (fetchedData && fetchedData.date && fetchedData.date !== getTodayDateString()) {
+      finalExtractedDate = fetchedData.date;
+    } else {
+      finalExtractedDate = extractDateFromUrlOrText(targetUrl, '', fetchedData?.date || '');
+    }
+    if (!finalExtractedDate) {
+      finalExtractedDate = getTodayDateString();
+    }
+
     // Populate Fields
     if (fetchedData.title && $('#content-title')) $('#content-title').value = fetchedData.title;
     if (fetchedData.description && $('#content-description')) $('#content-description').value = fetchedData.description;
     if (fetchedData.image && $('#content-image-url')) $('#content-image-url').value = fetchedData.image;
     if (fetchedData.readTime && $('#journal-readtime')) $('#journal-readtime').value = fetchedData.readTime;
     if ($('#journal-date')) {
-      const dateStr = typeof fetchedData.date === 'string' && fetchedData.date.trim() ? fetchedData.date.split('T')[0] : getTodayDateString();
-      $('#journal-date').value = dateStr;
+      $('#journal-date').value = finalExtractedDate;
     }
 
-    if (fetchStatusMsg) fetchStatusMsg.textContent = '✦ Article details & cover image auto-fetched!';
+    if (fetchStatusMsg) fetchStatusMsg.textContent = '✦ Details, image & publish date auto-fetched!';
     updateLivePreview();
 
     setTimeout(() => {
