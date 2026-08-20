@@ -40,9 +40,19 @@ const pgGalleryUrls = $('#pg-gallery-urls');
 const pgConclusion = $('#pg-conclusion');
 
 const contentUrl = $('#content-url');
+const urlFieldGroup = $('#url-field-group');
 const urlFieldLabel = $('#url-field-label');
 const autoFetchBtn = $('#auto-fetch-btn');
 const fetchStatusMsg = $('#fetch-status-msg');
+
+const titleFieldGroup = $('#title-field-group');
+const titleFieldLabel = $('#title-field-label');
+const contentTitle = $('#content-title');
+const descriptionFieldGroup = $('#description-field-group');
+const contentDescription = $('#content-description');
+
+const coverImageUrlGroup = $('#cover-image-url-group');
+const coverImageFileGroup = $('#cover-image-file-group');
 
 const formTitleHeading = $('#form-title-heading');
 const formSubtitle = $('#form-subtitle');
@@ -379,81 +389,203 @@ function refreshFields() {
 
   // Section visibility toggles
   if (playgroundTypeWrapper) playgroundTypeWrapper.style.display = isPlayground ? 'block' : 'none';
-  if (playgroundSectionWrapper) playgroundSectionWrapper.style.display = isPlayground ? 'block' : 'none';
+  if (playgroundSectionWrapper) playgroundSectionWrapper.style.display = 'none'; // Hide section selector, streamline playground
   if (journalTypeWrapper) journalTypeWrapper.style.display = isJournal ? 'block' : 'none';
-  if (journalFieldsGroup) {
-    journalFieldsGroup.style.display = isJournal ? 'grid' : 'none';
-    if (isJournal && $('#journal-date') && !$('#journal-date').value) {
-      $('#journal-date').value = getTodayDateString();
-    }
-  }
+  if (featuredLabel) featuredLabel.style.display = (isPlayground) ? 'none' : 'flex';
 
-  // Toggle Internal Playground vs Internal Blog Form Groups
-  if (pgInternalFieldsGroup) pgInternalFieldsGroup.style.display = (isPlayground && isInternalPlayground) ? 'block' : 'none';
-  if (journalBlogBodyGroup) journalBlogBodyGroup.style.display = (isJournal && isInternalBlog) ? 'block' : 'none';
-
-  if (workFieldsGroup) workFieldsGroup.style.display = (isWork || isPlayground) ? 'block' : 'none';
-  if (featuredLabel) featuredLabel.style.display = isPlayground ? 'none' : 'flex';
-
-  // Customize description label & placeholder based on mode
-  const descGroupLabel = $('#content-description') ? $('#content-description').closest('.form-group')?.querySelector('.group-label') : null;
-  if (descGroupLabel) {
-    if (isPlayground && isInternalPlayground) {
-      descGroupLabel.textContent = 'Short Explanation / Overview';
-      if (contentDescription) contentDescription.placeholder = 'A brief 1-2 sentence overview of what this study explores...';
-    } else {
-      descGroupLabel.textContent = 'Description / Excerpt';
-      if (contentDescription) contentDescription.placeholder = 'A brief summary or behind-the-scenes overview...';
-    }
-  }
-
-  // URL Field: hide entirely for internal blog, show for all others
-  const urlFieldWrapper = contentUrl ? contentUrl.closest('.form-group') : null;
-  if (urlFieldWrapper) {
-    if (isInternalBlog) {
-      urlFieldWrapper.style.display = 'none';
-      contentUrl.removeAttribute('required');
-    } else {
-      urlFieldWrapper.style.display = 'block';
-      if (isJournal) {
-        if (urlFieldLabel) urlFieldLabel.textContent = 'External Article URL';
-        contentUrl.placeholder = 'https://medium.com/@username/article-title';
-        contentUrl.setAttribute('required', 'required');
-      } else if (isPlayground) {
-        if (urlFieldLabel) urlFieldLabel.textContent = isInternalPlayground ? 'Live Prototype Link (Optional)' : 'External Prototype Link (Figma, Dribbble, CodePen, Live Demo)';
-        contentUrl.placeholder = isInternalPlayground ? 'https://... (optional demo link) or leave blank' : 'https://dribbble.com/shots/... or https://figma.com/proto/... or https://codepen.io/...';
-        if (isInternalPlayground) contentUrl.removeAttribute('required');
-        else contentUrl.setAttribute('required', 'required');
-      } else {
-        if (urlFieldLabel) urlFieldLabel.textContent = 'Case Study Link (URL)';
-        contentUrl.placeholder = 'https://... or #casestudy';
-        contentUrl.setAttribute('required', 'required');
-      }
-    }
-  }
-
-  const canAutoFetch = (isJournal && journalMode === 'link') || (isPlayground && pgMode === 'external');
-  if (autoFetchBtn) autoFetchBtn.style.display = canAutoFetch ? 'inline-flex' : 'none';
-
-  // Category visibility toggle: Hide for Quick Sketches & Just for Fun (Experiments ONLY gets Category)
   const categoryWrapper = $('#category-group-wrapper');
   const pgToggleBtn = $('#toggle-pg-topic-manager-btn');
   const pgInlineBox = $('#playground-inline-topics-box');
   const journalToggleBtn = $('#toggle-journal-topic-manager-btn');
   const journalInlineBox = $('#journal-inline-topics-box');
-  const pSection = section ? section.value : 'experiments';
-  if (isPlayground && (pSection === 'sketches' || pSection === 'fun')) {
-    if (categoryWrapper) categoryWrapper.style.display = 'none';
-    if (pgToggleBtn) pgToggleBtn.style.display = 'none';
-    if (pgInlineBox) pgInlineBox.style.display = 'none';
+  const descGroupLabel = $('#description-field-group')?.querySelector('.group-label');
+
+  if (isPlayground) {
+    // ══════════════════════════════════════════════════════
+    // PLAYGROUND TAB (Internal vs External)
+    // ══════════════════════════════════════════════════════
+    if (tagsLabel) tagsLabel.style.display = 'none';
+    const prodUrlWrapper = $('#product-url-field-label');
+    if (prodUrlWrapper) prodUrlWrapper.style.display = 'none';
+    if (journalFieldsGroup) journalFieldsGroup.style.display = 'none';
+    if (journalBlogBodyGroup) journalBlogBodyGroup.style.display = 'none';
+
+    if (categoryWrapper) {
+      categoryWrapper.style.display = 'block';
+      const cLbl = categoryWrapper.querySelector('.group-label');
+      if (cLbl) cLbl.textContent = isInternalPlayground ? 'Category tag — Interaction / Typography' : 'Category tag';
+    }
+    if (pgToggleBtn) pgToggleBtn.style.display = 'inline-block';
     if (journalToggleBtn) journalToggleBtn.style.display = 'none';
-    if (journalInlineBox) journalInlineBox.style.display = 'none';
-  } else {
-    if (categoryWrapper) categoryWrapper.style.display = 'block';
-    if (pgToggleBtn) pgToggleBtn.style.display = isPlayground ? 'inline-block' : 'none';
-    if (journalToggleBtn) journalToggleBtn.style.display = isJournal ? 'inline-block' : 'none';
-    if (!isPlayground && pgInlineBox) pgInlineBox.style.display = 'none';
-    if (!isJournal && journalInlineBox) journalInlineBox.style.display = 'none';
+
+    if (isInternalPlayground) {
+      // ── INTERNAL PLAYGROUND (ONLY 8 REQUESTED FIELDS) ──
+      // 1. Hero visual (Cover Image)
+      if (coverImageUrlGroup) coverImageUrlGroup.style.display = 'block';
+      if (coverImageFileGroup) coverImageFileGroup.style.display = 'block';
+      const cUrlLbl = $('#cover-image-url-label');
+      if (cUrlLbl) cUrlLbl.textContent = 'Hero visual (Cover Image URL)';
+      const cFileLbl = $('#cover-image-file-label');
+      if (cFileLbl) cFileLbl.textContent = 'Or Upload Hero Visual File';
+
+      // 2. The experiment question, 5. Design thinking, 6. Additional images gallery, 8. Conclusion/learning
+      if (pgInternalFieldsGroup) pgInternalFieldsGroup.style.display = 'block';
+
+      // 3. Short explanation
+      if (descriptionFieldGroup) descriptionFieldGroup.style.display = 'block';
+      if (descGroupLabel) descGroupLabel.textContent = 'Short explanation';
+      if (contentDescription) contentDescription.placeholder = 'Short explanation of what this exploration investigates...';
+
+      // 7. Tools
+      if (workFieldsGroup) workFieldsGroup.style.display = 'block';
+      const toolsWrapper = $('#tools-field-label');
+      if (toolsWrapper) {
+        toolsWrapper.style.display = 'block';
+        const tLbl = toolsWrapper.querySelector('.group-label');
+        if (tLbl) tLbl.textContent = 'Tools (e.g. Figma | Spline 3D | Framer | Three.js)';
+      }
+
+      // Hide all non-requested fields
+      if (titleFieldGroup) titleFieldGroup.style.display = 'none';
+      if (contentTitle) contentTitle.removeAttribute('required');
+      if (urlFieldGroup) {
+        urlFieldGroup.style.display = 'none';
+        contentUrl.removeAttribute('required');
+      }
+      if (autoFetchBtn) autoFetchBtn.style.display = 'none';
+    } else {
+      // ── EXTERNAL PLAYGROUND (ONLY 4 REQUESTED FIELDS: Title, Description, Category tag, Link) ──
+      // 1. Title
+      if (titleFieldGroup) {
+        titleFieldGroup.style.display = 'block';
+        if (titleFieldLabel) titleFieldLabel.textContent = 'Title';
+        if (contentTitle) {
+          contentTitle.placeholder = 'Prototype or exploration title';
+          contentTitle.setAttribute('required', 'required');
+        }
+      }
+
+      // 2. Description
+      if (descriptionFieldGroup) {
+        descriptionFieldGroup.style.display = 'block';
+        if (descGroupLabel) descGroupLabel.textContent = 'Description';
+        if (contentDescription) contentDescription.placeholder = 'Brief description of the prototype or demo...';
+      }
+
+      // 4. Link
+      if (urlFieldGroup) {
+        urlFieldGroup.style.display = 'block';
+        if (urlFieldLabel) urlFieldLabel.textContent = 'Link';
+        if (contentUrl) {
+          contentUrl.placeholder = 'https://dribbble.com/shots/... or https://figma.com/proto/... or https://codepen.io/...';
+          contentUrl.setAttribute('required', 'required');
+        }
+      }
+      if (autoFetchBtn) autoFetchBtn.style.display = 'inline-flex';
+
+      // Hide all internal and extra things
+      if (coverImageUrlGroup) coverImageUrlGroup.style.display = 'none';
+      if (coverImageFileGroup) coverImageFileGroup.style.display = 'none';
+      if (pgInternalFieldsGroup) pgInternalFieldsGroup.style.display = 'none';
+      if (workFieldsGroup) workFieldsGroup.style.display = 'none';
+    }
+  } else if (isWork) {
+    // Standard Work Fields
+    if (journalFieldsGroup) journalFieldsGroup.style.display = 'none';
+    if (journalBlogBodyGroup) journalBlogBodyGroup.style.display = 'none';
+    if (pgInternalFieldsGroup) pgInternalFieldsGroup.style.display = 'none';
+
+    if (titleFieldGroup) {
+      titleFieldGroup.style.display = 'block';
+      if (titleFieldLabel) titleFieldLabel.textContent = 'Title / Project Name';
+      if (contentTitle) contentTitle.setAttribute('required', 'required');
+    }
+    if (descriptionFieldGroup) {
+      descriptionFieldGroup.style.display = 'block';
+      if (descGroupLabel) descGroupLabel.textContent = 'Description / Excerpt';
+    }
+    if (urlFieldGroup) {
+      urlFieldGroup.style.display = 'block';
+      if (urlFieldLabel) urlFieldLabel.textContent = 'Case Study Link (URL)';
+      if (contentUrl) {
+        contentUrl.placeholder = 'https://... or #casestudy';
+        contentUrl.setAttribute('required', 'required');
+      }
+    }
+    if (coverImageUrlGroup) coverImageUrlGroup.style.display = 'block';
+    if (coverImageFileGroup) coverImageFileGroup.style.display = 'block';
+    const cUrlLbl = $('#cover-image-url-label');
+    if (cUrlLbl) cUrlLbl.textContent = 'Cover Image URL (optional)';
+    const cFileLbl = $('#cover-image-file-label');
+    if (cFileLbl) cFileLbl.textContent = 'Or Upload Cover Image File';
+
+    if (workFieldsGroup) workFieldsGroup.style.display = 'block';
+    if (tagsLabel) tagsLabel.style.display = 'block';
+    const toolsWrapper = $('#tools-field-label');
+    if (toolsWrapper) {
+      toolsWrapper.style.display = 'block';
+      const tLbl = toolsWrapper.querySelector('.group-label');
+      if (tLbl) tLbl.textContent = 'Tools / Tech Stack (optional)';
+    }
+    const prodUrlWrapper = $('#product-url-field-label');
+    if (prodUrlWrapper) prodUrlWrapper.style.display = 'block';
+    if (categoryWrapper) {
+      categoryWrapper.style.display = 'block';
+      const cLbl = categoryWrapper.querySelector('.group-label');
+      if (cLbl) cLbl.textContent = 'Category';
+    }
+    if (pgToggleBtn) pgToggleBtn.style.display = 'none';
+    if (journalToggleBtn) journalToggleBtn.style.display = 'none';
+    if (autoFetchBtn) autoFetchBtn.style.display = 'none';
+  } else if (isJournal) {
+    // Standard Journal Fields
+    if (journalFieldsGroup) {
+      journalFieldsGroup.style.display = 'grid';
+      if ($('#journal-date') && !$('#journal-date').value) {
+        $('#journal-date').value = getTodayDateString();
+      }
+    }
+    if (journalBlogBodyGroup) journalBlogBodyGroup.style.display = isInternalBlog ? 'block' : 'none';
+    if (pgInternalFieldsGroup) pgInternalFieldsGroup.style.display = 'none';
+    if (workFieldsGroup) workFieldsGroup.style.display = 'none';
+
+    if (titleFieldGroup) {
+      titleFieldGroup.style.display = 'block';
+      if (titleFieldLabel) titleFieldLabel.textContent = 'Article Title';
+      if (contentTitle) contentTitle.setAttribute('required', 'required');
+    }
+    if (descriptionFieldGroup) {
+      descriptionFieldGroup.style.display = 'block';
+      if (descGroupLabel) descGroupLabel.textContent = 'Summary / Excerpt';
+    }
+    if (coverImageUrlGroup) coverImageUrlGroup.style.display = 'block';
+    if (coverImageFileGroup) coverImageFileGroup.style.display = 'block';
+    const cUrlLbl = $('#cover-image-url-label');
+    if (cUrlLbl) cUrlLbl.textContent = 'Cover Image URL (optional)';
+    const cFileLbl = $('#cover-image-file-label');
+    if (cFileLbl) cFileLbl.textContent = 'Or Upload Cover Image File';
+
+    if (urlFieldGroup) {
+      if (isInternalBlog) {
+        urlFieldGroup.style.display = 'none';
+        if (contentUrl) contentUrl.removeAttribute('required');
+      } else {
+        urlFieldGroup.style.display = 'block';
+        if (urlFieldLabel) urlFieldLabel.textContent = 'External Article URL';
+        if (contentUrl) {
+          contentUrl.placeholder = 'https://medium.com/@username/article-title';
+          contentUrl.setAttribute('required', 'required');
+        }
+      }
+    }
+    if (categoryWrapper) {
+      categoryWrapper.style.display = 'block';
+      const cLbl = categoryWrapper.querySelector('.group-label');
+      if (cLbl) cLbl.textContent = 'Category';
+    }
+    if (pgToggleBtn) pgToggleBtn.style.display = 'none';
+    if (journalToggleBtn) journalToggleBtn.style.display = 'inline-block';
+    if (autoFetchBtn) autoFetchBtn.style.display = (journalMode === 'link') ? 'inline-flex' : 'none';
   }
 
   // Populate categories
@@ -1036,26 +1168,38 @@ contentForm.onsubmit = async event => {
       else detectedPlatform = 'Live Demo';
     }
 
+    let finalTitle = titleVal;
     let finalContentBody = '';
+    let finalUrl = urlVal || '';
+
     if (isInternalBlogNow) {
       finalContentBody = contentBodyVal;
-    } else if (targetType === 'playground' && pgModeNow === 'internal') {
-      const pgData = {
-        question: (pgExperimentQuestion ? pgExperimentQuestion.value.trim() : ''),
-        explanation: descVal,
-        designThinking: (pgDesignThinking ? pgDesignThinking.value.trim() : ''),
-        gallery: (pgGalleryUrls ? pgGalleryUrls.value.split(/[\n,]+/).map(s => s.trim()).filter(Boolean) : []),
-        conclusion: (pgConclusion ? pgConclusion.value.trim() : ''),
-        tools: (data.tools || '')
-      };
-      finalContentBody = JSON.stringify(pgData);
+      finalUrl = '';
+    } else if (targetType === 'playground') {
+      if (pgModeNow === 'internal') {
+        const qVal = pgExperimentQuestion ? pgExperimentQuestion.value.trim() : '';
+        finalTitle = qVal ? qVal.replace(/^["']|["']$/g, '').slice(0, 70) : (descVal ? descVal.slice(0, 50) : `${finalCategory} Study`);
+        finalUrl = '';
+        const pgData = {
+          question: qVal,
+          explanation: descVal,
+          designThinking: (pgDesignThinking ? pgDesignThinking.value.trim() : ''),
+          gallery: (pgGalleryUrls ? pgGalleryUrls.value.split(/[\n,]+/).map(s => s.trim()).filter(Boolean) : []),
+          conclusion: (pgConclusion ? pgConclusion.value.trim() : ''),
+          tools: (data.tools || '')
+        };
+        finalContentBody = JSON.stringify(pgData);
+      } else {
+        finalTitle = titleVal;
+        finalContentBody = '';
+      }
     }
 
     const payload = {
-      title: titleVal,
+      title: finalTitle,
       description: descVal,
       contentBody: finalContentBody,
-      url: isInternalBlogNow ? '' : (urlVal || ''),
+      url: finalUrl,
       productUrl: data.productUrl || '',
       image,
       category: `${targetType}|${sectionName}|${finalCategory}`,

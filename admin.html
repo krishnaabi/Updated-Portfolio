@@ -191,8 +191,8 @@
             </div>
           </div>
 
-          <!-- URL Field + Auto-Fetch Button (Journal External Link ONLY) -->
-          <div class="form-group">
+          <!-- URL Field + Auto-Fetch Button -->
+          <div class="form-group" id="url-field-group">
             <label class="group-label" id="url-field-label">Link / Destination URL</label>
             <div class="url-input-wrapper">
               <input name="url" id="content-url" required placeholder="https://medium.com/@username/article-title">
@@ -204,13 +204,13 @@
           </div>
 
           <!-- Title & Description -->
-          <div class="form-group">
+          <div class="form-group" id="title-field-group">
             <label class="group-label" id="title-field-label">Title / Project Name</label>
             <input name="title" id="content-title" required placeholder="e.g. Haniio or Designing for Clarity">
           </div>
 
-          <div class="form-group">
-            <label class="group-label">Description / Excerpt</label>
+          <div class="form-group" id="description-field-group">
+            <label class="group-label" id="description-field-label">Description / Excerpt</label>
             <textarea name="description" id="content-description"
               placeholder="A brief summary or behind-the-scenes overview..."></textarea>
           </div>
@@ -288,13 +288,13 @@
           </div>
 
           <!-- Cover Image Options -->
-          <div class="form-group">
-            <label class="group-label">Cover Image URL (optional)</label>
+          <div class="form-group" id="cover-image-url-group">
+            <label class="group-label" id="cover-image-url-label">Cover Image URL (optional)</label>
             <input name="imageUrl" id="content-image-url" placeholder="https://images.unsplash.com/... or /uploads/...">
           </div>
 
-          <div class="form-group">
-            <label class="group-label">Or Upload Cover Image File</label>
+          <div class="form-group" id="cover-image-file-group">
+            <label class="group-label" id="cover-image-file-label">Or Upload Cover Image File</label>
             <input name="imageFile" type="file" accept="image/*" id="content-image-file">
             <small class="recommended-size">💡 Recommended size: <b>1200 × 800 px</b> (3:2 landscape ratio, max 5 MB)</small>
           </div>
@@ -1176,7 +1176,7 @@
   </main>
 
   <script src="supabase-config.js"></script>
-  <script src="admin.js?v=35"></script>
+  <script src="admin.js?v=36"></script>
 </body>
 
 </html>
