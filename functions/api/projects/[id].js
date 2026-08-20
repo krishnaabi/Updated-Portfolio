@@ -33,6 +33,9 @@ export async function onRequest(context) {
       if (incoming.platform !== undefined) payload.platform = incoming.platform;
       if (incoming.journalType !== undefined) payload.journal_type = incoming.journalType;
       if (incoming.displayOrder !== undefined) payload.display_order = incoming.displayOrder;
+      if (incoming.date !== undefined && incoming.date) {
+        try { payload.created_at = new Date(incoming.date).toISOString(); } catch {}
+      }
 
       if (incoming.category) {
         const parts = incoming.category.split('|');

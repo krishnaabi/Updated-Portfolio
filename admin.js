@@ -54,6 +54,7 @@ let allProjectsData = [];
 
 const escapeHtml = str => String(str || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' })[c]);
 const cleanImgUrl = url => String(url || '').trim();
+const getTodayDateString = () => new Date().toISOString().split('T')[0];
 
 const API_BASE_URLS = ['', 'http://127.0.0.1:4173', 'http://localhost:4173'];
 
@@ -216,7 +217,12 @@ function refreshFields() {
   // Section visibility toggles
   if (playgroundSectionWrapper) playgroundSectionWrapper.style.display = isPlayground ? 'block' : 'none';
   if (journalTypeWrapper) journalTypeWrapper.style.display = isJournal ? 'block' : 'none';
-  if (journalFieldsGroup) journalFieldsGroup.style.display = isJournal ? 'grid' : 'none';
+  if (journalFieldsGroup) {
+    journalFieldsGroup.style.display = isJournal ? 'grid' : 'none';
+    if (isJournal && $('#journal-date') && !$('#journal-date').value) {
+      $('#journal-date').value = getTodayDateString();
+    }
+  }
   if (journalBlogBodyGroup) journalBlogBodyGroup.style.display = isInternalBlog ? 'block' : 'none';
 
   if (workFieldsGroup) workFieldsGroup.style.display = isWork ? 'block' : 'none';
@@ -314,7 +320,7 @@ if (autoFetchBtn) {
   autoFetchBtn.onclick = async () => {
     let targetUrl = contentUrl.value.trim();
     if (!targetUrl) {
-      alert('Please enter an article URL first (e.g. Medium, LinkedIn, or Substack link).');
+      alert('Please enter an article URL first (e.g. Medium, Substack, LinkedIn, or blog post link).');
       return;
     }
     if (!/^https?:\/\//i.test(targetUrl)) {
@@ -322,11 +328,12 @@ if (autoFetchBtn) {
       contentUrl.value = targetUrl;
     }
 
-    if (fetchStatusMsg) fetchStatusMsg.textContent = 'Extracting details... ⏳';
+    if (fetchStatusMsg) fetchStatusMsg.textContent = 'Extracting article details & cover image... ⏳';
     autoFetchBtn.disabled = true;
 
     let fetchedData = null;
 
+    // 1. Try backend API endpoint (/api/fetch-metadata)
     try {
       const response = await apiFetch('/api/fetch-metadata', {
         method: 'POST',
@@ -338,62 +345,85 @@ if (autoFetchBtn) {
       }
     } catch (e) {}
 
-    // Client-side Fallback Generator
+    // 2. Secondary browser-direct fallback via Microlink API if server failed or returned missing data
+    if (!fetchedData || !fetchedData.title || !fetchedData.image) {
+      try {
+        const microRes = await fetch(`https://api.microlink.io?url=${encodeURIComponent(targetUrl)}&screenshot=false&meta=true`);
+        if (microRes.ok) {
+          const microJson = await microRes.json();
+          if (microJson.status === 'success' && microJson.data) {
+            const md = microJson.data;
+            fetchedData = {
+              title: fetchedData?.title || md.title || '',
+              description: fetchedData?.description || md.description || '',
+              image: fetchedData?.image || ((md.image && md.image.url) ? md.image.url : ''),
+              platform: fetchedData?.platform || md.publisher || '',
+              readTime: fetchedData?.readTime || '5 min read',
+              date: md.date ? md.date.split('T')[0] : (fetchedData?.date || getTodayDateString())
+            };
+          }
+        }
+      } catch (e) {}
+    }
+
+    // 3. Fallback generator from URL structure if still incomplete
     if (!fetchedData || !fetchedData.title) {
-      let platformName = 'LinkedIn';
-      let titleName = 'Abi Krishna: UX India Design Pitch 2026';
-      let descName = 'Design pitch and product experience insights shared on LinkedIn.';
-      let imgUrl = 'https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&w=700&q=80';
+      let platformName = 'Web Article';
+      let titleName = '';
+      let descName = '';
+      let imgUrl = '';
 
       try {
-        const host = new URL(targetUrl).hostname.replace(/^www\./, '');
+        const parsed = new URL(targetUrl);
+        const host = parsed.hostname.replace(/^www\./, '');
         platformName = host.split('.')[0].charAt(0).toUpperCase() + host.split('.')[0].slice(1);
         if (targetUrl.includes('linkedin')) {
           platformName = 'LinkedIn';
-          const match = targetUrl.match(/posts\/([^\/\?]+)/) || targetUrl.match(/update\/([^\/\?]+)/);
+          const match = targetUrl.match(/posts\/([^\/\?]+)/) || targetUrl.match(/update\/([^\/\?]+)/) || targetUrl.match(/pulse\/([^\/\?]+)/);
           if (match) {
             const parts = match[1].split('_');
             let author = parts[0] ? parts[0].replace(/-\d+[a-z0-9]*$/i, '').replace(/-/g, ' ') : 'Abi Krishna';
-            let topic = parts[1] ? parts[1].replace(/-\d+/g, '').replace(/-[a-z0-9]{3,10}$/i, '').replace(/share/gi, '').replace(/-/g, ' ') : 'UX Design Pitch';
+            let topic = parts[1] ? parts[1].replace(/-\d+/g, '').replace(/-[a-z0-9]{3,10}$/i, '').replace(/share/gi, '').replace(/-/g, ' ') : 'Product Design';
             author = author.split(' ').filter(Boolean).map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
             topic = topic.split(' ').filter(Boolean).map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
             titleName = `${author}: ${topic}`;
-            descName = `Design pitch & product experience insights shared by ${author} on LinkedIn.`;
+            descName = `Insights and product design thinking shared by ${author} on LinkedIn.`;
           }
-        } else {
-          const pathSegs = new URL(targetUrl).pathname.split('/').filter(Boolean);
+        }
+        if (!titleName) {
+          const pathSegs = parsed.pathname.split('/').filter(Boolean);
           const slug = (pathSegs.pop() || '').replace(/[-_]/g, ' ').replace(/\d+/g, '').trim();
           if (slug.length > 3) titleName = slug.charAt(0).toUpperCase() + slug.slice(1);
         }
       } catch {}
 
       fetchedData = {
-        title: titleName,
-        description: descName,
-        image: imgUrl,
+        title: titleName || 'Design & Product Article',
+        description: descName || `An insightful article published on ${platformName} exploring design systems and product strategy.`,
+        image: imgUrl || 'https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?auto=format&fit=crop&w=1200&q=95',
         platform: platformName,
-        readTime: '4 min read',
-        date: new Date().toISOString().split('T')[0]
+        readTime: '5 min read',
+        date: getTodayDateString()
       };
     }
 
     // Populate Fields
-    if (fetchedData.title) $('#content-title').value = fetchedData.title;
-    if (fetchedData.description) $('#content-description').value = fetchedData.description;
-    if (fetchedData.image) $('#content-image-url').value = fetchedData.image;
+    if (fetchedData.title && $('#content-title')) $('#content-title').value = fetchedData.title;
+    if (fetchedData.description && $('#content-description')) $('#content-description').value = fetchedData.description;
+    if (fetchedData.image && $('#content-image-url')) $('#content-image-url').value = fetchedData.image;
     if (fetchedData.readTime && $('#journal-readtime')) $('#journal-readtime').value = fetchedData.readTime;
-    if (fetchedData.date && $('#journal-date')) {
-      const dateStr = typeof fetchedData.date === 'string' ? fetchedData.date.split('T')[0] : new Date().toISOString().split('T')[0];
+    if ($('#journal-date')) {
+      const dateStr = typeof fetchedData.date === 'string' && fetchedData.date.trim() ? fetchedData.date.split('T')[0] : getTodayDateString();
       $('#journal-date').value = dateStr;
     }
 
-    if (fetchStatusMsg) fetchStatusMsg.textContent = '✦ Metadata fetched successfully!';
+    if (fetchStatusMsg) fetchStatusMsg.textContent = '✦ Article details & cover image auto-fetched!';
     updateLivePreview();
 
     setTimeout(() => {
       if (fetchStatusMsg) fetchStatusMsg.textContent = '';
       autoFetchBtn.disabled = false;
-    }, 2500);
+    }, 3000);
   };
 }
 
@@ -446,8 +476,17 @@ function startEditing(id) {
   if ($('#content-image-url')) $('#content-image-url').value = item.image || '';
   if ($('#journal-readtime')) $('#journal-readtime').value = item.readTime || '';
   if ($('#content-featured')) $('#content-featured').checked = Boolean(item.featured);
-  if ($('#journal-date') && item.createdAt) {
-    $('#journal-date').value = new Date(item.createdAt).toISOString().split('T')[0];
+  if ($('#journal-date')) {
+    const rawDate = item.createdAt || item.date;
+    if (rawDate) {
+      try {
+        $('#journal-date').value = new Date(rawDate).toISOString().split('T')[0];
+      } catch {
+        $('#journal-date').value = getTodayDateString();
+      }
+    } else {
+      $('#journal-date').value = getTodayDateString();
+    }
   }
 
   editingIdInput.value = id;
@@ -465,6 +504,7 @@ if (cancelEditBtn) {
     submitBtn.innerHTML = 'Publish Item <b>↗</b>';
     cancelEditBtn.style.display = 'none';
     contentForm.reset();
+    if ($('#journal-date')) $('#journal-date').value = getTodayDateString();
     refreshFields();
   };
 }
@@ -2748,3 +2788,8 @@ if (journalResetBtn) {
 
 // Initial render of journal topics UI
 renderJournalTopicsUI();
+
+// Default Journal Date to today's date if empty
+if ($('#journal-date') && !$('#journal-date').value) {
+  $('#journal-date').value = getTodayDateString();
+}

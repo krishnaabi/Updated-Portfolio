@@ -74,7 +74,7 @@ export async function onRequest(context) {
         platform: incoming.platform || '',
         journal_type: incoming.journalType || 'link',
         display_order: incoming.displayOrder || 9999,
-        created_at: new Date().toISOString()
+        created_at: incoming.date ? new Date(incoming.date).toISOString() : new Date().toISOString()
       };
 
       const sbRes = await fetch(`${sbUrl}/rest/v1/portfolio_content`, {

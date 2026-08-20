@@ -246,88 +246,190 @@ const fetchMetadata = async rawUrl => {
   if (!targetUrl) return { ok: true, title: 'Design & Product Article', description: '', image: '', platform: 'Web', readTime: '5 min read', date: new Date().toISOString(), url: '' };
   if (!/^https?:\/\//i.test(targetUrl)) targetUrl = 'https://' + targetUrl;
 
+  let parsedUrl;
+  try {
+    parsedUrl = new URL(targetUrl);
+  } catch {
+    return { ok: false, error: 'Invalid URL' };
+  }
+
+  const host = parsedUrl.hostname.replace(/^www\./i, '');
+  let defaultPlatform = host.split('.')[0];
+  defaultPlatform = defaultPlatform.charAt(0).toUpperCase() + defaultPlatform.slice(1);
+  if (host.includes('medium.com')) defaultPlatform = 'Medium';
+  else if (host.includes('substack.com')) defaultPlatform = 'Substack';
+  else if (host.includes('linkedin.com')) defaultPlatform = 'LinkedIn';
+  else if (host.includes('dev.to')) defaultPlatform = 'Dev.to';
+  else if (host.includes('hashnode.dev') || host.includes('hashnode.com')) defaultPlatform = 'Hashnode';
+  else if (host.includes('behance.net')) defaultPlatform = 'Behance';
+  else if (host.includes('dribbble.com')) defaultPlatform = 'Dribbble';
+
   let title = '';
   let description = '';
   let image = '';
-  let platform = 'LinkedIn';
+  let platform = defaultPlatform;
+  let readTime = '5 min read';
+  let date = new Date().toISOString().split('T')[0];
 
-  if (targetUrl.includes('linkedin.com')) {
-    platform = 'LinkedIn';
-    const match = targetUrl.match(/posts\/([^\/\?]+)/) || targetUrl.match(/update\/([^\/\?]+)/);
-    if (match) {
-      const rawSlug = match[1];
-      const parts = rawSlug.split('_');
-      let author = parts[0] ? parts[0].replace(/-\d+[a-z0-9]*$/i, '').replace(/-/g, ' ') : 'Abi Krishna';
-      let topic = parts[1] ? parts[1].replace(/-\d+/g, '').replace(/-[a-z0-9]{3,10}$/i, '').replace(/share/gi, '').replace(/-/g, ' ') : '';
+  // Strategy 1: Direct HTML Fetch & Meta Tag Extraction
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    const response = await fetch(targetUrl, {
+      signal: controller.signal,
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+        'Accept-Language': 'en-US,en;q=0.9'
+      }
+    });
+    clearTimeout(timeoutId);
 
-      author = author.split(' ').filter(Boolean).map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
-      topic = topic ? topic.split(' ').filter(Boolean).map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ') : 'UX Design Pitch & Product Strategy';
+    if (response.ok) {
+      const html = await response.text();
 
-      title = `${author}: ${topic}`;
-      description = `Design pitch & product experience insights shared by ${author} on LinkedIn.`;
-      image = 'https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&w=700&q=80';
-      return { ok: true, title, description, image, platform: 'LinkedIn', readTime: '4 min read', date: new Date().toISOString(), url: targetUrl };
+      const decodeHtml = str => {
+        if (!str) return '';
+        return str
+          .replace(/&amp;/g, '&')
+          .replace(/&lt;/g, '<')
+          .replace(/&gt;/g, '>')
+          .replace(/&quot;/g, '"')
+          .replace(/&#039;/g, "'")
+          .replace(/&#39;/g, "'")
+          .replace(/&nbsp;/g, ' ')
+          .trim();
+      };
+
+      const getMetaContent = (nameOrProp) => {
+        const re = new RegExp(`<meta[^>]+(?:name|property)=["']${nameOrProp}["'][^>]+content=["']([^"']+)["']`, 'i');
+        const match = html.match(re);
+        if (match) return decodeHtml(match[1]);
+        const reReverse = new RegExp(`<meta[^>]+content=["']([^"']+)["'][^>]+(?:name|property)=["']${nameOrProp}["']`, 'i');
+        const matchRev = html.match(reReverse);
+        return matchRev ? decodeHtml(matchRev[1]) : '';
+      };
+
+      title = getMetaContent('og:title') || getMetaContent('twitter:title') || getMetaContent('title');
+      if (!title) {
+        const titleMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i);
+        if (titleMatch) title = decodeHtml(titleMatch[1]);
+      }
+
+      description = getMetaContent('og:description') || getMetaContent('twitter:description') || getMetaContent('description');
+      image = getMetaContent('og:image:secure_url') || getMetaContent('og:image') || getMetaContent('twitter:image') || getMetaContent('twitter:image:src');
+
+      const siteName = getMetaContent('og:site_name') || getMetaContent('twitter:site');
+      if (siteName) platform = siteName.replace(/^@/, '');
+
+      const publishedTime = getMetaContent('article:published_time') || getMetaContent('og:published_time') || getMetaContent('date') || getMetaContent('pubdate');
+      if (publishedTime) {
+        try {
+          const d = new Date(publishedTime);
+          if (!isNaN(d.getTime())) date = d.toISOString().split('T')[0];
+        } catch {}
+      }
+
+      const rt = getMetaContent('twitter:data1') || getMetaContent('reading_time');
+      if (rt) {
+        readTime = /min/i.test(rt) ? rt : `${rt} min read`;
+      } else {
+        const bodyMatch = html.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
+        if (bodyMatch) {
+          const textOnly = bodyMatch[1].replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+                                       .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '')
+                                       .replace(/<[^>]+>/g, ' ')
+                                       .replace(/\s+/g, ' ')
+                                       .trim();
+          const words = textOnly.split(/\s+/).length;
+          if (words > 200) {
+            const estMins = Math.max(1, Math.round(words / 220));
+            readTime = `${estMins} min read`;
+          }
+        }
+      }
+
+      const jsonLdMatches = html.match(/<script[^>]+type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi);
+      if (jsonLdMatches) {
+        for (const block of jsonLdMatches) {
+          try {
+            const rawJson = block.replace(/<script[^>]*>/i, '').replace(/<\/script>/i, '').trim();
+            const parsed = JSON.parse(rawJson);
+            const targetObj = Array.isArray(parsed) ? parsed[0] : (parsed['@graph'] ? parsed['@graph'].find(g => g.headline || g.image) || parsed['@graph'][0] : parsed);
+            if (targetObj) {
+              if (!title && targetObj.headline) title = decodeHtml(targetObj.headline);
+              if (!title && targetObj.name) title = decodeHtml(targetObj.name);
+              if (!description && targetObj.description) description = decodeHtml(targetObj.description);
+              if (!image && targetObj.image) {
+                if (typeof targetObj.image === 'string') image = targetObj.image;
+                else if (Array.isArray(targetObj.image) && targetObj.image[0]) image = typeof targetObj.image[0] === 'string' ? targetObj.image[0] : targetObj.image[0].url;
+                else if (targetObj.image.url) image = targetObj.image.url;
+              }
+              if (targetObj.datePublished) {
+                const d = new Date(targetObj.datePublished);
+                if (!isNaN(d.getTime())) date = d.toISOString().split('T')[0];
+              }
+            }
+          } catch {}
+        }
+      }
     }
+  } catch {}
+
+  // Strategy 2: Microlink API Fallback
+  if (!title || !image || !description) {
+    try {
+      const microRes = await fetch(`https://api.microlink.io?url=${encodeURIComponent(targetUrl)}&screenshot=false&meta=true`);
+      if (microRes.ok) {
+        const microData = await microRes.json();
+        if (microData.status === 'success' && microData.data) {
+          const d = microData.data;
+          if (!title && d.title) title = d.title;
+          if (!description && d.description) description = d.description;
+          if (!image && d.image && d.image.url) image = d.image.url;
+          if (d.publisher && platform === defaultPlatform) platform = d.publisher;
+          if (d.date) {
+            try {
+              const pd = new Date(d.date);
+              if (!isNaN(pd.getTime())) date = pd.toISOString().split('T')[0];
+            } catch {}
+          }
+        }
+      }
+    } catch {}
   }
 
-  try {
-    const microRes = await fetch(`https://api.microlink.io?url=${encodeURIComponent(targetUrl)}`);
-    if (microRes.ok) {
-      const microData = await microRes.json();
-      if (microData.status === 'success' && microData.data) {
-        const d = microData.data;
-        if (d.title) title = d.title.split('|')[0].split(' - ')[0].trim();
-        if (d.description) description = d.description;
-        if (d.image && d.image.url) image = d.image.url;
-        if (d.publisher) platform = d.publisher;
-      }
-    }
-  } catch { }
+  // Clean title
+  if (title) {
+    title = title
+      .split(/\s+[|\-—–]\s+(?:Medium|Substack|LinkedIn|Dev\.to|Hashnode|UX Collective|Behance|Dribbble|TechCrunch)$/i)[0]
+      .replace(/\s+[|\-—–]\s+by\s+[^|\-—–]+$/i, '')
+      .trim();
+  }
 
-  if (!title || !image) {
+  // Resolve relative image URLs to absolute
+  if (image) {
     try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 4000);
-      const response = await fetch(targetUrl, {
-        signal: controller.signal,
-        headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-        }
-      });
-      clearTimeout(timeoutId);
-      if (response.ok) {
-        const html = await response.text();
-        const getTag = prop => {
-          const match = html.match(new RegExp(`<meta[^>]+(?:name|property)=["']${prop}["'][^>]+content=["']([^"']+)["']`, 'i')) ||
-            html.match(new RegExp(`<meta[^>]+content=["']([^"']+)["'][^>]+(?:name|property)=["']${prop}["']`, 'i'));
-          return match ? match[1].replace(/&quot;/g, '"').replace(/&#39;/g, "'").trim() : '';
-        };
-        const titleMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i);
-        const rawTitle = getTag('og:title') || getTag('twitter:title') || (titleMatch ? titleMatch[1] : '');
-        if (!title && rawTitle) title = rawTitle.split('|')[0].split(' - ')[0].trim();
-        if (!description) description = getTag('og:description') || getTag('twitter:description') || getTag('description') || '';
-        if (!image) image = getTag('og:image') || getTag('twitter:image') || '';
-        if (!platform) platform = getTag('og:site_name') || platform;
+      if (image.startsWith('//')) {
+        image = 'https:' + image;
+      } else if (image.startsWith('/')) {
+        image = new URL(image, targetUrl).href;
       }
-    } catch { }
+    } catch {}
   }
 
   if (!title) {
-    try {
-      const parsedUrl = new URL(targetUrl);
-      const host = parsedUrl.hostname.replace(/^www\./, '');
-      platform = host.split('.')[0].charAt(0).toUpperCase() + host.split('.')[0].slice(1);
-      const pathSegments = parsedUrl.pathname.split('/').filter(Boolean);
-      const lastSegment = pathSegments.pop() || '';
-      const cleanSlug = lastSegment.replace(/-[a-f0-9]{8,12}$/i, '').replace(/[-_]/g, ' ').replace(/\d+/g, '').trim();
-      title = cleanSlug.length > 3 ? cleanSlug.charAt(0).toUpperCase() + cleanSlug.slice(1) : `Article on ${platform}`;
-    } catch {
-      title = 'Design & Product Article';
-    }
+    const pathSegs = parsedUrl.pathname.split('/').filter(Boolean);
+    const lastSeg = pathSegs.pop() || '';
+    const cleanSlug = lastSeg.replace(/-[a-f0-9]{8,12}$/i, '').replace(/[-_]/g, ' ').replace(/\d+/g, '').trim();
+    title = cleanSlug.length > 3 ? cleanSlug.charAt(0).toUpperCase() + cleanSlug.slice(1) : `Article on ${platform}`;
   }
 
-  if (!description) description = `An insightful article published on ${platform || 'the web'} exploring design thinking and product strategy.`;
-  return { ok: true, title, description, image, platform: platform || 'Web Article', readTime: '5 min read', date: new Date().toISOString(), url: targetUrl };
+  if (!description) {
+    description = `An article published on ${platform} exploring product design, strategy and creative engineering.`;
+  }
+
+  return { ok: true, title: title.trim(), description: description.trim(), image: (image || '').trim(), platform: platform.trim(), readTime: readTime.trim(), date, url: targetUrl };
 };
 
 // Mapper: Supabase row -> Frontend Project

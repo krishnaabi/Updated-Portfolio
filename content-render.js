@@ -1666,7 +1666,8 @@
       const closeArticleModal = closeSharedModal;
 
       const renderArticleCard = (item) => {
-        const dateStr = item.createdAt ? new Date(item.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'May 2026';
+        const itemDate = item.createdAt || item.date;
+        const dateStr = itemDate ? new Date(itemDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
         const catTag = categoryOf(item) || 'UX / UI Design';
         const readTime = item.readTime || '5 min read';
         const platformBadge = item.platform ? `<span style="font-size:10px;background:#f0ebe5;padding:2px 8px;border-radius:4px;color:#555;font-weight:700;">${escape(item.platform)}</span>` : '';
@@ -1790,7 +1791,8 @@
 
         if (spotlightContainer) {
           spotlightContainer.style.display = 'block';
-          const dateStr = spotlightArticle.createdAt ? new Date(spotlightArticle.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'May 12, 2026';
+          const spotlightDate = spotlightArticle.createdAt || spotlightArticle.date;
+          const dateStr = spotlightDate ? new Date(spotlightDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
           const catTag = categoryOf(spotlightArticle) || 'Product Design';
           const readTime = spotlightArticle.readTime || '8 min read';
           const imgHtml = spotlightArticle.image ?
