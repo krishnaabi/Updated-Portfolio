@@ -381,7 +381,7 @@ function refreshFields() {
   const isInternalBlog = isJournal && journalMode === 'blog';
 
   const pgModeEl = document.querySelector('input[name="playgroundType"]:checked');
-  const pgMode = pgModeEl ? pgModeEl.value : 'external';
+  const pgMode = pgModeEl ? pgModeEl.value : 'internal';
   const isInternalPlayground = isPlayground && pgMode === 'internal';
 
   // Section Headers
