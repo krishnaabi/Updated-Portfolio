@@ -204,8 +204,13 @@
             <!-- 6. Additional Images - Gallery -->
             <div class="form-group">
               <label class="group-label">Additional Images — Gallery</label>
-              <textarea name="pgGalleryUrls" id="pg-gallery-urls" style="height:80px;"
-                placeholder="Gallery of supporting visuals (Paste image URLs one per line or comma separated)..."></textarea>
+              <textarea name="pgGalleryUrls" id="pg-gallery-urls" style="height:75px;"
+                placeholder="Paste image URLs (one per line) or upload multiple files below..."></textarea>
+              <div style="margin-top:8px;">
+                <input name="pgGalleryFiles" type="file" accept="image/*" multiple id="pg-gallery-files">
+                <small class="recommended-size">💡 Select multiple images at once (Hold Ctrl / Cmd or Shift in file picker to select multiple images).</small>
+                <div id="pg-gallery-preview-container" style="display:flex;flex-wrap:wrap;gap:10px;margin-top:10px;"></div>
+              </div>
             </div>
 
             <!-- 7. Tools -->
@@ -1238,7 +1243,7 @@
   </main>
 
   <script src="supabase-config.js"></script>
-  <script src="admin.js?v=41"></script>
+  <script src="admin.js?v=42"></script>
 </body>
 
 </html>

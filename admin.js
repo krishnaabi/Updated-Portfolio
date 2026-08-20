@@ -42,6 +42,8 @@ const pgShortExplanation = $('#pg-short-explanation');
 const pgInternalCategory = $('#pg-internal-category');
 const pgDesignThinking = $('#pg-design-thinking');
 const pgGalleryUrls = $('#pg-gallery-urls');
+const pgGalleryFiles = $('#pg-gallery-files');
+const pgGalleryPreviewContainer = $('#pg-gallery-preview-container');
 const pgTools = $('#pg-tools');
 const pgConclusion = $('#pg-conclusion');
 
@@ -728,16 +730,77 @@ if (autoFetchPgExtBtn) {
   };
 }
 
-// Playground Topic Manager Toggles
-const togglePgTopics = () => {
-  const box = $('#playground-inline-topics-box');
-  if (!box) return;
-  const isHidden = box.style.display === 'none' || !box.style.display;
-  box.style.display = isHidden ? 'block' : 'none';
-  if (isHidden) renderPlaygroundTopicsChips();
-};
-if ($('#toggle-pg-topic-manager-btn')) $('#toggle-pg-topic-manager-btn').onclick = togglePgTopics;
-if ($('#toggle-pg-ext-topic-manager-btn')) $('#toggle-pg-ext-topic-manager-btn').onclick = togglePgTopics;
+// -------------------------------------------------------------
+// Additional Images Gallery — Multiple File Upload & Thumbnails
+// -------------------------------------------------------------
+function renderGalleryThumbnails() {
+  if (!pgGalleryPreviewContainer || !pgGalleryUrls) return;
+  const rawUrls = (pgGalleryUrls.value || '').split(/[\n,]+/).map(s => s.trim()).filter(Boolean);
+  if (!rawUrls.length) {
+    pgGalleryPreviewContainer.innerHTML = '';
+    return;
+  }
+
+  pgGalleryPreviewContainer.innerHTML = rawUrls.map((url, index) => {
+    return `
+      <div class="pg-gallery-thumb-item" style="position:relative;width:70px;height:70px;border-radius:10px;overflow:hidden;border:1.5px solid #e2ddd8;background:#111;display:inline-block;box-shadow:0 2px 6px rgba(0,0,0,0.08);">
+        <img src="${escapeHtml(url)}" alt="Gallery Preview" style="width:100%;height:100%;object-fit:cover;display:block;">
+        <button type="button" data-remove-gallery-idx="${index}" title="Remove image" style="position:absolute;top:3px;right:3px;background:rgba(0,0,0,0.8);color:#fff;border:none;border-radius:50%;width:18px;height:18px;font-size:11px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;">✕</button>
+      </div>
+    `;
+  }).join('');
+
+  pgGalleryPreviewContainer.querySelectorAll('[data-remove-gallery-idx]').forEach(btn => {
+    btn.onclick = (e) => {
+      e.preventDefault();
+      const idxToRemove = parseInt(btn.dataset.removeGalleryIdx, 10);
+      const remaining = rawUrls.filter((_, idx) => idx !== idxToRemove);
+      pgGalleryUrls.value = remaining.join('\n');
+      renderGalleryThumbnails();
+    };
+  });
+}
+
+if (pgGalleryFiles) {
+  pgGalleryFiles.onchange = async () => {
+    const files = Array.from(pgGalleryFiles.files || []);
+    if (!files.length) return;
+
+    if (pgGalleryPreviewContainer) {
+      const msg = document.createElement('div');
+      msg.id = 'pg-gallery-uploading-msg';
+      msg.innerHTML = `<span style="color:var(--accent,#ff4e1b);font-size:12px;font-weight:700;">⏳ Uploading ${files.length} gallery image(s)...</span>`;
+      pgGalleryPreviewContainer.appendChild(msg);
+    }
+
+    const uploadedUrls = [];
+    for (const file of files) {
+      try {
+        const url = await fileToUrl(file);
+        if (url) uploadedUrls.push(url);
+      } catch (err) {
+        console.warn('Failed to upload gallery file:', file.name, err);
+      }
+    }
+
+    const currentUrls = (pgGalleryUrls ? pgGalleryUrls.value : '').trim();
+    const newUrlsText = uploadedUrls.join('\n');
+    if (pgGalleryUrls) {
+      pgGalleryUrls.value = currentUrls ? `${currentUrls}\n${newUrlsText}` : newUrlsText;
+    }
+
+    const loadMsg = $('#pg-gallery-uploading-msg');
+    if (loadMsg) loadMsg.remove();
+
+    renderGalleryThumbnails();
+    pgGalleryFiles.value = '';
+  };
+}
+
+if (pgGalleryUrls) {
+  pgGalleryUrls.oninput = renderGalleryThumbnails;
+  pgGalleryUrls.onchange = renderGalleryThumbnails;
+}
 
 // Start Editing Item
 function startEditing(id) {
@@ -796,6 +859,7 @@ function startEditing(id) {
       }
       if (pgDesignThinking) pgDesignThinking.value = (parsedPg && parsedPg.designThinking) ? parsedPg.designThinking : '';
       if (pgGalleryUrls) pgGalleryUrls.value = (parsedPg && Array.isArray(parsedPg.gallery)) ? parsedPg.gallery.join('\n') : ((parsedPg && parsedPg.gallery) || '');
+      renderGalleryThumbnails();
       if (pgTools) pgTools.value = (parsedPg && parsedPg.tools) ? parsedPg.tools : (item.tools || '');
       if (pgConclusion) pgConclusion.value = (parsedPg && parsedPg.conclusion) ? parsedPg.conclusion : '';
     } else {
@@ -858,6 +922,7 @@ if (cancelEditBtn) {
     cancelEditBtn.style.display = 'none';
     contentForm.reset();
     if ($('#journal-date')) $('#journal-date').value = getTodayDateString();
+    if (pgGalleryPreviewContainer) pgGalleryPreviewContainer.innerHTML = '';
     refreshFields();
   };
 }
@@ -1261,6 +1326,7 @@ contentForm.onsubmit = async event => {
     if (cancelEditBtn) cancelEditBtn.style.display = 'none';
     contentForm.reset();
     if ($('#journal-date')) $('#journal-date').value = getTodayDateString();
+    if (pgGalleryPreviewContainer) pgGalleryPreviewContainer.innerHTML = '';
     refreshFields();
     await load();
 
