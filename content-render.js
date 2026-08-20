@@ -95,26 +95,77 @@
       .map(block => {
         block = block.trim();
         if (!block) return '';
+
         // Markdown Image ![caption](url)
         const imgMatch = block.match(/^!\[(.*?)\]\((https?:\/\/[^\s)]+|\/uploads\/[^\s)]+)\)$/);
         if (imgMatch) {
           const alt = imgMatch[1] || 'Design Breakdown Visual';
           const src = imgMatch[2];
-          return `<figure class="pg-body-figure" style="margin:32px 0;"><img src="${escape(cleanImgUrl(src))}" alt="${escape(alt)}" style="width:100%;border-radius:18px;box-shadow:0 12px 35px rgba(0,0,0,0.08);display:block;">${alt ? `<figcaption style="font-family:'DM Mono',monospace;font-size:11.5px;color:#777;text-align:center;margin-top:10px;">✦ ${escape(alt)}</figcaption>` : ''}</figure>`;
+          return `<figure class="pg-body-figure" style="margin:36px 0;"><img src="${escape(cleanImgUrl(src))}" alt="${escape(alt)}" style="width:100%;border-radius:18px;box-shadow:0 12px 35px rgba(0,0,0,0.08);display:block;">${alt ? `<figcaption style="font-family:'DM Mono',monospace;font-size:12px;color:#777;text-align:center;margin-top:12px;">✦ ${escape(alt)}</figcaption>` : ''}</figure>`;
         }
-        if (/^###\s+/.test(block)) return `<h4 class="modal-h4" style="font-size:18px;font-weight:800;margin:24px 0 10px;color:var(--ink,#111);">${escape(block.replace(/^###\s+/, ''))}</h4>`;
-        if (/^##\s+/.test(block)) return `<h3 class="modal-h3" style="font-size:24px;font-weight:800;margin:36px 0 14px;color:var(--ink,#111);">${escape(block.replace(/^##\s+/, ''))}</h3>`;
-        if (/^#\s+/.test(block)) return `<h2 class="modal-h2" style="font-size:30px;font-weight:800;margin:42px 0 18px;color:var(--ink,#111);">${escape(block.replace(/^#\s+/, ''))}</h2>`;
-        if (/^>\s+/.test(block)) return `<blockquote class="modal-quote" style="border-left:4px solid var(--accent,#e34c26);padding:14px 20px;background:#fcf9f6;border-radius:0 14px 14px 0;font-style:italic;margin:28px 0;">${escape(block.replace(/^>\s+/, ''))}</blockquote>`;
+
+        // Headings
+        if (/^###\s+/.test(block)) return `<h4 class="modal-h4" style="font-size:20px;font-weight:800;letter-spacing:-0.5px;margin:28px 0 12px;color:var(--ink,#111);">${escape(block.replace(/^###\s+/, ''))}</h4>`;
+        if (/^##\s+/.test(block)) return `<h3 class="modal-h3" style="font-size:26px;font-weight:800;letter-spacing:-0.7px;margin:40px 0 16px;color:var(--ink,#111);">${escape(block.replace(/^##\s+/, ''))}</h3>`;
+        if (/^#\s+/.test(block)) return `<h2 class="modal-h2" style="font-size:32px;font-weight:800;letter-spacing:-1px;margin:48px 0 20px;color:var(--ink,#111);">${escape(block.replace(/^#\s+/, ''))}</h2>`;
+
+        // Blockquotes
+        if (/^>\s+/.test(block)) return `<blockquote class="modal-quote" style="border-left:4px solid var(--accent,#e34c26);padding:18px 24px;background:#fcf9f6;border-radius:0 16px 16px 0;font-size:18px;font-style:italic;color:var(--ink,#111);margin:32px 0;line-height:1.7;">${escape(block.replace(/^>\s+/, ''))}</blockquote>`;
+
+        // Bullet lists
         if (/^[-*]\s+/.test(block)) {
-          const its = block.split('\n').filter(l => /^[-*]\s+/.test(l.trim())).map(l => `<li>${escape(l.replace(/^[-*]\s+/, '').trim())}</li>`);
-          return `<ul class="modal-list" style="margin:0 0 24px 24px;line-height:1.75;">${its.join('')}</ul>`;
+          const its = block.split('\n').filter(l => /^[-*]\s+/.test(l.trim())).map(l => {
+            const cleanText = l.replace(/^[-*]\s+/, '').trim();
+            const formatted = escape(cleanText)
+              .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+              .replace(/\*([^*]+)\*/g, '<em>$1</em>');
+            return `<li style="margin-bottom:10px;">${formatted}</li>`;
+          });
+          return `<ul class="modal-list" style="margin:0 0 28px 24px;line-height:1.8;color:#333;">${its.join('')}</ul>`;
         }
+
+        // Ordered lists
+        if (/^\d+\.\s+/.test(block)) {
+          const its = block.split('\n').filter(l => /^\d+\.\s+/.test(l.trim())).map(l => {
+            const cleanText = l.replace(/^\d+\.\s+/, '').trim();
+            const formatted = escape(cleanText)
+              .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+              .replace(/\*([^*]+)\*/g, '<em>$1</em>');
+            return `<li style="margin-bottom:10px;">${formatted}</li>`;
+          });
+          return `<ol class="modal-list" style="margin:0 0 28px 24px;line-height:1.8;color:#333;">${its.join('')}</ol>`;
+        }
+
+        // Multiple key-value items or lines separated by single newlines inside a block:
+        const lines = block.split('\n').map(l => l.trim()).filter(Boolean);
+        const hasKeyValues = lines.length > 1 && lines.every(l => /^([A-Z][a-zA-Z0-9\s]{1,30})\s*[-:—]\s*(.+)$/.test(l));
+
+        if (hasKeyValues) {
+          const itemsHtml = lines.map(line => {
+            const m = line.match(/^([A-Z][a-zA-Z0-9\s]{1,30})\s*[-:—]\s*(.+)$/);
+            if (m) {
+              const label = m[1].trim();
+              const text = m[2].trim();
+              return `
+                <div class="pg-concept-point" style="background:#ffffff;border:1px solid #e9e3dc;border-radius:14px;padding:16px 20px;margin-bottom:12px;box-shadow:0 4px 14px rgba(0,0,0,0.03);display:flex;flex-direction:column;gap:4px;">
+                  <strong style="font-family:'DM Mono',monospace;font-size:13px;color:var(--accent,#e34c26);text-transform:uppercase;letter-spacing:0.8px;display:flex;align-items:center;gap:6px;">✦ ${escape(label)}</strong>
+                  <span style="font-size:15.5px;line-height:1.65;color:#333;">${escape(text)}</span>
+                </div>
+              `;
+            }
+            return `<p style="margin-bottom:12px;">${escape(line)}</p>`;
+          }).join('');
+          return `<div class="pg-concept-points-group" style="margin:24px 0 32px;">${itemsHtml}</div>`;
+        }
+
+        // Standard Paragraph with inline markdown & sentence-level key-point styling
         let p = escape(block)
           .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
           .replace(/\*([^*]+)\*/g, '<em>$1</em>')
-          .replace(/`([^`]+)`/g, '<code style="background:#f4efea;padding:2px 6px;border-radius:4px;font-family:\'DM Mono\',monospace;font-size:12.5px;">$1</code>');
-        return `<p style="margin-bottom:20px;line-height:1.8;">${p}</p>`;
+          .replace(/`([^`]+)`/g, '<code style="background:#f4efea;padding:2px 6px;border-radius:4px;font-family:\'DM Mono\',monospace;font-size:12.5px;">$1</code>')
+          .replace(/\n/g, '<br>');
+
+        return `<p style="margin-bottom:24px;line-height:1.85;font-size:17px;color:#2c2c2c;">${p}</p>`;
       })
       .filter(Boolean)
       .join('\n');
@@ -1477,15 +1528,41 @@
           }
         }
 
-        // 8. Lightbox Modal Wiring
+        // 8. Enhanced Lightbox Modal with Next/Prev & Caption
         const lightbox = document.querySelector('#pg-lightbox-modal');
         const lightboxImg = document.querySelector('#pg-lightbox-img');
         const lightboxClose = document.querySelector('#pg-lightbox-close');
         const lightboxBackdrop = document.querySelector('#pg-lightbox-backdrop');
+        const lightboxPrev = document.querySelector('#pg-lightbox-prev');
+        const lightboxNext = document.querySelector('#pg-lightbox-next');
+        const lightboxCaption = document.querySelector('#pg-lightbox-caption');
+
+        const allZoomImages = [];
+        if (currentItem.image) {
+          allZoomImages.push({ src: cleanImgUrl(currentItem.image), caption: `${currentItem.title} — Main Visual` });
+        }
+        galleryImages.forEach((src, idx) => {
+          allZoomImages.push({ src: cleanImgUrl(src), caption: `Exploration Screen 0${idx + 1} of 0${galleryImages.length}` });
+        });
+
+        let currentLightboxIdx = 0;
+
+        const updateLightboxView = (idx) => {
+          if (!lightboxImg || !allZoomImages.length) return;
+          currentLightboxIdx = (idx + allZoomImages.length) % allZoomImages.length;
+          const current = allZoomImages[currentLightboxIdx];
+          lightboxImg.src = current.src;
+          if (lightboxCaption) {
+            lightboxCaption.textContent = current.caption || `Visual 0${currentLightboxIdx + 1}`;
+          }
+          if (lightboxPrev) lightboxPrev.style.display = allZoomImages.length > 1 ? 'flex' : 'none';
+          if (lightboxNext) lightboxNext.style.display = allZoomImages.length > 1 ? 'flex' : 'none';
+        };
 
         const openLightbox = (src) => {
           if (!lightbox || !lightboxImg) return;
-          lightboxImg.src = src;
+          const foundIdx = allZoomImages.findIndex(img => img.src === src);
+          updateLightboxView(foundIdx >= 0 ? foundIdx : 0);
           lightbox.style.display = 'flex';
           document.body.style.overflow = 'hidden';
         };
@@ -1498,7 +1575,16 @@
 
         if (lightboxClose) lightboxClose.onclick = closeLightbox;
         if (lightboxBackdrop) lightboxBackdrop.onclick = closeLightbox;
-        document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
+        if (lightboxPrev) lightboxPrev.onclick = () => updateLightboxView(currentLightboxIdx - 1);
+        if (lightboxNext) lightboxNext.onclick = () => updateLightboxView(currentLightboxIdx + 1);
+
+        document.addEventListener('keydown', e => {
+          if (lightbox && lightbox.style.display === 'flex') {
+            if (e.key === 'Escape') closeLightbox();
+            if (e.key === 'ArrowLeft') updateLightboxView(currentLightboxIdx - 1);
+            if (e.key === 'ArrowRight') updateLightboxView(currentLightboxIdx + 1);
+          }
+        });
 
         document.querySelectorAll('.pg-zoomable-img').forEach(img => {
           img.addEventListener('click', () => openLightbox(img.src));

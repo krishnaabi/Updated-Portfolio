@@ -731,7 +731,7 @@ if (autoFetchPgExtBtn) {
 }
 
 // -------------------------------------------------------------
-// Additional Images Gallery — Multiple File Upload & Thumbnails
+// Additional Images Gallery — Multiple File Upload & Reordering
 // -------------------------------------------------------------
 function renderGalleryThumbnails() {
   if (!pgGalleryPreviewContainer || !pgGalleryUrls) return;
@@ -741,15 +741,29 @@ function renderGalleryThumbnails() {
     return;
   }
 
-  pgGalleryPreviewContainer.innerHTML = rawUrls.map((url, index) => {
-    return `
-      <div class="pg-gallery-thumb-item" style="position:relative;width:70px;height:70px;border-radius:10px;overflow:hidden;border:1.5px solid #e2ddd8;background:#111;display:inline-block;box-shadow:0 2px 6px rgba(0,0,0,0.08);">
-        <img src="${escapeHtml(url)}" alt="Gallery Preview" style="width:100%;height:100%;object-fit:cover;display:block;">
-        <button type="button" data-remove-gallery-idx="${index}" title="Remove image" style="position:absolute;top:3px;right:3px;background:rgba(0,0,0,0.8);color:#fff;border:none;border-radius:50%;width:18px;height:18px;font-size:11px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;">✕</button>
-      </div>
-    `;
-  }).join('');
+  pgGalleryPreviewContainer.innerHTML = `
+    <div style="width:100%;display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+      <small style="color:var(--muted,#777);font-size:11px;font-family:'DM Mono',monospace;font-weight:700;">✦ ${rawUrls.length} IMAGES (USE ◀ ▶ OR DRAG CARDS TO REORDER)</small>
+      <button type="button" id="pg-gallery-clear-all-btn" style="background:none;border:none;color:#e33;font-size:11px;cursor:pointer;font-weight:700;padding:0;">Clear All</button>
+    </div>
+    <div class="pg-gallery-cards-wrap" style="display:flex;flex-wrap:wrap;gap:12px;width:100%;">
+      ${rawUrls.map((url, index) => {
+        return `
+          <div class="pg-gallery-thumb-item" data-idx="${index}" draggable="true" style="position:relative;width:95px;height:95px;border-radius:12px;overflow:hidden;border:1.5px solid #dfd9d2;background:#181818;box-shadow:0 3px 10px rgba(0,0,0,0.08);cursor:grab;transition:all 0.2s ease;">
+            <img src="${escapeHtml(url)}" alt="Gallery #${index + 1}" style="width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;">
+            <span style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.75);color:#fff;font-family:'DM Mono',monospace;font-size:10px;font-weight:700;padding:2px 5px;border-radius:4px;backdrop-filter:blur(4px);">#${index + 1}</span>
+            <button type="button" data-remove-gallery-idx="${index}" title="Remove image" style="position:absolute;top:4px;right:4px;background:rgba(220,40,40,0.85);color:#fff;border:none;border-radius:50%;width:18px;height:18px;font-size:11px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;">✕</button>
+            <div style="position:absolute;bottom:3px;left:3px;right:3px;display:flex;justify-content:space-between;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);border-radius:6px;padding:2px 4px;">
+              <button type="button" data-move-left-idx="${index}" title="Move left" style="background:none;border:none;color:#fff;font-size:11px;cursor:pointer;padding:0 3px;${index === 0 ? 'opacity:0.3;cursor:default;' : ''}">◀</button>
+              <button type="button" data-move-right-idx="${index}" title="Move right" style="background:none;border:none;color:#fff;font-size:11px;cursor:pointer;padding:0 3px;${index === rawUrls.length - 1 ? 'opacity:0.3;cursor:default;' : ''}">▶</button>
+            </div>
+          </div>
+        `;
+      }).join('')}
+    </div>
+  `;
 
+  // Remove button
   pgGalleryPreviewContainer.querySelectorAll('[data-remove-gallery-idx]').forEach(btn => {
     btn.onclick = (e) => {
       e.preventDefault();
@@ -757,6 +771,80 @@ function renderGalleryThumbnails() {
       const remaining = rawUrls.filter((_, idx) => idx !== idxToRemove);
       pgGalleryUrls.value = remaining.join('\n');
       renderGalleryThumbnails();
+    };
+  });
+
+  // Move Left
+  pgGalleryPreviewContainer.querySelectorAll('[data-move-left-idx]').forEach(btn => {
+    btn.onclick = (e) => {
+      e.preventDefault();
+      const idx = parseInt(btn.dataset.moveLeftIdx, 10);
+      if (idx > 0) {
+        const item = rawUrls[idx];
+        rawUrls[idx] = rawUrls[idx - 1];
+        rawUrls[idx - 1] = item;
+        pgGalleryUrls.value = rawUrls.join('\n');
+        renderGalleryThumbnails();
+      }
+    };
+  });
+
+  // Move Right
+  pgGalleryPreviewContainer.querySelectorAll('[data-move-right-idx]').forEach(btn => {
+    btn.onclick = (e) => {
+      e.preventDefault();
+      const idx = parseInt(btn.dataset.moveRightIdx, 10);
+      if (idx < rawUrls.length - 1) {
+        const item = rawUrls[idx];
+        rawUrls[idx] = rawUrls[idx + 1];
+        rawUrls[idx + 1] = item;
+        pgGalleryUrls.value = rawUrls.join('\n');
+        renderGalleryThumbnails();
+      }
+    };
+  });
+
+  // Clear All
+  const clearBtn = document.querySelector('#pg-gallery-clear-all-btn');
+  if (clearBtn) {
+    clearBtn.onclick = (e) => {
+      e.preventDefault();
+      if (confirm('Clear all gallery images?')) {
+        pgGalleryUrls.value = '';
+        renderGalleryThumbnails();
+      }
+    };
+  }
+
+  // HTML5 Drag and Drop Sorting
+  let dragSrcIdx = null;
+  pgGalleryPreviewContainer.querySelectorAll('.pg-gallery-thumb-item').forEach(card => {
+    card.ondragstart = (e) => {
+      dragSrcIdx = parseInt(card.dataset.idx, 10);
+      e.dataTransfer.effectAllowed = 'move';
+      card.style.opacity = '0.4';
+    };
+    card.ondragend = () => {
+      card.style.opacity = '1';
+    };
+    card.ondragover = (e) => {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      card.style.borderColor = 'var(--accent, #e34c26)';
+    };
+    card.ondragleave = () => {
+      card.style.borderColor = '#dfd9d2';
+    };
+    card.ondrop = (e) => {
+      e.preventDefault();
+      card.style.borderColor = '#dfd9d2';
+      const dropTargetIdx = parseInt(card.dataset.idx, 10);
+      if (dragSrcIdx !== null && dragSrcIdx !== dropTargetIdx) {
+        const draggedItem = rawUrls.splice(dragSrcIdx, 1)[0];
+        rawUrls.splice(dropTargetIdx, 0, draggedItem);
+        pgGalleryUrls.value = rawUrls.join('\n');
+        renderGalleryThumbnails();
+      }
     };
   });
 }

@@ -24,7 +24,7 @@
   <link rel="stylesheet" href="cms-content.css?v=3" />
   <link rel="stylesheet" href="experience.css?v=1" />
   <link rel="stylesheet" href="process-enhance.css?v=1" />
-  <link rel="stylesheet" href="playground.css?v=45" />
+  <link rel="stylesheet" href="playground.css?v=46" />
 </head>
 
 <body class="play-page playground-detail-page">
@@ -147,8 +147,11 @@
   <div id="pg-lightbox-modal" class="pg-lightbox" style="display:none;">
     <div class="pg-lightbox-backdrop" id="pg-lightbox-backdrop"></div>
     <div class="pg-lightbox-content">
+      <button type="button" class="pg-lightbox-nav pg-lightbox-prev" id="pg-lightbox-prev" aria-label="Previous Image">‹</button>
       <img id="pg-lightbox-img" src="" alt="Enlarged Visual">
-      <button type="button" class="pg-lightbox-close" id="pg-lightbox-close">✕</button>
+      <button type="button" class="pg-lightbox-nav pg-lightbox-next" id="pg-lightbox-next" aria-label="Next Image">›</button>
+      <button type="button" class="pg-lightbox-close" id="pg-lightbox-close" aria-label="Close Lightbox">✕</button>
+      <div id="pg-lightbox-caption" class="pg-lightbox-caption-text"></div>
     </div>
   </div>
 
@@ -191,7 +194,7 @@
   <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js" defer></script>
   <script src="icons.js?v=2" defer></script>
   <script src="supabase-config.js"></script>
-  <script src="content-render.js?v=84"></script>
+  <script src="content-render.js?v=85"></script>
   <script src="motion.js" defer></script>
   <script src="process-enhance.js" defer></script>
   <script src="script.js?v=15"></script>
