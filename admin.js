@@ -1187,12 +1187,13 @@ contentForm.onsubmit = async event => {
       };
 
       const titleForStudy = qVal ? qVal.replace(/^["']|["']$/g, '').slice(0, 80) : (explVal ? explVal.slice(0, 50) : `${catVal} Exploration`);
+      const descForStudy = explVal || qVal || `${catVal} Exploration and design experiment.`;
 
       const finalCatVal = pgSectionNow === 'experiments' ? catVal : (pgSectionNow === 'sketches' ? 'Quick sketches' : 'Just for fun');
 
       payload = {
         title: titleForStudy,
-        description: explVal,
+        description: descForStudy,
         contentBody: JSON.stringify(pgData),
         category: `playground|${pgSectionNow}|${finalCatVal}`,
         image: heroImg,

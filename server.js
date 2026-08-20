@@ -1017,8 +1017,8 @@ http.createServer(async (req, res) => {
     }
     if (url.pathname === '/api/projects' && req.method === 'POST') {
       const incoming = await body(req);
-      if (!incoming.title || !incoming.title.trim()) return json(res, 400, { error: 'Title is required.' });
-      if (!incoming.description || !incoming.description.trim()) return json(res, 400, { error: 'Description is required.' });
+      if (!incoming.title || !incoming.title.trim()) incoming.title = 'Project / Exploration';
+      if (!incoming.description || !incoming.description.trim()) incoming.description = incoming.title || 'Creative study.';
       const jType = incoming.journalType || 'link';
       const isJournal = (incoming.category || '').startsWith('journal');
       if (isJournal && jType === 'link') {

@@ -103,7 +103,7 @@
 
       <div class="admin-grid">
         <!-- Form Area -->
-        <form id="content-form" class="studio-form">
+        <form id="content-form" class="studio-form" novalidate>
           <input type="hidden" name="type" id="content-type" value="work">
 
           <div class="form-header">
@@ -295,7 +295,7 @@
             <div class="form-group" id="url-field-group">
               <label class="group-label" id="url-field-label">Link / Destination URL</label>
               <div class="url-input-wrapper">
-                <input name="url" id="content-url" required placeholder="https://medium.com/@username/article-title">
+                <input name="url" id="content-url" placeholder="https://medium.com/@username/article-title">
                 <button type="button" id="auto-fetch-btn" class="auto-fetch-btn" style="display:none;">
                   <span>🪄</span> Auto-Fetch Details
                 </button>
@@ -306,7 +306,7 @@
             <!-- Title & Description -->
             <div class="form-group" id="title-field-group">
               <label class="group-label" id="title-field-label">Title / Project Name</label>
-              <input name="title" id="content-title" required placeholder="e.g. Haniio or Designing for Clarity">
+              <input name="title" id="content-title" placeholder="e.g. Haniio or Designing for Clarity">
             </div>
 
             <div class="form-group" id="description-field-group">
@@ -1243,7 +1243,7 @@
   </main>
 
   <script src="supabase-config.js"></script>
-  <script src="admin.js?v=42"></script>
+  <script src="admin.js?v=43"></script>
 </body>
 
 </html>
