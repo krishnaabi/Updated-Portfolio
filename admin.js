@@ -29,6 +29,7 @@ const featuredLabel = $('#featured-field-label');
 
 const journalTypeWrapper = $('#journal-type-wrapper');
 const playgroundTypeWrapper = $('#playground-type-wrapper');
+const playgroundSectionWrapper = $('#playground-section-wrapper');
 const journalFieldsGroup = $('#journal-fields-group');
 const journalBlogBodyGroup = $('#journal-blog-body-group');
 
@@ -404,6 +405,7 @@ function refreshFields() {
 
   // Section visibility toggles
   if (playgroundTypeWrapper) playgroundTypeWrapper.style.display = isPlayground ? 'block' : 'none';
+  if (playgroundSectionWrapper) playgroundSectionWrapper.style.display = isPlayground ? 'block' : 'none';
   if (journalTypeWrapper) journalTypeWrapper.style.display = isJournal ? 'block' : 'none';
   if (featuredLabel) featuredLabel.style.display = isPlayground ? 'none' : 'flex';
 
@@ -489,12 +491,21 @@ document.querySelectorAll('input[name="journalType"]').forEach(radio => {
   };
 });
 
-// Format Radio Buttons Switcher (Playground)
+// Format Radio Buttons Switcher (Playground Type)
 document.querySelectorAll('input[name="playgroundType"]').forEach(radio => {
   radio.onchange = () => {
     document.querySelectorAll('#playground-type-wrapper .format-radio').forEach(lbl => lbl.classList.remove('active'));
     radio.closest('.format-radio').classList.add('active');
     refreshFields();
+  };
+});
+
+// Format Radio Buttons Switcher (Playground Placement / Section)
+document.querySelectorAll('input[name="playgroundSection"]').forEach(radio => {
+  radio.onchange = () => {
+    document.querySelectorAll('#playground-section-wrapper .format-radio').forEach(lbl => lbl.classList.remove('active'));
+    radio.closest('.format-radio').classList.add('active');
+    updateLivePreview();
   };
 });
 
@@ -756,6 +767,15 @@ function startEditing(id) {
     pgRadioBtn.checked = true;
     document.querySelectorAll('#playground-type-wrapper .format-radio').forEach(lbl => lbl.classList.remove('active'));
     pgRadioBtn.closest('.format-radio').classList.add('active');
+  }
+
+  // Set Playground Section / Placement Radio
+  const itemSection = catParts.length > 2 ? catParts[1] : (catParts[1] === 'sketches' || catParts[1] === 'fun' ? catParts[1] : 'experiments');
+  const secRadio = document.querySelector(`input[name="playgroundSection"][value="${itemSection}"]`) || document.querySelector('input[name="playgroundSection"][value="experiments"]');
+  if (secRadio) {
+    secRadio.checked = true;
+    document.querySelectorAll('#playground-section-wrapper .format-radio').forEach(lbl => lbl.classList.remove('active'));
+    secRadio.closest('.format-radio').classList.add('active');
   }
 
   refreshFields();
@@ -1073,6 +1093,9 @@ contentForm.onsubmit = async event => {
   let payload = null;
 
   if (targetType === 'playground') {
+    const pgSecElNow = document.querySelector('input[name="playgroundSection"]:checked');
+    const pgSectionNow = pgSecElNow ? pgSecElNow.value : 'experiments';
+
     if (pgModeNow === 'internal') {
       const qVal = (pgExperimentQuestion ? pgExperimentQuestion.value : '').trim();
       const explVal = (pgShortExplanation ? pgShortExplanation.value : '').trim();
@@ -1110,7 +1133,7 @@ contentForm.onsubmit = async event => {
         title: titleForStudy,
         description: explVal,
         contentBody: JSON.stringify(pgData),
-        category: `playground|experiments|${catVal}`,
+        category: `playground|${pgSectionNow}|${catVal}`,
         image: heroImg,
         tools: toolsVal,
         url: '',
@@ -1145,7 +1168,7 @@ contentForm.onsubmit = async event => {
         title: extTitle,
         description: extDesc,
         contentBody: '',
-        category: `playground|experiments|${extCat}`,
+        category: `playground|${pgSectionNow}|${extCat}`,
         url: extLink,
         image: '',
         platform: detectedPlatform,

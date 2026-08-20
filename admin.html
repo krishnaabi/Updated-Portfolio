@@ -141,6 +141,25 @@
             </div>
           </div>
 
+          <!-- Playground Showcase Section / Placement -->
+          <div id="playground-section-wrapper" class="form-group" style="display:none;">
+            <label class="group-label">Showcase Placement / Section</label>
+            <div class="format-toggle-bar" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 8px;">
+              <label class="format-radio active" id="pg-sec-experiments-label">
+                <input type="radio" name="playgroundSection" value="experiments" checked>
+                <span>⚡ Interactive Explorations</span>
+              </label>
+              <label class="format-radio" id="pg-sec-sketches-label">
+                <input type="radio" name="playgroundSection" value="sketches">
+                <span>✏️ Quick sketches &amp; Wireframes</span>
+              </label>
+              <label class="format-radio" id="pg-sec-fun-label">
+                <input type="radio" name="playgroundSection" value="fun">
+                <span>🎨 Just for fun &amp; Visual Tests</span>
+              </label>
+            </div>
+          </div>
+
           <!-- ══════════════════════════════════════════════════════════ -->
           <!-- 1. INTERNAL PLAYGROUND (EXACT 8 REQUIRED FIELDS ONLY) -->
           <!-- ══════════════════════════════════════════════════════════ -->
@@ -1242,7 +1261,7 @@
   </main>
 
   <script src="supabase-config.js"></script>
-  <script src="admin.js?v=38"></script>
+  <script src="admin.js?v=39"></script>
 </body>
 
 </html>
