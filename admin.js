@@ -419,6 +419,23 @@ function refreshFields() {
     // ══════════════════════════════════════════════════════
     if (workJournalGeneralGroup) workJournalGeneralGroup.style.display = 'none';
 
+    const pgSecEl = document.querySelector('input[name="playgroundSection"]:checked');
+    const pgSection = pgSecEl ? pgSecEl.value : 'experiments';
+    const isInteractiveExp = pgSection === 'experiments';
+
+    // Toggle Category Tag dropdown: ONLY for Interactive Explorations!
+    const internalCatGroup = $('#pg-internal-category-group');
+    if (internalCatGroup) {
+      internalCatGroup.style.display = isInteractiveExp ? 'block' : 'none';
+    }
+    const extCatGroup = $('#pg-ext-category-group');
+    if (extCatGroup) {
+      extCatGroup.style.display = isInteractiveExp ? 'block' : 'none';
+    }
+    if (!isInteractiveExp && pgInlineBox) {
+      pgInlineBox.style.display = 'none';
+    }
+
     if (isInternalPlayground) {
       if (pgInternalGroup) pgInternalGroup.style.display = 'block';
       if (pgExternalGroup) pgExternalGroup.style.display = 'none';
@@ -505,7 +522,7 @@ document.querySelectorAll('input[name="playgroundSection"]').forEach(radio => {
   radio.onchange = () => {
     document.querySelectorAll('#playground-section-wrapper .format-radio').forEach(lbl => lbl.classList.remove('active'));
     radio.closest('.format-radio').classList.add('active');
-    updateLivePreview();
+    refreshFields();
   };
 });
 
@@ -1129,11 +1146,13 @@ contentForm.onsubmit = async event => {
 
       const titleForStudy = qVal ? qVal.replace(/^["']|["']$/g, '').slice(0, 80) : (explVal ? explVal.slice(0, 50) : `${catVal} Exploration`);
 
+      const finalCatVal = pgSectionNow === 'experiments' ? catVal : (pgSectionNow === 'sketches' ? 'Quick sketches' : 'Just for fun');
+
       payload = {
         title: titleForStudy,
         description: explVal,
         contentBody: JSON.stringify(pgData),
-        category: `playground|${pgSectionNow}|${catVal}`,
+        category: `playground|${pgSectionNow}|${finalCatVal}`,
         image: heroImg,
         tools: toolsVal,
         url: '',
@@ -1164,11 +1183,13 @@ contentForm.onsubmit = async event => {
         else detectedPlatform = 'Live Demo';
       }
 
+      const finalExtCatVal = pgSectionNow === 'experiments' ? extCat : (pgSectionNow === 'sketches' ? 'Quick sketches' : 'Just for fun');
+
       payload = {
         title: extTitle,
         description: extDesc,
         contentBody: '',
-        category: `playground|${pgSectionNow}|${extCat}`,
+        category: `playground|${pgSectionNow}|${finalExtCatVal}`,
         url: extLink,
         image: '',
         platform: detectedPlatform,
