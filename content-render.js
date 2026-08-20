@@ -87,6 +87,38 @@
     return article;
   };
 
+  const renderBodyShared = (article, raw) => {
+    if (!raw) return `<p><strong>Summary:</strong> ${escape((article && article.description) || 'Exploring design principles and product thinking.')}</p><p>In modern product design, clarity and focus dictate how seamlessly users transition from intent to action. By examining early interaction flows and structural layouts, we can eliminate unnecessary friction and elevate user delight.</p>`;
+    return raw
+      .replace(/\r\n/g, '\n')
+      .split(/\n{2,}/)
+      .map(block => {
+        block = block.trim();
+        if (!block) return '';
+        // Markdown Image ![caption](url)
+        const imgMatch = block.match(/^!\[(.*?)\]\((https?:\/\/[^\s)]+|\/uploads\/[^\s)]+)\)$/);
+        if (imgMatch) {
+          const alt = imgMatch[1] || 'Design Breakdown Visual';
+          const src = imgMatch[2];
+          return `<figure class="pg-body-figure" style="margin:32px 0;"><img src="${escape(cleanImgUrl(src))}" alt="${escape(alt)}" style="width:100%;border-radius:18px;box-shadow:0 12px 35px rgba(0,0,0,0.08);display:block;">${alt ? `<figcaption style="font-family:'DM Mono',monospace;font-size:11.5px;color:#777;text-align:center;margin-top:10px;">✦ ${escape(alt)}</figcaption>` : ''}</figure>`;
+        }
+        if (/^###\s+/.test(block)) return `<h4 class="modal-h4" style="font-size:18px;font-weight:800;margin:24px 0 10px;color:var(--ink,#111);">${escape(block.replace(/^###\s+/, ''))}</h4>`;
+        if (/^##\s+/.test(block)) return `<h3 class="modal-h3" style="font-size:24px;font-weight:800;margin:36px 0 14px;color:var(--ink,#111);">${escape(block.replace(/^##\s+/, ''))}</h3>`;
+        if (/^#\s+/.test(block)) return `<h2 class="modal-h2" style="font-size:30px;font-weight:800;margin:42px 0 18px;color:var(--ink,#111);">${escape(block.replace(/^#\s+/, ''))}</h2>`;
+        if (/^>\s+/.test(block)) return `<blockquote class="modal-quote" style="border-left:4px solid var(--accent,#e34c26);padding:14px 20px;background:#fcf9f6;border-radius:0 14px 14px 0;font-style:italic;margin:28px 0;">${escape(block.replace(/^>\s+/, ''))}</blockquote>`;
+        if (/^[-*]\s+/.test(block)) {
+          const its = block.split('\n').filter(l => /^[-*]\s+/.test(l.trim())).map(l => `<li>${escape(l.replace(/^[-*]\s+/, '').trim())}</li>`);
+          return `<ul class="modal-list" style="margin:0 0 24px 24px;line-height:1.75;">${its.join('')}</ul>`;
+        }
+        let p = escape(block)
+          .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+          .replace(/\*([^*]+)\*/g, '<em>$1</em>')
+          .replace(/`([^`]+)`/g, '<code style="background:#f4efea;padding:2px 6px;border-radius:4px;font-family:\'DM Mono\',monospace;font-size:12.5px;">$1</code>');
+        return `<p style="margin-bottom:20px;line-height:1.8;">${p}</p>`;
+      })
+      .filter(Boolean)
+      .join('\n');
+  };
 
   // Default Curated Fallback Datasets (Ensures 100% beautiful rendering on static hosts like Cloudflare Pages)
   const defaultWorkItems = [
@@ -1780,44 +1812,10 @@
       }
     }
 
-    // --- Shared Article Modal (works on homepage AND blog.html) ---
     const sharedModal = document.querySelector('#article-modal');
     const sharedModalBackdrop = document.querySelector('#article-modal-backdrop');
     const sharedModalClose = document.querySelector('#article-modal-close');
     const sharedModalBody = document.querySelector('#article-modal-body');
-
-    const renderBodyShared = (article, raw) => {
-      if (!raw) return `<p><strong>Summary:</strong> ${escape(article.description || 'Exploring design principles and product thinking.')}</p><p>In modern product design, clarity and focus dictate how seamlessly users transition from intent to action. By examining early interaction flows and structural layouts, we can eliminate unnecessary friction and elevate user delight.</p>`;
-      return raw
-        .replace(/\r\n/g, '\n')
-        .split(/\n{2,}/)
-        .map(block => {
-          block = block.trim();
-          if (!block) return '';
-          // Markdown Image ![caption](url)
-          const imgMatch = block.match(/^!\[(.*?)\]\((https?:\/\/[^\s)]+)\)$/);
-          if (imgMatch) {
-            const alt = imgMatch[1] || 'Design Breakdown Visual';
-            const src = imgMatch[2];
-            return `<figure class="pg-body-figure" style="margin:32px 0;"><img src="${escape(cleanImgUrl(src))}" alt="${escape(alt)}" style="width:100%;border-radius:18px;box-shadow:0 12px 35px rgba(0,0,0,0.08);display:block;">${alt ? `<figcaption style="font-family:'DM Mono',monospace;font-size:11.5px;color:#777;text-align:center;margin-top:10px;">✦ ${escape(alt)}</figcaption>` : ''}</figure>`;
-          }
-          if (/^###\s+/.test(block)) return `<h4 class="modal-h4" style="font-size:18px;font-weight:800;margin:24px 0 10px;color:var(--ink,#111);">${escape(block.replace(/^###\s+/, ''))}</h4>`;
-          if (/^##\s+/.test(block)) return `<h3 class="modal-h3" style="font-size:24px;font-weight:800;margin:36px 0 14px;color:var(--ink,#111);">${escape(block.replace(/^##\s+/, ''))}</h3>`;
-          if (/^#\s+/.test(block)) return `<h2 class="modal-h2" style="font-size:30px;font-weight:800;margin:42px 0 18px;color:var(--ink,#111);">${escape(block.replace(/^#\s+/, ''))}</h2>`;
-          if (/^>\s+/.test(block)) return `<blockquote class="modal-quote" style="border-left:4px solid var(--accent,#e34c26);padding:14px 20px;background:#fcf9f6;border-radius:0 14px 14px 0;font-style:italic;margin:28px 0;">${escape(block.replace(/^>\s+/, ''))}</blockquote>`;
-          if (/^[-*]\s+/.test(block)) {
-            const its = block.split('\n').filter(l => /^[-*]\s+/.test(l.trim())).map(l => `<li>${escape(l.replace(/^[-*]\s+/, '').trim())}</li>`);
-            return `<ul class="modal-list" style="margin:0 0 24px 24px;line-height:1.75;">${its.join('')}</ul>`;
-          }
-          let p = escape(block)
-            .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
-            .replace(/\*([^*]+)\*/g, '<em>$1</em>')
-            .replace(/`([^`]+)`/g, '<code style="background:#f4efea;padding:2px 6px;border-radius:4px;font-family:\'DM Mono\',monospace;font-size:12.5px;">$1</code>');
-          return `<p style="margin-bottom:20px;line-height:1.8;">${p}</p>`;
-        })
-        .filter(Boolean)
-        .join('\n');
-    };
 
     const openSharedModal = (article) => {
       if (!sharedModal || !sharedModalBody) return;
