@@ -55,6 +55,8 @@
     const actionText = isExternal ? `Explore on ${platformName || 'Live'} <b>↗</b>` : 'View Study Details <b>↗</b>';
     const toolBadge = (item.tools || item.tags) ? (item.tools || item.tags).split('|')[0].trim() : '';
 
+    const detailUrl = isExternal ? item.url : `playground-detail.html?id=${encodeURIComponent(item.id || '')}`;
+
     const article = document.createElement('article');
     article.className = `play-card ${className} ${isExternal ? 'is-external' : 'is-internal'} reveal visible cms-injected-item`;
     article.dataset.category = cat.toLowerCase();
@@ -63,7 +65,7 @@
     if (item.url) article.dataset.url = item.url;
 
     article.innerHTML = `
-      <div class="cms-link" role="button" tabindex="0">
+      <a href="${escape(detailUrl)}" ${isExternal ? 'target="_blank" rel="noreferrer"' : ''} class="cms-link">
         <div class="card-art cms-art">
           ${item.image ? `<img src="${escape(cleanImgUrl(item.image))}" alt="${escape(item.title)}">` : '<strong>✦</strong>'}
           ${isExternal ? `<span class="pg-platform-pill">${platformIcon} ${escape(platformName)}</span>` : `<span class="pg-internal-pill">✦ Interactive Study</span>`}
@@ -79,7 +81,7 @@
             <span>${actionText}</span>
           </div>
         </div>
-      </div>
+      </a>
     `;
 
     return article;
@@ -1155,36 +1157,23 @@
         const isExternal = !isInternal && item.url && item.url.startsWith('http');
 
         if (sectionOf(item) === 'sketches' && sketchGrid) {
+          const detailUrl = isExternal ? item.url : `playground-detail.html?id=${encodeURIComponent(item.id || '')}`;
           const sketch = document.createElement('a');
-          sketch.href = isExternal ? item.url : '#';
+          sketch.href = detailUrl;
           if (isExternal) sketch.target = '_blank';
           sketch.className = 'cms-sketch cms-injected-item';
           sketch.dataset.category = 'sketches';
           sketch.dataset.id = item.id || '';
           sketch.innerHTML = item.image ? `<img src="${escape(cleanImgUrl(item.image))}" alt="${escape(item.title)}"><span>${escape(item.title)}</span>` : `<i>✦<br>${escape(item.title)}</i>`;
-          if (!isExternal) {
-            sketch.addEventListener('click', e => {
-              e.preventDefault();
-              if (window.__openPlaygroundModal) window.__openPlaygroundModal(item);
-            });
-          }
           sketchGrid.appendChild(sketch);
           sketchCount++;
         } else if (sectionOf(item) === 'fun' && funGrid) {
+          const detailUrl = isExternal ? item.url : `playground-detail.html?id=${encodeURIComponent(item.id || '')}`;
           const fun = document.createElement('article');
           fun.className = 'fun-card cms-injected-item';
           fun.dataset.category = 'fun';
           fun.dataset.id = item.id || '';
-          fun.innerHTML = `<a href="${isExternal ? escape(item.url) : '#'}" ${isExternal ? 'target="_blank" rel="noreferrer"' : ''} class="cms-link"><div class="fun-art cms-fun">${item.image ? `<img src="${escape(cleanImgUrl(item.image))}" alt="${escape(item.title)}">` : '✦'}</div><div class="fun-text"><h3>${escape(item.title)}</h3><p>${escape(item.description || 'A playful creative study.')}</p><small>${escape(categoryOf(item))}</small></div></a>`;
-          if (!isExternal) {
-            const link = fun.querySelector('.cms-link');
-            if (link) {
-              link.addEventListener('click', e => {
-                e.preventDefault();
-                if (window.__openPlaygroundModal) window.__openPlaygroundModal(item);
-              });
-            }
-          }
+          fun.innerHTML = `<a href="${escape(detailUrl)}" ${isExternal ? 'target="_blank" rel="noreferrer"' : ''} class="cms-link"><div class="fun-art cms-fun">${item.image ? `<img src="${escape(cleanImgUrl(item.image))}" alt="${escape(item.title)}">` : '✦'}</div><div class="fun-text"><h3>${escape(item.title)}</h3><p>${escape(item.description || 'A playful creative study.')}</p><small>${escape(categoryOf(item))}</small></div></a>`;
           funGrid.appendChild(fun);
           funCount++;
         } else if (experimentGrid) {
@@ -1283,7 +1272,7 @@
         itemSelector: ':scope > *',
         initialVisible: 8, // 2 rows (4 per row)
         batchSize: 8,
-        label: 'Explorations'
+        label: 'Sketches'
       });
 
       const updateFun = setupSectionLoadMore({
@@ -1303,7 +1292,121 @@
       };
     }
 
+    // 3.5. Playground Detail Page (playground-detail.html)
+    if (document.body.classList.contains('playground-detail-page')) {
+      const urlParams = new URLSearchParams(window.location.search);
+      const itemId = urlParams.get('id');
+      const rawPlayground = items.filter(item => typeOf(item) === 'playground');
+      const allPg = rawPlayground.length ? rawPlayground : [];
 
+      let currentItem = allPg.find(item => String(item.id) === String(itemId));
+      if (!currentItem && allPg.length) {
+        currentItem = allPg[0];
+      }
+
+      if (currentItem) {
+        const catTag = categoryOf(currentItem) || 'UI & Motion';
+        const sectionTag = (sectionOf(currentItem) === 'sketches' ? '02 / SKETCHES' : (sectionOf(currentItem) === 'fun' ? '03 / FUN ZONE' : '01 / EXPERIMENTS'));
+        const dateStr = currentItem.createdAt || currentItem.date
+          ? new Date(currentItem.createdAt || currentItem.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
+          : 'May 2026';
+
+        document.title = `${currentItem.title} — Creative Playground · Abi Krishna`;
+
+        const titleEl = document.querySelector('#pg-detail-title');
+        const descEl = document.querySelector('#pg-detail-desc');
+        const catEl = document.querySelector('#pg-detail-cat');
+        const areaEl = document.querySelector('#pg-detail-area');
+        const dateEl = document.querySelector('#pg-detail-date');
+        const mediaEl = document.querySelector('#pg-detail-media');
+        const toolsEl = document.querySelector('#pg-detail-tools');
+        const bodyEl = document.querySelector('#pg-detail-body');
+        const liveCta = document.querySelector('#pg-detail-live-cta');
+
+        if (titleEl) titleEl.textContent = currentItem.title;
+        if (descEl) descEl.textContent = currentItem.description || 'An interactive exploration examining motion fidelity, UX ergonomics, and visual systems.';
+        if (catEl) catEl.textContent = catTag;
+        if (areaEl) areaEl.textContent = sectionTag;
+        if (dateEl) dateEl.textContent = `· ${dateStr}`;
+
+        // Live CTA Link if present
+        if (liveCta) {
+          if (currentItem.url && currentItem.url.startsWith('http')) {
+            liveCta.href = currentItem.url;
+            liveCta.style.display = 'inline-flex';
+            const pName = currentItem.platform || (currentItem.url.includes('figma') ? 'Figma' : (currentItem.url.includes('dribbble') ? 'Dribbble' : (currentItem.url.includes('codepen') ? 'CodePen' : 'Live Demo')));
+            liveCta.innerHTML = `<span>Explore on ${escape(pName)}</span> <b>↗</b>`;
+          } else {
+            liveCta.style.display = 'none';
+          }
+        }
+
+        // Tools / Tech stack chips
+        if (toolsEl) {
+          const rawTools = currentItem.tools || currentItem.tags || '';
+          const toolsList = rawTools.split('|').map(t => t.trim()).filter(Boolean);
+          if (toolsList.length) {
+            toolsEl.innerHTML = toolsList.map(t => `<span class="pg-tool-chip">⚡ ${escape(t)}</span>`).join('');
+          } else {
+            toolsEl.innerHTML = `<span class="pg-tool-chip">⚡ Figma</span><span class="pg-tool-chip">✨ Framer Motion</span><span class="pg-tool-chip">📐 Design System</span>`;
+          }
+        }
+
+        // Media Hero
+        if (mediaEl) {
+          if (currentItem.image) {
+            mediaEl.innerHTML = `<img src="${escape(cleanImgUrl(currentItem.image))}" alt="${escape(currentItem.title)}" class="reveal visible">`;
+          } else {
+            mediaEl.innerHTML = `<div style="width:100%;min-height:380px;display:grid;place-items:center;background:linear-gradient(135deg,#1b1b1b,#913d22);color:#fff;font-weight:800;font-size:38px;">AK.</div>`;
+          }
+        }
+
+        // Body Content Rendering
+        if (bodyEl) {
+          if (currentItem.contentBody && currentItem.contentBody.trim()) {
+            bodyEl.innerHTML = renderBodyShared(currentItem, currentItem.contentBody);
+          } else {
+            bodyEl.innerHTML = `
+              <h2>01 / The Concept & Purpose</h2>
+              <p>${escape(currentItem.description || 'This experiment was conceived as a creative laboratory test to explore high-fidelity interaction models, micro-feedback choreography, and modern design tokens.')}</p>
+              <blockquote>"Design isn't just how it looks and feels. Design is how it functions and feels alive under user input."</blockquote>
+              <h2>02 / Key Interaction Decisions</h2>
+              <p>During the prototyping stage, multiple tactile spring curves and easing transitions were tested to balance responsive snap with fluid momentum. Every transition was engineered with strict spatial hierarchies to prevent visual clutter.</p>
+              <ul>
+                <li><strong>Spring Dynamics:</strong> Tuned damping ratios (0.78 stiffness) for organic motion without lag.</li>
+                <li><strong>Visual Density:</strong> High-contrast surfaces paired with subtle ambient background depth.</li>
+                <li><strong>Component Modularity:</strong> Scalable variants ready for production design systems.</li>
+              </ul>
+            `;
+          }
+        }
+
+        // Next Exploration Navigator
+        const nextWrap = document.querySelector('#pg-next-wrap');
+        const nextCard = document.querySelector('#pg-next-card');
+        const nextTitle = document.querySelector('#pg-next-title');
+        const nextDesc = document.querySelector('#pg-next-desc');
+        const nextCat = document.querySelector('#pg-next-cat');
+        const nextThumb = document.querySelector('#pg-next-thumb');
+
+        if (nextWrap && nextCard && allPg.length > 1) {
+          const currentIdx = allPg.findIndex(p => String(p.id) === String(currentItem.id));
+          const nextIdx = (currentIdx + 1) % allPg.length;
+          const nextItem = allPg[nextIdx];
+
+          if (nextItem && String(nextItem.id) !== String(currentItem.id)) {
+            nextWrap.style.display = 'block';
+            nextCard.href = `playground-detail.html?id=${encodeURIComponent(nextItem.id)}`;
+            if (nextTitle) nextTitle.textContent = nextItem.title;
+            if (nextDesc) nextDesc.textContent = nextItem.description || 'Explore the next interactive case study.';
+            if (nextCat) nextCat.textContent = categoryOf(nextItem) || 'UI & Motion';
+            if (nextThumb) {
+              nextThumb.innerHTML = nextItem.image ? `<img src="${escape(cleanImgUrl(nextItem.image))}" alt="${escape(nextItem.title)}">` : `<div style="width:100%;height:100%;background:#1b1b1b;color:#fff;display:grid;place-items:center;font-weight:800;">AK.</div>`;
+            }
+          }
+        }
+      }
+    }
 
     // 4. Work Page (work.html)
     if (document.body.classList.contains('work-page')) {
@@ -1599,15 +1702,26 @@
         .map(block => {
           block = block.trim();
           if (!block) return '';
-          if (/^##\s+/.test(block)) return `<h3 class="modal-h3">${escape(block.replace(/^##\s+/, ''))}</h3>`;
-          if (/^#\s+/.test(block)) return `<h2 class="modal-h2">${escape(block.replace(/^#\s+/, ''))}</h2>`;
-          if (/^>\s+/.test(block)) return `<blockquote class="modal-quote">${escape(block.replace(/^>\s+/, ''))}</blockquote>`;
+          // Markdown Image ![caption](url)
+          const imgMatch = block.match(/^!\[(.*?)\]\((https?:\/\/[^\s)]+)\)$/);
+          if (imgMatch) {
+            const alt = imgMatch[1] || 'Design Breakdown Visual';
+            const src = imgMatch[2];
+            return `<figure class="pg-body-figure" style="margin:32px 0;"><img src="${escape(cleanImgUrl(src))}" alt="${escape(alt)}" style="width:100%;border-radius:18px;box-shadow:0 12px 35px rgba(0,0,0,0.08);display:block;">${alt ? `<figcaption style="font-family:'DM Mono',monospace;font-size:11.5px;color:#777;text-align:center;margin-top:10px;">✦ ${escape(alt)}</figcaption>` : ''}</figure>`;
+          }
+          if (/^###\s+/.test(block)) return `<h4 class="modal-h4" style="font-size:18px;font-weight:800;margin:24px 0 10px;color:var(--ink,#111);">${escape(block.replace(/^###\s+/, ''))}</h4>`;
+          if (/^##\s+/.test(block)) return `<h3 class="modal-h3" style="font-size:24px;font-weight:800;margin:36px 0 14px;color:var(--ink,#111);">${escape(block.replace(/^##\s+/, ''))}</h3>`;
+          if (/^#\s+/.test(block)) return `<h2 class="modal-h2" style="font-size:30px;font-weight:800;margin:42px 0 18px;color:var(--ink,#111);">${escape(block.replace(/^#\s+/, ''))}</h2>`;
+          if (/^>\s+/.test(block)) return `<blockquote class="modal-quote" style="border-left:4px solid var(--accent,#e34c26);padding:14px 20px;background:#fcf9f6;border-radius:0 14px 14px 0;font-style:italic;margin:28px 0;">${escape(block.replace(/^>\s+/, ''))}</blockquote>`;
           if (/^[-*]\s+/.test(block)) {
             const its = block.split('\n').filter(l => /^[-*]\s+/.test(l.trim())).map(l => `<li>${escape(l.replace(/^[-*]\s+/, '').trim())}</li>`);
-            return `<ul class="modal-list">${its.join('')}</ul>`;
+            return `<ul class="modal-list" style="margin:0 0 24px 24px;line-height:1.75;">${its.join('')}</ul>`;
           }
-          let p = escape(block).replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>').replace(/\*([^*]+)\*/g, '<em>$1</em>');
-          return `<p>${p}</p>`;
+          let p = escape(block)
+            .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+            .replace(/\*([^*]+)\*/g, '<em>$1</em>')
+            .replace(/`([^`]+)`/g, '<code style="background:#f4efea;padding:2px 6px;border-radius:4px;font-family:\'DM Mono\',monospace;font-size:12.5px;">$1</code>');
+          return `<p style="margin-bottom:20px;line-height:1.8;">${p}</p>`;
         })
         .filter(Boolean)
         .join('\n');

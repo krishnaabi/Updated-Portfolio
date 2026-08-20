@@ -381,7 +381,20 @@ function refreshFields() {
       $('#journal-date').value = getTodayDateString();
     }
   }
-  if (journalBlogBodyGroup) journalBlogBodyGroup.style.display = isInternalBlog ? 'block' : 'none';
+  const shouldShowContentBody = isInternalBlog || isInternalPlayground;
+  if (journalBlogBodyGroup) {
+    journalBlogBodyGroup.style.display = shouldShowContentBody ? 'block' : 'none';
+    const bodyLabel = $('#content-body-label');
+    const bodyInput = $('#journal-content-body');
+    if (bodyLabel) {
+      bodyLabel.textContent = isPlayground ? 'Full Playground Study Content (Dedicated Page)' : 'Full Article Content (Internal Blog Post)';
+    }
+    if (bodyInput) {
+      bodyInput.placeholder = isPlayground
+        ? 'Write your study breakdown, design challenge, interaction details, and markdown image embeds (e.g. ## Overview, ## Design Decisions)...'
+        : 'Write or paste your full article body text here. Supports markdown (## headings, > quotes, - lists)...';
+    }
+  }
 
   if (workFieldsGroup) workFieldsGroup.style.display = (isWork || isPlayground) ? 'block' : 'none';
   if (featuredLabel) featuredLabel.style.display = isPlayground ? 'none' : 'flex';

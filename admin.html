@@ -246,11 +246,12 @@
             </div>
           </div>
 
-          <!-- Internal Blog Post Content (Internal Blog Post Only) -->
+          <!-- Rich Content Body Editor (Internal Blog Post & Internal Playground Study) -->
           <div class="form-group" id="journal-blog-body-group" style="display:none;">
-            <label class="group-label">Full Article Content (Internal Blog Post)</label>
-            <textarea name="contentBody" id="journal-content-body" style="height:160px;"
-              placeholder="Write or paste your full article body text here. Double line breaks create paragraphs..."></textarea>
+            <label class="group-label" id="content-body-label">Full Article / Study Content Body</label>
+            <textarea name="contentBody" id="journal-content-body" style="height:180px;"
+              placeholder="Write or paste your full content body text here. Supports markdown (## headings, > quotes, - lists, images)..."></textarea>
+            <small class="help" style="color:var(--muted,#777);font-size:11.5px;margin-top:6px;display:block;">💡 Supports headings (<code>## Section Title</code>), quotes (<code>> Highlight</code>), bullet points, and markdown images (<code>![Caption](image_url)</code>).</small>
           </div>
 
           <!-- Cover Image Options -->
@@ -1142,7 +1143,7 @@
   </main>
 
   <script src="supabase-config.js"></script>
-  <script src="admin.js?v=33"></script>
+  <script src="admin.js?v=34"></script>
 </body>
 
 </html>

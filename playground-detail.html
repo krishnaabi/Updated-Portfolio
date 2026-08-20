@@ -3,10 +3,10 @@
 
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Selected Work - Abi Krishna</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>Playground Study - Abikrishna T.</title>
   <meta name="description"
-    content="Selected product design, UI/UX case studies, design systems, and digital brand experiences by Abi Krishna." />
+    content="Interactive creative exploration, prototype study, and design systems breakdown by Abi Krishna." />
   <link rel="icon" type="image/svg+xml" href="assets/ak-logo.svg" />
   <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png" />
   <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png" />
@@ -14,7 +14,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
-    href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap"
+    href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500;600&family=Manrope:wght@400;500;600;700;800&display=swap"
     rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
   <link rel="stylesheet" href="enhancements.css?v=63" />
@@ -24,17 +24,17 @@
   <link rel="stylesheet" href="cms-content.css?v=3" />
   <link rel="stylesheet" href="experience.css?v=1" />
   <link rel="stylesheet" href="process-enhance.css?v=1" />
-  <link rel="stylesheet" href="work.css?v=9" />
+  <link rel="stylesheet" href="playground.css?v=43" />
 </head>
 
-<body class="work-page">
+<body class="play-page playground-detail-page">
   <header class="site-header">
     <a class="logo" href="index.html" aria-label="Abi Krishna home"><img src="assets/ak-logo-exact.png" alt="AK."
         class="brand-logo-img"></a>
     <nav aria-label="Main navigation">
-      <a class="selected" href="work.html">Work</a>
+      <a href="work.html">Work</a>
       <a href="about.html">About</a>
-      <a href="playground.html">Playground</a>
+      <a class="selected" href="playground.html">Playground</a>
       <a href="blog.html">Journal</a>
     </nav>
     <div class="header-actions">
@@ -43,21 +43,74 @@
     </div>
   </header>
 
-  <main>
-    <section class="work-hero">
-      <div class="work-hero-inner reveal">
-        <p class="label">✦ MY WORK</p>
-        <h1>Designing products<br />that create <em>impact.</em></h1>
-        <p>A selection of projects where strategy,<br />design and technology come together.</p>
-        <a class="scroll-cta" href="#projects"><span>↓</span> Scroll to explore</a>
-      </div>
-      <div class="work-hero-visual" id="work-hero-visual">
-        <img src="" alt="Work Hero" id="work-hero-img" style="display:none;" />
-      </div>
-    </section>
+  <main class="pg-detail-main">
+    <!-- Top Return Bar -->
+    <div class="pg-detail-topbar">
+      <a href="playground.html" class="pg-back-btn">
+        <span class="back-arrow">←</span>
+        <span>Back to Creative Playground</span>
+      </a>
+      <span class="pg-detail-badge" id="pg-detail-badge">✦ CREATIVE STUDY</span>
+    </div>
 
-    <section class="projects" id="projects">
-      <!-- Projects dynamically populated by content-render.js -->
+    <!-- Playground Study Hero Header -->
+    <section class="pg-detail-header-section" id="pg-detail-container">
+      <div class="pg-detail-header-inner reveal visible">
+        <div class="pg-detail-tags-row">
+          <span class="pg-detail-cat-pill" id="pg-detail-cat">UI & Motion</span>
+          <span class="pg-detail-area-pill" id="pg-detail-area">01 / EXPERIMENTS</span>
+        </div>
+
+        <h1 class="pg-detail-headline" id="pg-detail-title">Loading Exploration...</h1>
+        <p class="pg-detail-lead" id="pg-detail-desc"></p>
+
+        <!-- Meta info & Action row -->
+        <div class="pg-detail-meta-bar">
+          <div class="pg-detail-author-info">
+            <div class="pg-author-avatar">AK</div>
+            <div>
+              <span class="pg-author-name">Abikrishna T.</span>
+              <span class="pg-post-date" id="pg-detail-date">· May 2026</span>
+            </div>
+          </div>
+
+          <div class="pg-detail-header-actions">
+            <a href="#" id="pg-detail-live-cta" class="pg-live-demo-btn" target="_blank" rel="noreferrer" style="display:none;">
+              <span>Launch Live Prototype</span> <b>↗</b>
+            </a>
+          </div>
+        </div>
+
+        <!-- Tech Stack Tools Bar -->
+        <div class="pg-detail-tools-row" id="pg-detail-tools"></div>
+      </div>
+
+      <!-- Hero Visual Container -->
+      <div class="pg-detail-hero-media" id="pg-detail-media"></div>
+
+      <!-- Main Study Content Body -->
+      <article class="pg-detail-content-body" id="pg-detail-body">
+        <div class="pg-body-placeholder">
+          <p>Loading interactive breakdown and design thinking...</p>
+        </div>
+      </article>
+
+      <!-- Next Exploration Navigator Card -->
+      <div class="pg-next-section-wrap" id="pg-next-wrap" style="display:none;">
+        <div class="pg-next-header">
+          <span class="label">✦ NEXT EXPLORATION</span>
+          <h3>Keep Exploring</h3>
+        </div>
+        <a href="#" class="pg-next-card" id="pg-next-card">
+          <div class="pg-next-thumb" id="pg-next-thumb"></div>
+          <div class="pg-next-info">
+            <small id="pg-next-cat">3D & Visuals</small>
+            <h4 id="pg-next-title">Next Exploration Title</h4>
+            <p id="pg-next-desc">A brief preview of the next creative study.</p>
+            <span class="pg-next-link">Explore Study <b>↗</b></span>
+          </div>
+        </a>
+      </div>
     </section>
   </main>
 
@@ -81,7 +134,7 @@
           </svg></span>Download CV
       </a>
     </div>
-    <a class="big-arrow" href="#projects" aria-label="Back to top">↗</a>
+    <a class="big-arrow" href="#top" aria-label="Back to top">↗</a>
     <div class="footer-bottom">
       <div class="footer-bottom-left">
         <a class="logo" href="index.html" aria-label="Abi Krishna home"><img src="assets/ak-logo-exact.png" alt="AK."
@@ -101,7 +154,6 @@
   <script src="icons.js?v=2" defer></script>
   <script src="supabase-config.js"></script>
   <script src="content-render.js?v=79"></script>
-  <script src="work-stack.js" defer></script>
   <script src="motion.js" defer></script>
   <script src="process-enhance.js" defer></script>
   <script src="script.js?v=15"></script>
