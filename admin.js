@@ -9,7 +9,7 @@ const assetsForm = $('#assets-form');
 const list = $('#items');
 
 
-const defaultPlaygroundTopics = ['UI & Motion', 'Concepts', '3D & Visuals', 'Quick Sketches', 'Just for Fun'];
+const defaultPlaygroundTopics = ['Interaction', 'Typography', 'UI & Motion', 'Concepts', '3D & Visuals', 'Quick Sketches', 'Just for Fun'];
 const defaultJournalTopics = ['UX / UI Design', 'Product Design', 'Process', 'Career', 'Tools', 'Opinion', 'Design Thinking'];
 
 const categories = {
@@ -32,6 +32,12 @@ const playgroundTypeWrapper = $('#playground-type-wrapper');
 const playgroundSectionWrapper = $('#playground-section-wrapper');
 const journalFieldsGroup = $('#journal-fields-group');
 const journalBlogBodyGroup = $('#journal-blog-body-group');
+
+const pgInternalFieldsGroup = $('#pg-internal-fields-group');
+const pgExperimentQuestion = $('#pg-experiment-question');
+const pgDesignThinking = $('#pg-design-thinking');
+const pgGalleryUrls = $('#pg-gallery-urls');
+const pgConclusion = $('#pg-conclusion');
 
 const contentUrl = $('#content-url');
 const urlFieldLabel = $('#url-field-label');
@@ -381,23 +387,25 @@ function refreshFields() {
       $('#journal-date').value = getTodayDateString();
     }
   }
-  const shouldShowContentBody = isInternalBlog || isInternalPlayground;
-  if (journalBlogBodyGroup) {
-    journalBlogBodyGroup.style.display = shouldShowContentBody ? 'block' : 'none';
-    const bodyLabel = $('#content-body-label');
-    const bodyInput = $('#journal-content-body');
-    if (bodyLabel) {
-      bodyLabel.textContent = isPlayground ? 'Full Playground Study Content (Dedicated Page)' : 'Full Article Content (Internal Blog Post)';
-    }
-    if (bodyInput) {
-      bodyInput.placeholder = isPlayground
-        ? 'Write your study breakdown, design challenge, interaction details, and markdown image embeds (e.g. ## Overview, ## Design Decisions)...'
-        : 'Write or paste your full article body text here. Supports markdown (## headings, > quotes, - lists)...';
-    }
-  }
+
+  // Toggle Internal Playground vs Internal Blog Form Groups
+  if (pgInternalFieldsGroup) pgInternalFieldsGroup.style.display = (isPlayground && isInternalPlayground) ? 'block' : 'none';
+  if (journalBlogBodyGroup) journalBlogBodyGroup.style.display = (isJournal && isInternalBlog) ? 'block' : 'none';
 
   if (workFieldsGroup) workFieldsGroup.style.display = (isWork || isPlayground) ? 'block' : 'none';
   if (featuredLabel) featuredLabel.style.display = isPlayground ? 'none' : 'flex';
+
+  // Customize description label & placeholder based on mode
+  const descGroupLabel = $('#content-description') ? $('#content-description').closest('.form-group')?.querySelector('.group-label') : null;
+  if (descGroupLabel) {
+    if (isPlayground && isInternalPlayground) {
+      descGroupLabel.textContent = 'Short Explanation / Overview';
+      if (contentDescription) contentDescription.placeholder = 'A brief 1-2 sentence overview of what this study explores...';
+    } else {
+      descGroupLabel.textContent = 'Description / Excerpt';
+      if (contentDescription) contentDescription.placeholder = 'A brief summary or behind-the-scenes overview...';
+    }
+  }
 
   // URL Field: hide entirely for internal blog, show for all others
   const urlFieldWrapper = contentUrl ? contentUrl.closest('.form-group') : null;
@@ -412,8 +420,8 @@ function refreshFields() {
         contentUrl.placeholder = 'https://medium.com/@username/article-title';
         contentUrl.setAttribute('required', 'required');
       } else if (isPlayground) {
-        if (urlFieldLabel) urlFieldLabel.textContent = isInternalPlayground ? 'Interactive Prototype / Demo Link (Optional)' : 'External Prototype Link (Figma, Dribbble, CodePen, Live Demo)';
-        contentUrl.placeholder = isInternalPlayground ? 'https://... (optional) or leave blank for internal modal' : 'https://dribbble.com/shots/... or https://figma.com/proto/... or https://codepen.io/...';
+        if (urlFieldLabel) urlFieldLabel.textContent = isInternalPlayground ? 'Live Prototype Link (Optional)' : 'External Prototype Link (Figma, Dribbble, CodePen, Live Demo)';
+        contentUrl.placeholder = isInternalPlayground ? 'https://... (optional demo link) or leave blank' : 'https://dribbble.com/shots/... or https://figma.com/proto/... or https://codepen.io/...';
         if (isInternalPlayground) contentUrl.removeAttribute('required');
         else contentUrl.setAttribute('required', 'required');
       } else {
@@ -681,6 +689,26 @@ function startEditing(id) {
   if ($('#content-title')) $('#content-title').value = item.title || '';
   if ($('#content-description')) $('#content-description').value = item.description || '';
   if ($('#journal-content-body')) $('#journal-content-body').value = item.contentBody || '';
+
+  // Populate Playground Internal Fields
+  if (pgExperimentQuestion) pgExperimentQuestion.value = '';
+  if (pgDesignThinking) pgDesignThinking.value = '';
+  if (pgGalleryUrls) pgGalleryUrls.value = '';
+  if (pgConclusion) pgConclusion.value = '';
+
+  if (targetType === 'playground' && item.contentBody) {
+    try {
+      const parsed = JSON.parse(item.contentBody);
+      if (parsed && typeof parsed === 'object') {
+        if (pgExperimentQuestion) pgExperimentQuestion.value = parsed.question || '';
+        if (pgDesignThinking) pgDesignThinking.value = parsed.designThinking || '';
+        if (pgGalleryUrls) pgGalleryUrls.value = Array.isArray(parsed.gallery) ? parsed.gallery.join('\n') : (parsed.gallery || '');
+        if (pgConclusion) pgConclusion.value = parsed.conclusion || '';
+      }
+    } catch {
+      if (pgDesignThinking) pgDesignThinking.value = item.contentBody || '';
+    }
+  }
   if ($('#content-url')) $('#content-url').value = item.url || '';
   if ($('#content-product-url')) $('#content-product-url').value = item.productUrl || '';
   if ($('#content-tags')) $('#content-tags').value = item.tags || '';
@@ -1008,10 +1036,25 @@ contentForm.onsubmit = async event => {
       else detectedPlatform = 'Live Demo';
     }
 
+    let finalContentBody = '';
+    if (isInternalBlogNow) {
+      finalContentBody = contentBodyVal;
+    } else if (targetType === 'playground' && pgModeNow === 'internal') {
+      const pgData = {
+        question: (pgExperimentQuestion ? pgExperimentQuestion.value.trim() : ''),
+        explanation: descVal,
+        designThinking: (pgDesignThinking ? pgDesignThinking.value.trim() : ''),
+        gallery: (pgGalleryUrls ? pgGalleryUrls.value.split(/[\n,]+/).map(s => s.trim()).filter(Boolean) : []),
+        conclusion: (pgConclusion ? pgConclusion.value.trim() : ''),
+        tools: (data.tools || '')
+      };
+      finalContentBody = JSON.stringify(pgData);
+    }
+
     const payload = {
       title: titleVal,
       description: descVal,
-      contentBody: isInternalBlogNow ? contentBodyVal : '',
+      contentBody: finalContentBody,
       url: isInternalBlogNow ? '' : (urlVal || ''),
       productUrl: data.productUrl || '',
       image,

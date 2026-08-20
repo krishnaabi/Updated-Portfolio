@@ -24,7 +24,7 @@
   <link rel="stylesheet" href="cms-content.css?v=3" />
   <link rel="stylesheet" href="experience.css?v=1" />
   <link rel="stylesheet" href="process-enhance.css?v=1" />
-  <link rel="stylesheet" href="playground.css?v=43" />
+  <link rel="stylesheet" href="playground.css?v=44" />
 </head>
 
 <body class="play-page playground-detail-page">
@@ -57,7 +57,7 @@
     <section class="pg-detail-header-section" id="pg-detail-container">
       <div class="pg-detail-header-inner reveal visible">
         <div class="pg-detail-tags-row">
-          <span class="pg-detail-cat-pill" id="pg-detail-cat">UI & Motion</span>
+          <span class="pg-detail-cat-pill" id="pg-detail-cat">Interaction</span>
           <span class="pg-detail-area-pill" id="pg-detail-area">01 / EXPERIMENTS</span>
         </div>
 
@@ -85,15 +85,44 @@
         <div class="pg-detail-tools-row" id="pg-detail-tools"></div>
       </div>
 
+      <!-- The Experiment Question Card -->
+      <div class="pg-question-callout" id="pg-detail-question-box" style="display:none;">
+        <div class="pg-q-label"><span class="pulse-dot"></span> ✦ THE EXPERIMENT QUESTION</div>
+        <h2 class="pg-q-text" id="pg-detail-question"></h2>
+      </div>
+
       <!-- Hero Visual Container -->
       <div class="pg-detail-hero-media" id="pg-detail-media"></div>
 
-      <!-- Main Study Content Body -->
-      <article class="pg-detail-content-body" id="pg-detail-body">
-        <div class="pg-body-placeholder">
-          <p>Loading interactive breakdown and design thinking...</p>
+      <!-- Main Study Content: Design Thinking -->
+      <section class="pg-design-thinking-section" id="pg-detail-design-thinking-box">
+        <div class="pg-section-heading-pill">
+          <span class="label">✦ 01 / DESIGN THINKING & PROCESS</span>
         </div>
-      </article>
+        <article class="pg-detail-content-body" id="pg-detail-body">
+          <div class="pg-body-placeholder">
+            <p>Loading interactive breakdown and design thinking...</p>
+          </div>
+        </article>
+      </section>
+
+      <!-- Additional Images Gallery Section -->
+      <section class="pg-gallery-section" id="pg-detail-gallery-box" style="display:none;">
+        <div class="pg-section-heading-pill">
+          <span class="label">✦ 02 / EXPLORATION GALLERY & PROTOTYPE SCREENS</span>
+        </div>
+        <div class="pg-gallery-grid" id="pg-detail-gallery-grid"></div>
+      </section>
+
+      <!-- Conclusion & Key Learnings Section -->
+      <section class="pg-conclusion-section" id="pg-detail-conclusion-box" style="display:none;">
+        <div class="pg-conclusion-card">
+          <div class="pg-section-heading-pill">
+            <span class="label">✦ 03 / KEY LEARNINGS & CONCLUSION</span>
+          </div>
+          <div class="pg-conclusion-prose" id="pg-detail-conclusion"></div>
+        </div>
+      </section>
 
       <!-- Next Exploration Navigator Card -->
       <div class="pg-next-section-wrap" id="pg-next-wrap" style="display:none;">
@@ -104,7 +133,7 @@
         <a href="#" class="pg-next-card" id="pg-next-card">
           <div class="pg-next-thumb" id="pg-next-thumb"></div>
           <div class="pg-next-info">
-            <small id="pg-next-cat">3D & Visuals</small>
+            <small id="pg-next-cat">Typography</small>
             <h4 id="pg-next-title">Next Exploration Title</h4>
             <p id="pg-next-desc">A brief preview of the next creative study.</p>
             <span class="pg-next-link">Explore Study <b>↗</b></span>
@@ -113,6 +142,15 @@
       </div>
     </section>
   </main>
+
+  <!-- Lightbox Modal for Gallery and Hero Zoom -->
+  <div id="pg-lightbox-modal" class="pg-lightbox" style="display:none;">
+    <div class="pg-lightbox-backdrop" id="pg-lightbox-backdrop"></div>
+    <div class="pg-lightbox-content">
+      <img id="pg-lightbox-img" src="" alt="Enlarged Visual">
+      <button type="button" class="pg-lightbox-close" id="pg-lightbox-close">✕</button>
+    </div>
+  </div>
 
   <footer id="contact">
     <div class="footer-intro">
@@ -153,7 +191,7 @@
   <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js" defer></script>
   <script src="icons.js?v=2" defer></script>
   <script src="supabase-config.js"></script>
-  <script src="content-render.js?v=79"></script>
+  <script src="content-render.js?v=80"></script>
   <script src="motion.js" defer></script>
   <script src="process-enhance.js" defer></script>
   <script src="script.js?v=15"></script>

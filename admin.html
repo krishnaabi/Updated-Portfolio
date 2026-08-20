@@ -246,9 +246,42 @@
             </div>
           </div>
 
-          <!-- Rich Content Body Editor (Internal Blog Post & Internal Playground Study) -->
+          <!-- Playground Internal Study Dedicated Structured Fields -->
+          <div id="pg-internal-fields-group" style="display:none;">
+            <!-- The Experiment Question -->
+            <div class="form-group">
+              <label class="group-label">The Experiment Question / Core Hypothesis</label>
+              <input name="pgExperimentQuestion" id="pg-experiment-question"
+                placeholder="e.g. How can we make data visualization feel tactile and responsive in dark mode?">
+              <small class="help" style="color:var(--muted,#777);font-size:11.5px;margin-top:4px;display:block;">💡 The central design problem or hypothesis being tested in this study.</small>
+            </div>
+
+            <!-- Design Thinking & Process -->
+            <div class="form-group">
+              <label class="group-label">Design Thinking & Exploration Process</label>
+              <textarea name="pgDesignThinking" id="pg-design-thinking" style="height:140px;"
+                placeholder="Explain the UX decisions, interaction principles, spatial rules, spring physics, or motion choreography... (Supports markdown)"></textarea>
+            </div>
+
+            <!-- Additional Images - Gallery -->
+            <div class="form-group">
+              <label class="group-label">Additional Images — Gallery (Optional)</label>
+              <textarea name="pgGalleryUrls" id="pg-gallery-urls" style="height:80px;"
+                placeholder="Paste additional image URLs (one per line or comma separated) to build the interactive gallery..."></textarea>
+              <small class="help" style="color:var(--muted,#777);font-size:11.5px;margin-top:4px;display:block;">💡 Add multiple visual assets to showcase alternate states, wireframes, or high-res prototype screens.</small>
+            </div>
+
+            <!-- Conclusion / Key Learnings -->
+            <div class="form-group">
+              <label class="group-label">Your Conclusion & Key Learnings</label>
+              <textarea name="pgConclusion" id="pg-conclusion" style="height:110px;"
+                placeholder="Key takeaways, what worked, what failed, lessons learned, and next iteration steps..."></textarea>
+            </div>
+          </div>
+
+          <!-- Rich Content Body Editor (Internal Blog Post Only) -->
           <div class="form-group" id="journal-blog-body-group" style="display:none;">
-            <label class="group-label" id="content-body-label">Full Article / Study Content Body</label>
+            <label class="group-label" id="content-body-label">Full Article Content (Internal Blog Post)</label>
             <textarea name="contentBody" id="journal-content-body" style="height:180px;"
               placeholder="Write or paste your full content body text here. Supports markdown (## headings, > quotes, - lists, images)..."></textarea>
             <small class="help" style="color:var(--muted,#777);font-size:11.5px;margin-top:6px;display:block;">💡 Supports headings (<code>## Section Title</code>), quotes (<code>> Highlight</code>), bullet points, and markdown images (<code>![Caption](image_url)</code>).</small>
@@ -1143,7 +1176,7 @@
   </main>
 
   <script src="supabase-config.js"></script>
-  <script src="admin.js?v=34"></script>
+  <script src="admin.js?v=35"></script>
 </body>
 
 </html>

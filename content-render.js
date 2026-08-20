@@ -1305,7 +1305,29 @@
       }
 
       if (currentItem) {
-        const catTag = categoryOf(currentItem) || 'UI & Motion';
+        // Parse contentBody (structured JSON or raw text)
+        let questionText = '';
+        let designThinkingText = '';
+        let galleryImages = [];
+        let conclusionText = '';
+        let explanationText = currentItem.description || '';
+
+        if (currentItem.contentBody) {
+          try {
+            const parsed = JSON.parse(currentItem.contentBody);
+            if (parsed && typeof parsed === 'object') {
+              questionText = parsed.question || '';
+              designThinkingText = parsed.designThinking || '';
+              galleryImages = Array.isArray(parsed.gallery) ? parsed.gallery : (parsed.gallery ? [parsed.gallery] : []);
+              conclusionText = parsed.conclusion || '';
+              if (parsed.explanation) explanationText = parsed.explanation;
+            }
+          } catch {
+            designThinkingText = currentItem.contentBody;
+          }
+        }
+
+        const catTag = categoryOf(currentItem) || 'Interaction';
         const sectionTag = (sectionOf(currentItem) === 'sketches' ? '02 / SKETCHES' : (sectionOf(currentItem) === 'fun' ? '03 / FUN ZONE' : '01 / EXPERIMENTS'));
         const dateStr = currentItem.createdAt || currentItem.date
           ? new Date(currentItem.createdAt || currentItem.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
@@ -1320,68 +1342,138 @@
         const dateEl = document.querySelector('#pg-detail-date');
         const mediaEl = document.querySelector('#pg-detail-media');
         const toolsEl = document.querySelector('#pg-detail-tools');
-        const bodyEl = document.querySelector('#pg-detail-body');
         const liveCta = document.querySelector('#pg-detail-live-cta');
 
+        const questionBox = document.querySelector('#pg-detail-question-box');
+        const questionEl = document.querySelector('#pg-detail-question');
+        const bodyEl = document.querySelector('#pg-detail-body');
+        const galleryBox = document.querySelector('#pg-detail-gallery-box');
+        const galleryGrid = document.querySelector('#pg-detail-gallery-grid');
+        const conclusionBox = document.querySelector('#pg-detail-conclusion-box');
+        const conclusionEl = document.querySelector('#pg-detail-conclusion');
+
         if (titleEl) titleEl.textContent = currentItem.title;
-        if (descEl) descEl.textContent = currentItem.description || 'An interactive exploration examining motion fidelity, UX ergonomics, and visual systems.';
+        if (descEl) descEl.textContent = explanationText;
         if (catEl) catEl.textContent = catTag;
         if (areaEl) areaEl.textContent = sectionTag;
         if (dateEl) dateEl.textContent = `· ${dateStr}`;
 
-        // Live CTA Link if present
+        // 1. Live Prototype CTA Link
         if (liveCta) {
           if (currentItem.url && currentItem.url.startsWith('http')) {
             liveCta.href = currentItem.url;
             liveCta.style.display = 'inline-flex';
             const pName = currentItem.platform || (currentItem.url.includes('figma') ? 'Figma' : (currentItem.url.includes('dribbble') ? 'Dribbble' : (currentItem.url.includes('codepen') ? 'CodePen' : 'Live Demo')));
-            liveCta.innerHTML = `<span>Explore on ${escape(pName)}</span> <b>↗</b>`;
+            liveCta.innerHTML = `<span>Explore Prototype on ${escape(pName)}</span> <b>↗</b>`;
           } else {
             liveCta.style.display = 'none';
           }
         }
 
-        // Tools / Tech stack chips
+        // 2. The Experiment Question
+        if (questionBox && questionEl) {
+          if (questionText && questionText.trim()) {
+            questionEl.textContent = questionText.startsWith('"') ? questionText : `"${questionText}"`;
+            questionBox.style.display = 'block';
+          } else {
+            questionBox.style.display = 'none';
+          }
+        }
+
+        // 3. Hero Visual
+        if (mediaEl) {
+          if (currentItem.image) {
+            mediaEl.innerHTML = `<img src="${escape(cleanImgUrl(currentItem.image))}" alt="${escape(currentItem.title)}" class="pg-zoomable-img reveal visible" role="button" tabindex="0" title="Click to enlarge">`;
+          } else {
+            mediaEl.innerHTML = `<div style="width:100%;min-height:380px;display:grid;place-items:center;background:linear-gradient(135deg,#1b1b1b,#913d22);color:#fff;font-weight:800;font-size:38px;">AK.</div>`;
+          }
+        }
+
+        // 4. Tools Chips
         if (toolsEl) {
           const rawTools = currentItem.tools || currentItem.tags || '';
           const toolsList = rawTools.split('|').map(t => t.trim()).filter(Boolean);
           if (toolsList.length) {
             toolsEl.innerHTML = toolsList.map(t => `<span class="pg-tool-chip">⚡ ${escape(t)}</span>`).join('');
           } else {
-            toolsEl.innerHTML = `<span class="pg-tool-chip">⚡ Figma</span><span class="pg-tool-chip">✨ Framer Motion</span><span class="pg-tool-chip">📐 Design System</span>`;
+            toolsEl.innerHTML = `<span class="pg-tool-chip">⚡ Figma</span><span class="pg-tool-chip">✨ Framer</span><span class="pg-tool-chip">📐 Design System</span>`;
           }
         }
 
-        // Media Hero
-        if (mediaEl) {
-          if (currentItem.image) {
-            mediaEl.innerHTML = `<img src="${escape(cleanImgUrl(currentItem.image))}" alt="${escape(currentItem.title)}" class="reveal visible">`;
-          } else {
-            mediaEl.innerHTML = `<div style="width:100%;min-height:380px;display:grid;place-items:center;background:linear-gradient(135deg,#1b1b1b,#913d22);color:#fff;font-weight:800;font-size:38px;">AK.</div>`;
-          }
-        }
-
-        // Body Content Rendering
+        // 5. Design Thinking & Process Content
         if (bodyEl) {
-          if (currentItem.contentBody && currentItem.contentBody.trim()) {
-            bodyEl.innerHTML = renderBodyShared(currentItem, currentItem.contentBody);
+          if (designThinkingText && designThinkingText.trim()) {
+            bodyEl.innerHTML = renderBodyShared(currentItem, designThinkingText);
           } else {
             bodyEl.innerHTML = `
-              <h2>01 / The Concept & Purpose</h2>
-              <p>${escape(currentItem.description || 'This experiment was conceived as a creative laboratory test to explore high-fidelity interaction models, micro-feedback choreography, and modern design tokens.')}</p>
-              <blockquote>"Design isn't just how it looks and feels. Design is how it functions and feels alive under user input."</blockquote>
+              <h2>01 / Context & Interaction Challenge</h2>
+              <p>${escape(explanationText || 'This experiment was conceived as a creative laboratory test to explore high-fidelity interaction models, micro-feedback choreography, and modern design tokens.')}</p>
+              <blockquote>"Interaction design is the architecture of motion and feedback — clarity emerges from seamless continuity."</blockquote>
               <h2>02 / Key Interaction Decisions</h2>
-              <p>During the prototyping stage, multiple tactile spring curves and easing transitions were tested to balance responsive snap with fluid momentum. Every transition was engineered with strict spatial hierarchies to prevent visual clutter.</p>
+              <p>During the prototyping stage, multiple spring physics curves were analyzed to achieve responsive tactile feedback without causing perceptual latency.</p>
               <ul>
-                <li><strong>Spring Dynamics:</strong> Tuned damping ratios (0.78 stiffness) for organic motion without lag.</li>
-                <li><strong>Visual Density:</strong> High-contrast surfaces paired with subtle ambient background depth.</li>
-                <li><strong>Component Modularity:</strong> Scalable variants ready for production design systems.</li>
+                <li><strong>Spring Dynamics:</strong> Tuned stiffness (0.82) to mimic organic physical mass.</li>
+                <li><strong>Spatial Alignment:</strong> Strict grid discipline ensuring visual balance across viewports.</li>
+                <li><strong>Feedback States:</strong> Multi-tiered micro-animations for hover, active, and resting states.</li>
               </ul>
             `;
           }
         }
 
-        // Next Exploration Navigator
+        // 6. Additional Images Gallery
+        if (galleryBox && galleryGrid) {
+          if (galleryImages.length) {
+            galleryBox.style.display = 'block';
+            galleryGrid.innerHTML = galleryImages.map((src, idx) => `
+              <div class="pg-gallery-item" role="button" tabindex="0">
+                <img src="${escape(cleanImgUrl(src))}" alt="Exploration screen ${idx + 1}" class="pg-zoomable-img">
+                <span class="pg-gallery-caption">✦ Visual 0${idx + 1}</span>
+              </div>
+            `).join('');
+          } else {
+            galleryBox.style.display = 'none';
+          }
+        }
+
+        // 7. Conclusion & Key Learnings
+        if (conclusionBox && conclusionEl) {
+          if (conclusionText && conclusionText.trim()) {
+            conclusionBox.style.display = 'block';
+            conclusionEl.innerHTML = renderBodyShared(currentItem, conclusionText);
+          } else {
+            conclusionBox.style.display = 'none';
+          }
+        }
+
+        // 8. Lightbox Modal Wiring
+        const lightbox = document.querySelector('#pg-lightbox-modal');
+        const lightboxImg = document.querySelector('#pg-lightbox-img');
+        const lightboxClose = document.querySelector('#pg-lightbox-close');
+        const lightboxBackdrop = document.querySelector('#pg-lightbox-backdrop');
+
+        const openLightbox = (src) => {
+          if (!lightbox || !lightboxImg) return;
+          lightboxImg.src = src;
+          lightbox.style.display = 'flex';
+          document.body.style.overflow = 'hidden';
+        };
+
+        const closeLightbox = () => {
+          if (!lightbox) return;
+          lightbox.style.display = 'none';
+          document.body.style.overflow = '';
+        };
+
+        if (lightboxClose) lightboxClose.onclick = closeLightbox;
+        if (lightboxBackdrop) lightboxBackdrop.onclick = closeLightbox;
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
+
+        document.querySelectorAll('.pg-zoomable-img').forEach(img => {
+          img.addEventListener('click', () => openLightbox(img.src));
+          img.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') openLightbox(img.src); });
+        });
+
+        // 9. Next Exploration Navigator
         const nextWrap = document.querySelector('#pg-next-wrap');
         const nextCard = document.querySelector('#pg-next-card');
         const nextTitle = document.querySelector('#pg-next-title');
@@ -1399,7 +1491,7 @@
             nextCard.href = `playground-detail.html?id=${encodeURIComponent(nextItem.id)}`;
             if (nextTitle) nextTitle.textContent = nextItem.title;
             if (nextDesc) nextDesc.textContent = nextItem.description || 'Explore the next interactive case study.';
-            if (nextCat) nextCat.textContent = categoryOf(nextItem) || 'UI & Motion';
+            if (nextCat) nextCat.textContent = categoryOf(nextItem) || 'Interaction';
             if (nextThumb) {
               nextThumb.innerHTML = nextItem.image ? `<img src="${escape(cleanImgUrl(nextItem.image))}" alt="${escape(nextItem.title)}">` : `<div style="width:100%;height:100%;background:#1b1b1b;color:#fff;display:grid;place-items:center;font-weight:800;">AK.</div>`;
             }
