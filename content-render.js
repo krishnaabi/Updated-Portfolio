@@ -96,70 +96,8 @@
     }
   ];
 
-  const defaultPlaygroundItems = [
-    {
-      id: 'pg-1',
-      title: 'Spatial Canvas Nodes — Dynamic Node-Graph Interface',
-      category: 'playground|experiments|UI & Motion',
-      description: 'An infinite zoomable node canvas exploring fluid connection physics, magnetic bezier curves, and gesture panning.',
-      url: 'https://dribbble.com',
-      image: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800&q=80'
-    },
-    {
-      id: 'pg-2',
-      title: 'Dark Mode Data Flow — Kinetic Financial Charts',
-      category: 'playground|experiments|Concepts',
-      description: 'Interactive telemetry telemetry charts with custom shader glow and real-time candlestick rendering.',
-      url: 'https://dribbble.com',
-      image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80'
-    },
-    {
-      id: 'pg-3',
-      title: 'Orbital 3D Particle Constellation Engine',
-      category: 'playground|experiments|3D & Visuals',
-      description: 'WebGL atmospheric depth simulator with mouse parallax, inertia drift, and champagne particle physics.',
-      url: 'https://dribbble.com',
-      image: 'https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?auto=format&fit=crop&w=800&q=80'
-    },
-    {
-      id: 'pg-4',
-      title: 'Tactile Haptic Sliders & Fluid Spring Physics',
-      category: 'playground|experiments|UI & Motion',
-      description: 'Micro-interaction study experimenting with spring damping, velocity inertia, and audio-haptic feedback cues.',
-      url: 'https://dribbble.com',
-      image: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=800&q=80'
-    },
-    {
-      id: 'pg-5',
-      title: 'Proactive AI Workspace Canvas',
-      category: 'playground|experiments|Concepts',
-      description: 'Exploration of human-in-the-loop AI interaction cards that anticipate intent based on viewport context.',
-      url: 'https://dribbble.com',
-      image: 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?auto=format&fit=crop&w=800&q=80'
-    },
-    {
-      id: 'pg-6',
-      title: 'Glassmorphic HUD Control Suite',
-      category: 'playground|experiments|3D & Visuals',
-      description: 'Multi-layered frosted glass panels with dynamic background diffraction and chromatic aberration.',
-      url: 'https://dribbble.com',
-      image: 'https://images.unsplash.com/photo-1581291518633-83b4ebd1d83e?auto=format&fit=crop&w=800&q=80'
-    },
-    { id: 'sk-1', title: 'Spatial Grid Layout', category: 'playground|sketches|Sketches', url: 'https://dribbble.com', image: 'https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?auto=format&fit=crop&w=400&q=80' },
-    { id: 'sk-2', title: 'Gestural Radial Menu', category: 'playground|sketches|Sketches', url: 'https://dribbble.com', image: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=400&q=80' },
-    { id: 'sk-3', title: 'Dynamic Island HUD', category: 'playground|sketches|Sketches', url: 'https://dribbble.com', image: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=400&q=80' },
-    { id: 'sk-4', title: 'Card Stack Depth', category: 'playground|sketches|Sketches', url: 'https://dribbble.com', image: 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?auto=format&fit=crop&w=400&q=80' },
-    { id: 'sk-5', title: 'Variable Type Shifter', category: 'playground|sketches|Sketches', url: 'https://dribbble.com', image: 'https://images.unsplash.com/photo-1581291518633-83b4ebd1d83e?auto=format&fit=crop&w=400&q=80' },
-    { id: 'sk-6', title: 'Tactile Rotary Dial', category: 'playground|sketches|Sketches', url: 'https://dribbble.com', image: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=400&q=80' },
-    { id: 'sk-7', title: 'Generative Palette Mix', category: 'playground|sketches|Sketches', url: 'https://dribbble.com', image: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=400&q=80' },
-    { id: 'sk-8', title: 'Neo-brutalist Toggles', category: 'playground|sketches|Sketches', url: 'https://dribbble.com', image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=400&q=80' },
-    { id: 'fn-1', title: 'Cyberpunk Synth Dashboard', category: 'playground|fun|Just for Fun', description: '80s retro-futurism synth wave visualizer.', url: 'https://dribbble.com', image: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=600&q=80' },
-    { id: 'fn-2', title: 'Isometric Clay Scene 3D', category: 'playground|fun|Just for Fun', description: 'A cozy minimalist isometric workspace study.', url: 'https://dribbble.com', image: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=600&q=80' },
-    { id: 'fn-3', title: 'Fluid Liquid Blob Physics', category: 'playground|fun|Just for Fun', description: 'Interactive metaball fluid dynamics with cursor repulsion.', url: 'https://dribbble.com', image: 'https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?auto=format&fit=crop&w=600&q=80' },
-    { id: 'fn-4', title: 'Mechanical Switch Exploded View', category: 'playground|fun|Just for Fun', description: '3D mechanical engineering disassembly visualization.', url: 'https://dribbble.com', image: 'https://images.unsplash.com/photo-1581291518633-83b4ebd1d83e?auto=format&fit=crop&w=600&q=80' },
-    { id: 'fn-5', title: 'Vintage Braun Radio Simulator', category: 'playground|fun|Just for Fun', description: 'Dieter Rams-inspired physical radio tuner interaction.', url: 'https://dribbble.com', image: 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?auto=format&fit=crop&w=600&q=80' },
-    { id: 'fn-6', title: 'Holographic HUD with Gyro Tilt', category: 'playground|fun|Just for Fun', description: '3D gyroscope-driven holographic depth card.', url: 'https://dribbble.com', image: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=600&q=80' }
-  ];
+  // Default fallback playground items (empty by default so only user published items appear)
+  const defaultPlaygroundItems = [];
 
   const defaultMilestones = [
     {
@@ -1154,7 +1092,7 @@
       // Deduplicate items by ID
       const seenIds = new Set();
       const rawPlayground = items.filter(item => typeOf(item) === 'playground');
-      const playgroundSource = rawPlayground.length ? rawPlayground : defaultPlaygroundItems;
+      const playgroundSource = rawPlayground;
       const playgroundItems = playgroundSource.filter(item => {
         const idKey = String(item.id || item.title || '');
         if (!idKey || seenIds.has(idKey)) return false;
