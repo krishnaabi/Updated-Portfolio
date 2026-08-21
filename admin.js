@@ -441,17 +441,32 @@ function refreshFields() {
     const pgSection = pgSecEl ? pgSecEl.value : 'experiments';
     const isInteractiveExp = pgSection === 'experiments';
 
-    // Toggle Category Tag dropdown: ONLY for Interactive Explorations!
+    // Show Category Tag field for ALL playground sections (Interactive Explorations, Quick sketches, Just for fun)
     const internalCatGroup = $('#pg-internal-category-group');
     if (internalCatGroup) {
-      internalCatGroup.style.display = isInteractiveExp ? 'block' : 'none';
+      internalCatGroup.style.display = 'block';
+      if (pgInternalCategory) {
+        if (pgSection === 'sketches') {
+          pgInternalCategory.placeholder = 'e.g. Wireframes, User Flows, Sketches, System Architecture...';
+        } else if (pgSection === 'fun') {
+          pgInternalCategory.placeholder = 'e.g. 3D Experiments, Visual Art, Shaders, Playful Concepts...';
+        } else {
+          pgInternalCategory.placeholder = 'e.g. Interaction, Typography, Motion, Concepts...';
+        }
+      }
     }
     const extCatGroup = $('#pg-ext-category-group');
     if (extCatGroup) {
-      extCatGroup.style.display = isInteractiveExp ? 'block' : 'none';
-    }
-    if (!isInteractiveExp && pgInlineBox) {
-      pgInlineBox.style.display = 'none';
+      extCatGroup.style.display = 'block';
+      if (pgExtCategory) {
+        if (pgSection === 'sketches') {
+          pgExtCategory.placeholder = 'e.g. Wireframes, User Flows, Sketches, System Architecture...';
+        } else if (pgSection === 'fun') {
+          pgExtCategory.placeholder = 'e.g. 3D Experiments, Visual Art, Shaders, Playful Concepts...';
+        } else {
+          pgExtCategory.placeholder = 'e.g. Interaction, Typography, Motion, Concepts...';
+        }
+      }
     }
 
     if (isInternalPlayground) {
@@ -959,7 +974,7 @@ function startEditing(id) {
       if (pgExperimentQuestion) pgExperimentQuestion.value = (parsedPg && parsedPg.question) ? parsedPg.question : (item.title || '');
       if (pgShortExplanation) pgShortExplanation.value = (parsedPg && parsedPg.explanation) ? parsedPg.explanation : (item.description || '');
       if (pgInternalCategory) {
-        pgInternalCategory.value = (itemCategoryName && !['experiments', 'sketches', 'fun', 'Quick sketches', 'Just for fun'].includes(itemCategoryName)) ? itemCategoryName : '';
+        pgInternalCategory.value = (itemCategoryName && !['experiments', 'sketches', 'fun'].includes(itemCategoryName)) ? itemCategoryName : (itemCategoryName || '');
       }
       if (pgDesignThinking) pgDesignThinking.value = (parsedPg && parsedPg.designThinking) ? parsedPg.designThinking : '';
       if (pgGalleryUrls) pgGalleryUrls.value = (parsedPg && Array.isArray(parsedPg.gallery)) ? parsedPg.gallery.join('\n') : ((parsedPg && parsedPg.gallery) || '');
@@ -970,7 +985,7 @@ function startEditing(id) {
       if (pgExtTitle) pgExtTitle.value = item.title || '';
       if (pgExtDescription) pgExtDescription.value = item.description || '';
       if (pgExtCategory) {
-        pgExtCategory.value = (itemCategoryName && !['experiments', 'sketches', 'fun', 'Quick sketches', 'Just for fun'].includes(itemCategoryName)) ? itemCategoryName : '';
+        pgExtCategory.value = (itemCategoryName && !['experiments', 'sketches', 'fun'].includes(itemCategoryName)) ? itemCategoryName : (itemCategoryName || '');
       }
       if (pgExtLink) pgExtLink.value = item.url || '';
     }
@@ -1328,7 +1343,8 @@ contentForm.onsubmit = async event => {
       const titleForStudy = qVal ? qVal.replace(/^["']|["']$/g, '').slice(0, 80) : (explVal ? explVal.slice(0, 50) : `${catVal} Exploration`);
       const descForStudy = explVal || qVal || `${catVal} Exploration and design experiment.`;
 
-      const finalCatVal = pgSectionNow === 'experiments' ? catVal : (pgSectionNow === 'sketches' ? 'Quick sketches' : 'Just for fun');
+      const defaultCat = pgSectionNow === 'sketches' ? 'Wireframes & Sketches' : (pgSectionNow === 'fun' ? 'Visual Tests' : 'Interaction');
+      const finalCatVal = catVal || defaultCat;
 
       payload = {
         title: titleForStudy,
@@ -1365,7 +1381,8 @@ contentForm.onsubmit = async event => {
         else detectedPlatform = 'Live Demo';
       }
 
-      const finalExtCatVal = pgSectionNow === 'experiments' ? extCat : (pgSectionNow === 'sketches' ? 'Quick sketches' : 'Just for fun');
+      const defaultExtCat = pgSectionNow === 'sketches' ? 'Wireframes & Sketches' : (pgSectionNow === 'fun' ? 'Visual Tests' : 'Interaction');
+      const finalExtCatVal = extCat || defaultExtCat;
 
       payload = {
         title: extTitle,
