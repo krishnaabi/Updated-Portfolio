@@ -250,26 +250,43 @@ export default {
         const incoming = await request.json();
         if (!incoming.name || !incoming.name.trim()) return json({ error: 'Name is required' }, 400);
 
-        const row = {
-          name: incoming.name.trim(),
-          logo: incoming.logo || incoming.logo_url || '',
-          created_at: new Date().toISOString()
-        };
+        if (incoming.id) {
+          // UPDATE existing brand
+          const res = await sbFetch(`portfolio_brands?id=eq.${encodeURIComponent(incoming.id)}`, {
+            method: 'PATCH',
+            headers: { Prefer: 'return=representation' },
+            body: JSON.stringify({
+              name: incoming.name.trim(),
+              logo: incoming.logo || incoming.logo_url || ''
+            })
+          }, env);
 
-        const res = await sbFetch('portfolio_brands', {
-          method: 'POST',
-          headers: { Prefer: 'return=representation' },
-          body: JSON.stringify(row)
-        }, env);
+          if (!res.ok) return json({ error: await res.text() }, 500);
+          const data = await res.json();
+          return json(Array.isArray(data) ? data[0] : incoming, 200);
+        } else {
+          // INSERT new brand
+          const row = {
+            name: incoming.name.trim(),
+            logo: incoming.logo || incoming.logo_url || '',
+            created_at: new Date().toISOString()
+          };
 
-        if (!res.ok) return json({ error: await res.text() }, 500);
-        const data = await res.json();
-        return json(Array.isArray(data) ? data[0] : data, 201);
+          const res = await sbFetch('portfolio_brands', {
+            method: 'POST',
+            headers: { Prefer: 'return=representation' },
+            body: JSON.stringify(row)
+          }, env);
+
+          if (!res.ok) return json({ error: await res.text() }, 500);
+          const data = await res.json();
+          return json(Array.isArray(data) ? data[0] : data, 201);
+        }
       }
 
       if (path.startsWith('/api/brands/') && method === 'DELETE') {
         const id = path.split('/').pop();
-        await sbFetch(`portfolio_brands?id=eq.${id}`, { method: 'DELETE' }, env);
+        await sbFetch(`portfolio_brands?id=eq.${encodeURIComponent(id)}`, { method: 'DELETE' }, env);
         return json({ ok: true });
       }
 

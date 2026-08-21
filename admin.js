@@ -328,6 +328,32 @@ async function apiFetch(path, options = {}) {
           }
         }
         return { ok: true, status: 200, json: async () => ({ ok: true }) };
+      } else if (path === '/api/brands' && options.method === 'POST') {
+        const bodyObj = JSON.parse(options.body || '{}');
+        if (bodyObj.id) {
+          // UPDATE existing brand
+          const sbRes = await fetch(`${sbUrl}/rest/v1/portfolio_brands?id=eq.${encodeURIComponent(bodyObj.id)}`, {
+            method: 'PATCH',
+            headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}`, 'Content-Type': 'application/json', Prefer: 'return=representation' },
+            body: JSON.stringify({ name: bodyObj.name, logo: bodyObj.logo || '' })
+          });
+          if (sbRes.ok) return sbRes;
+        } else {
+          // INSERT new brand
+          const sbRes = await fetch(`${sbUrl}/rest/v1/portfolio_brands`, {
+            method: 'POST',
+            headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}`, 'Content-Type': 'application/json', Prefer: 'return=representation' },
+            body: JSON.stringify({ name: bodyObj.name, logo: bodyObj.logo || '', created_at: new Date().toISOString() })
+          });
+          if (sbRes.ok) return sbRes;
+        }
+      } else if (path.startsWith('/api/brands/') && options.method === 'DELETE') {
+        const id = path.split('/').pop();
+        const sbRes = await fetch(`${sbUrl}/rest/v1/portfolio_brands?id=eq.${encodeURIComponent(id)}`, {
+          method: 'DELETE',
+          headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}` }
+        });
+        if (sbRes.ok) return sbRes;
       }
     } catch (e) {}
   }
@@ -2294,12 +2320,19 @@ const fetchBrands = async () => {
   try {
     const res = await apiFetch('/api/brands');
     if (res.ok) {
-      allBrandsData = await res.json();
-      renderBrandsAdminList();
+      const data = await res.json();
+      if (Array.isArray(data) && data.length) {
+        allBrandsData = data;
+        try { localStorage.setItem('ak_portfolio_brands', JSON.stringify(data)); } catch (e) {}
+      }
     }
   } catch (err) {
-    console.error('Failed to fetch brands', err);
+    try {
+      const cached = JSON.parse(localStorage.getItem('ak_portfolio_brands') || '[]');
+      if (Array.isArray(cached) && cached.length) allBrandsData = cached;
+    } catch (e) {}
   }
+  renderBrandsAdminList();
 };
 
 const renderBrandsAdminList = () => {
@@ -2320,7 +2353,7 @@ const renderBrandsAdminList = () => {
         <strong style="font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#1b1b1b;">${escapeHtml(item.name)}</strong>
       </div>
       <div class="actions" style="display:flex;gap:6px;flex-shrink:0;">
-        <button class="btn-edit" data-edit-brand="${item.id}" style="padding:5px 10px;font-size:11px;">✏️ Edit</button>
+        <button class="btn-edit" data-edit-brand="${item.id}" style="padding:5px 10px;font-size:11px;cursor:pointer;">✏️ Edit</button>
         <button class="btn-remove-brand" data-remove-brand="${item.id}" style="padding:5px 12px;font-size:11px;border:1px solid #ff3b30;color:#ff3b30;background:#ffffff;border-radius:6px;font-weight:700;cursor:pointer;">Remove</button>
       </div>
     </div>`;
@@ -2345,9 +2378,11 @@ const renderBrandsAdminList = () => {
       btn.disabled = true;
 
       try {
-        const res = await fetch(`/api/brands/${brandId}`, { method: 'DELETE' });
+        const res = await apiFetch(`/api/brands/${brandId}`, { method: 'DELETE' });
         if (res.ok) {
-          fetchBrands();
+          allBrandsData = allBrandsData.filter(b => String(b.id) !== String(brandId));
+          try { localStorage.setItem('ak_portfolio_brands', JSON.stringify(allBrandsData)); } catch (e) {}
+          renderBrandsAdminList();
         } else {
           alert('Could not remove brand.');
           btn.textContent = 'Remove';
@@ -2365,19 +2400,20 @@ const renderBrandsAdminList = () => {
 const startEditingBrand = id => {
   const item = allBrandsData.find(b => String(b.id) === String(id));
   if (!item) return;
-  $('#brand-editing-id').value = item.id;
-  $('#brand-name').value = item.name || '';
-  $('#brand-logo-url').value = item.logo || '';
-  $('#brand-submit-btn').innerHTML = '💾 Save Brand <b>↗</b>';
+  if ($('#brand-editing-id')) $('#brand-editing-id').value = item.id;
+  if ($('#brand-name')) $('#brand-name').value = item.name || '';
+  if ($('#brand-logo-url')) $('#brand-logo-url').value = item.logo || '';
+  if ($('#brand-submit-btn')) $('#brand-submit-btn').innerHTML = '💾 Update Brand Logo <b>↗</b>';
   if ($('#brand-cancel-btn')) $('#brand-cancel-btn').style.display = 'inline-block';
+  $('#subpanel-brands')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 };
 
 const resetBrandForm = () => {
-  $('#brand-editing-id').value = '';
-  $('#brand-name').value = '';
-  $('#brand-logo-url').value = '';
+  if ($('#brand-editing-id')) $('#brand-editing-id').value = '';
+  if ($('#brand-name')) $('#brand-name').value = '';
+  if ($('#brand-logo-url')) $('#brand-logo-url').value = '';
   if ($('#brand-logo-file')) $('#brand-logo-file').value = '';
-  $('#brand-submit-btn').innerHTML = 'Save Brand Logo <b>↗</b>';
+  if ($('#brand-submit-btn')) $('#brand-submit-btn').innerHTML = 'Save Brand Logo <b>↗</b>';
   if ($('#brand-cancel-btn')) $('#brand-cancel-btn').style.display = 'none';
 };
 
@@ -2388,38 +2424,51 @@ if (brandSubmitBtn) {
   brandSubmitBtn.onclick = async e => {
     e.preventDefault();
     const status = $('#brand-status');
-    const nameVal = $('#brand-name').value.trim();
+    const nameVal = ($('#brand-name')?.value || '').trim();
     if (!nameVal) {
-      status.textContent = 'Company / Brand Name is required.';
+      if (status) status.textContent = 'Company / Brand Name is required.';
       return;
     }
-    status.textContent = 'Saving brand logo...';
+    if (status) status.textContent = 'Saving brand logo...';
 
-    const editId = $('#brand-editing-id').value;
-    let logoUrl = $('#brand-logo-url').value || '';
+    const editId = ($('#brand-editing-id')?.value || '').trim();
+    let logoUrl = $('#brand-logo-url')?.value || '';
     const fileElem = $('#brand-logo-file');
     if (fileElem && fileElem.files && fileElem.files[0]) {
       try {
         logoUrl = await fileToUrl(fileElem.files[0]);
       } catch (err) {
-        status.textContent = 'Failed to upload logo file.';
+        if (status) status.textContent = 'Failed to upload logo file.';
         return;
       }
     }
 
     try {
-      const res = await fetch('/api/brands', {
+      const res = await apiFetch('/api/brands', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id: editId || undefined, name: nameVal, logo: logoUrl })
       });
       if (!res.ok) throw new Error();
-      status.textContent = '✦ Brand logo saved!';
+
+      if (editId) {
+        const idx = allBrandsData.findIndex(b => String(b.id) === String(editId));
+        if (idx !== -1) {
+          allBrandsData[idx] = { ...allBrandsData[idx], name: nameVal, logo: logoUrl };
+        }
+      } else {
+        const newBrand = { id: 'brand_' + Date.now(), name: nameVal, logo: logoUrl };
+        allBrandsData.push(newBrand);
+      }
+
+      try { localStorage.setItem('ak_portfolio_brands', JSON.stringify(allBrandsData)); } catch (e) {}
+
+      if (status) status.textContent = editId ? '✦ Brand logo updated!' : '✦ Brand logo saved!';
       resetBrandForm();
       fetchBrands();
-      setTimeout(() => status.textContent = '', 3500);
+      setTimeout(() => { if (status) status.textContent = ''; }, 3500);
     } catch (err) {
-      status.textContent = 'Failed to save brand.';
+      if (status) status.textContent = 'Failed to save brand.';
     }
   };
 }
