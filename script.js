@@ -543,136 +543,149 @@ document.querySelectorAll('.big-arrow').forEach((arrow) => {
 });
 
 // Render Footer Social Links & Dynamic Email / Resume from Settings
+const applyColorFilter = (elements, mode, defaultMode = 'original') => {
+  const activeMode = mode || defaultMode;
+  let filterVal = 'none';
+  if (activeMode === 'gray' || activeMode === 'monochrome' || activeMode === 'classic-gray') {
+    filterVal = 'grayscale(100%) contrast(1.1)';
+  } else if (activeMode === 'warm-gray' || activeMode === 'warm-vintage' || activeMode === 'vintage') {
+    filterVal = 'grayscale(90%) sepia(20%) contrast(1.1)';
+  }
+  elements.forEach(el => {
+    el.style.setProperty('filter', filterVal, 'important');
+  });
+};
+
+const applySettingsToDOM = (settings) => {
+  if (!settings) return;
+
+  // Dynamic Hero Images & Focal Repositioning & Color Modes from Admin Settings
+  if (settings.homeHeroImage) {
+    document.querySelectorAll('.portrait-wrap img, .hero-visual img').forEach(img => {
+      if (img.getAttribute('src') !== settings.homeHeroImage) img.src = settings.homeHeroImage;
+      if (settings.homeHeroPosition) img.style.setProperty('object-position', settings.homeHeroPosition, 'important');
+    });
+  }
+  applyColorFilter(document.querySelectorAll('.portrait-wrap img, .hero-visual img'), settings.homeHeroColorMode, 'original');
+
+  if (settings.homeCenterImage) {
+    document.querySelectorAll('.about-image img').forEach(img => {
+      if (img.getAttribute('src') !== settings.homeCenterImage) img.src = settings.homeCenterImage;
+      if (settings.homeCenterPosition) img.style.setProperty('object-position', settings.homeCenterPosition, 'important');
+    });
+  }
+  applyColorFilter(document.querySelectorAll('.about-image img'), settings.homeCenterColorMode, 'gray');
+
+  if (settings.aboutHeroImage) {
+    document.querySelectorAll('.about-portrait img').forEach(img => {
+      if (img.getAttribute('src') !== settings.aboutHeroImage) img.src = settings.aboutHeroImage;
+      if (settings.aboutHeroPosition) img.style.setProperty('object-position', settings.aboutHeroPosition, 'important');
+    });
+  }
+  applyColorFilter(document.querySelectorAll('.about-portrait img'), settings.aboutHeroColorMode, 'original');
+
+  if (settings.workHeroImage) {
+    document.querySelectorAll('#work-hero-img, .work-hero-visual img, .work-hero img').forEach(workImg => {
+      if (workImg.getAttribute('src') !== settings.workHeroImage) workImg.src = settings.workHeroImage;
+      workImg.style.display = 'block';
+      if (settings.workHeroPosition) workImg.style.setProperty('object-position', settings.workHeroPosition, 'important');
+    });
+  }
+  applyColorFilter(document.querySelectorAll('#work-hero-img, .work-hero-visual img, .work-hero img'), settings.workHeroColorMode, 'original');
+
+  if (settings.playgroundHeroImage) {
+    document.querySelectorAll('#pg-hero-img, .pg-hero-visual img, .pg-hero img, .playground-hero img').forEach(pgImg => {
+      if (pgImg.getAttribute('src') !== settings.playgroundHeroImage) pgImg.src = settings.playgroundHeroImage;
+      pgImg.style.display = 'block';
+      if (settings.playgroundHeroPosition) pgImg.style.setProperty('object-position', settings.playgroundHeroPosition, 'important');
+    });
+  }
+  applyColorFilter(document.querySelectorAll('#pg-hero-img, .pg-hero-visual img, .pg-hero img, .playground-hero img'), settings.playgroundHeroColorMode, 'original');
+
+  if (settings.journalHeroImage) {
+    document.querySelectorAll('#journal-hero-img, .journal-hero-visual img, .journal-hero img').forEach(journalImg => {
+      if (journalImg.getAttribute('src') !== settings.journalHeroImage) journalImg.src = settings.journalHeroImage;
+      journalImg.style.display = 'block';
+      if (settings.journalHeroPosition) journalImg.style.setProperty('object-position', settings.journalHeroPosition, 'important');
+    });
+  }
+  applyColorFilter(document.querySelectorAll('#journal-hero-img, .journal-hero-visual img, .journal-hero img'), settings.journalHeroColorMode, 'original');
+
+  // Contact Email & CV Link
+  document.querySelectorAll('#footer-email-link').forEach(emailLink => {
+    if (settings.email) {
+      emailLink.href = `mailto:${settings.email}`;
+      emailLink.innerHTML = `<span>✉</span>${settings.email}`;
+    }
+  });
+
+  document.querySelectorAll('#footer-cv-link, a.resume, .download-cv-btn').forEach(cvLink => {
+    if (settings.resumeUrl) {
+      cvLink.href = settings.resumeUrl;
+      cvLink.target = '_blank';
+      cvLink.setAttribute('download', '');
+    }
+  });
+
+  // Social Links Container
+  const socialContainer = document.querySelector('#footer-social-links');
+  if (socialContainer) {
+    const svgIcons = {
+      linkedin: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect width="4" height="12" x="2" y="9"/><circle cx="4" cy="4" r="2"/></svg>',
+      behance: '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M7.7 11.2c1.2 0 2-.6 2-1.7 0-1-.8-1.5-1.8-1.5H3.5v3.2h4.2zm.3 3.3c1.4 0 2.3-.7 2.3-1.8 0-1.2-1-1.8-2.3-1.8H3.5v3.6H8zm9.5-1.8c0-1.8-1.3-3.2-3.1-3.2-1.9 0-3.3 1.5-3.3 3.3 0 1.9 1.4 3.4 3.4 3.4 1.5 0 2.6-.8 3-2.1h-1.6c-.3.6-.8.9-1.4.9-1 0-1.7-.6-1.8-1.6h4.8v-.6zm-4.7-.8c.1-.8.7-1.3 1.6-1.3.8 0 1.4.5 1.5 1.3h-3.1zM13 7.8h3.6v.9H13v-.9zM0 5.4h8.3c2.4 0 4.1 1.2 4.1 3.2 0 1.2-.6 2.2-1.6 2.7 1.4.5 2.1 1.6 2.1 3.1 0 2.3-1.9 3.8-4.6 3.8H0V5.4z"/></svg>',
+      instagram: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>',
+      dribbble: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M19.13 5.09C15.22 9.14 10 10.44 2.25 10.94"/><path d="M21.75 12.84c-6.62-1.41-12.14 1-16.38 6.32"/><path d="M8.56 2.75c4.37 6 6 9.42 8 17.72"/></svg>',
+      twitter: '<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>',
+      youtube: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17"/><polygon points="10 15 15 12 10 9 10 15"/></svg>'
+    };
+
+    const links = [];
+    if (settings.socialLinkedIn && settings.socialLinkedIn.trim()) links.push({ name: 'LinkedIn', url: settings.socialLinkedIn.trim(), icon: svgIcons.linkedin });
+    if (settings.socialBehance && settings.socialBehance.trim()) links.push({ name: 'Behance', url: settings.socialBehance.trim(), icon: svgIcons.behance });
+    if (settings.socialInstagram && settings.socialInstagram.trim()) links.push({ name: 'Instagram', url: settings.socialInstagram.trim(), icon: svgIcons.instagram });
+    if (settings.socialDribbble && settings.socialDribbble.trim()) links.push({ name: 'Dribbble', url: settings.socialDribbble.trim(), icon: svgIcons.dribbble });
+    if (settings.socialTwitter && settings.socialTwitter.trim()) links.push({ name: 'Twitter / X', url: settings.socialTwitter.trim(), icon: svgIcons.twitter });
+    if (settings.socialYoutube && settings.socialYoutube.trim()) links.push({ name: 'YouTube', url: settings.socialYoutube.trim(), icon: svgIcons.youtube });
+
+    // Fallback defaults if none configured yet
+    if (!links.length) {
+      links.push(
+        { name: 'LinkedIn', url: 'https://linkedin.com', icon: svgIcons.linkedin },
+        { name: 'Behance', url: 'https://behance.net', icon: svgIcons.behance },
+        { name: 'Instagram', url: 'https://instagram.com', icon: svgIcons.instagram }
+      );
+    }
+
+    socialContainer.innerHTML = links.map(item => `
+      <a class="social-link-pill" href="${item.url}" target="_blank" rel="noopener noreferrer">
+        ${item.icon}
+        <span>${item.name}</span>
+      </a>
+    `).join('');
+  }
+};
+
+// 1. Instant synchronous apply from localStorage so there is ZERO delay or flash on page load
+try {
+  const cachedSettings = JSON.parse(localStorage.getItem('ak_portfolio_settings') || '{}');
+  if (cachedSettings && Object.keys(cachedSettings).length > 0) {
+    applySettingsToDOM(cachedSettings);
+  }
+} catch (e) {}
+
+// 2. Fetch latest settings from server asynchronously to sync in background
 (async () => {
   try {
     const res = await fetch('/api/settings');
     if (!res.ok) return;
     const settings = await res.json();
-
-    // Helper function to apply color filter safely
-    const applyColorFilter = (elements, mode, defaultMode = 'original') => {
-      const activeMode = mode || defaultMode;
-      let filterVal = 'none';
-      if (activeMode === 'gray' || activeMode === 'monochrome' || activeMode === 'classic-gray') {
-        filterVal = 'grayscale(100%) contrast(1.1)';
-      } else if (activeMode === 'warm-gray' || activeMode === 'warm-vintage' || activeMode === 'vintage') {
-        filterVal = 'grayscale(90%) sepia(20%) contrast(1.1)';
-      }
-      elements.forEach(el => {
-        el.style.setProperty('filter', filterVal, 'important');
-      });
-    };
-
-    // Dynamic Hero Images & Focal Repositioning & Color Modes from Admin Settings
-    if (settings.homeHeroImage) {
-      document.querySelectorAll('.portrait-wrap img, .hero-visual img').forEach(img => {
-        img.src = settings.homeHeroImage;
-        if (settings.homeHeroPosition) img.style.setProperty('object-position', settings.homeHeroPosition, 'important');
-      });
+    if (settings) {
+      applySettingsToDOM(settings);
+      try {
+        localStorage.setItem('ak_portfolio_settings', JSON.stringify(settings));
+      } catch (e) {}
     }
-    applyColorFilter(document.querySelectorAll('.portrait-wrap img, .hero-visual img'), settings.homeHeroColorMode, 'original');
-
-    if (settings.homeCenterImage) {
-      document.querySelectorAll('.about-image img').forEach(img => {
-        img.src = settings.homeCenterImage;
-        if (settings.homeCenterPosition) img.style.setProperty('object-position', settings.homeCenterPosition, 'important');
-      });
-    }
-    applyColorFilter(document.querySelectorAll('.about-image img'), settings.homeCenterColorMode, 'gray');
-
-    if (settings.aboutHeroImage) {
-      document.querySelectorAll('.about-portrait img').forEach(img => {
-        img.src = settings.aboutHeroImage;
-        if (settings.aboutHeroPosition) img.style.setProperty('object-position', settings.aboutHeroPosition, 'important');
-      });
-    }
-    applyColorFilter(document.querySelectorAll('.about-portrait img'), settings.aboutHeroColorMode, 'original');
-
-    if (settings.workHeroImage) {
-      document.querySelectorAll('#work-hero-img, .work-hero-visual img, .work-hero img').forEach(workImg => {
-        workImg.src = settings.workHeroImage;
-        workImg.style.display = 'block';
-        if (settings.workHeroPosition) workImg.style.setProperty('object-position', settings.workHeroPosition, 'important');
-      });
-    }
-    applyColorFilter(document.querySelectorAll('#work-hero-img, .work-hero-visual img, .work-hero img'), settings.workHeroColorMode, 'original');
-
-    if (settings.playgroundHeroImage) {
-      document.querySelectorAll('#pg-hero-img, .pg-hero-visual img, .pg-hero img, .playground-hero img').forEach(pgImg => {
-        pgImg.src = settings.playgroundHeroImage;
-        pgImg.style.display = 'block';
-        if (settings.playgroundHeroPosition) pgImg.style.setProperty('object-position', settings.playgroundHeroPosition, 'important');
-      });
-    }
-    applyColorFilter(document.querySelectorAll('#pg-hero-img, .pg-hero-visual img, .pg-hero img, .playground-hero img'), settings.playgroundHeroColorMode, 'original');
-
-    if (settings.journalHeroImage) {
-      document.querySelectorAll('#journal-hero-img, .journal-hero-visual img, .journal-hero img').forEach(journalImg => {
-        journalImg.src = settings.journalHeroImage;
-        journalImg.style.display = 'block';
-        if (settings.journalHeroPosition) journalImg.style.setProperty('object-position', settings.journalHeroPosition, 'important');
-      });
-    }
-    applyColorFilter(document.querySelectorAll('#journal-hero-img, .journal-hero-visual img, .journal-hero img'), settings.journalHeroColorMode, 'original');
-
-
-
-
-    // Contact Email & CV Link
-    document.querySelectorAll('#footer-email-link').forEach(emailLink => {
-      if (settings.email) {
-        emailLink.href = `mailto:${settings.email}`;
-        emailLink.innerHTML = `<span>✉</span>${settings.email}`;
-      }
-    });
-
-    document.querySelectorAll('#footer-cv-link, a.resume, .download-cv-btn').forEach(cvLink => {
-      if (settings.resumeUrl) {
-        cvLink.href = settings.resumeUrl;
-        cvLink.target = '_blank';
-        cvLink.setAttribute('download', '');
-      }
-    });
-
-
-
-    // Social Links Container
-    const socialContainer = document.querySelector('#footer-social-links');
-    if (socialContainer) {
-      const svgIcons = {
-        linkedin: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect width="4" height="12" x="2" y="9"/><circle cx="4" cy="4" r="2"/></svg>',
-        behance: '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M7.7 11.2c1.2 0 2-.6 2-1.7 0-1-.8-1.5-1.8-1.5H3.5v3.2h4.2zm.3 3.3c1.4 0 2.3-.7 2.3-1.8 0-1.2-1-1.8-2.3-1.8H3.5v3.6H8zm9.5-1.8c0-1.8-1.3-3.2-3.1-3.2-1.9 0-3.3 1.5-3.3 3.3 0 1.9 1.4 3.4 3.4 3.4 1.5 0 2.6-.8 3-2.1h-1.6c-.3.6-.8.9-1.4.9-1 0-1.7-.6-1.8-1.6h4.8v-.6zm-4.7-.8c.1-.8.7-1.3 1.6-1.3.8 0 1.4.5 1.5 1.3h-3.1zM13 7.8h3.6v.9H13v-.9zM0 5.4h8.3c2.4 0 4.1 1.2 4.1 3.2 0 1.2-.6 2.2-1.6 2.7 1.4.5 2.1 1.6 2.1 3.1 0 2.3-1.9 3.8-4.6 3.8H0V5.4z"/></svg>',
-        instagram: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>',
-        dribbble: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M19.13 5.09C15.22 9.14 10 10.44 2.25 10.94"/><path d="M21.75 12.84c-6.62-1.41-12.14 1-16.38 6.32"/><path d="M8.56 2.75c4.37 6 6 9.42 8 17.72"/></svg>',
-        twitter: '<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>',
-        youtube: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17"/><polygon points="10 15 15 12 10 9 10 15"/></svg>'
-      };
-
-      const links = [];
-      if (settings.socialLinkedIn && settings.socialLinkedIn.trim()) links.push({ name: 'LinkedIn', url: settings.socialLinkedIn.trim(), icon: svgIcons.linkedin });
-      if (settings.socialBehance && settings.socialBehance.trim()) links.push({ name: 'Behance', url: settings.socialBehance.trim(), icon: svgIcons.behance });
-      if (settings.socialInstagram && settings.socialInstagram.trim()) links.push({ name: 'Instagram', url: settings.socialInstagram.trim(), icon: svgIcons.instagram });
-      if (settings.socialDribbble && settings.socialDribbble.trim()) links.push({ name: 'Dribbble', url: settings.socialDribbble.trim(), icon: svgIcons.dribbble });
-      if (settings.socialTwitter && settings.socialTwitter.trim()) links.push({ name: 'Twitter / X', url: settings.socialTwitter.trim(), icon: svgIcons.twitter });
-      if (settings.socialYoutube && settings.socialYoutube.trim()) links.push({ name: 'YouTube', url: settings.socialYoutube.trim(), icon: svgIcons.youtube });
-
-      // Fallback defaults if none configured yet
-      if (!links.length) {
-        links.push(
-          { name: 'LinkedIn', url: 'https://linkedin.com', icon: svgIcons.linkedin },
-          { name: 'Behance', url: 'https://behance.net', icon: svgIcons.behance },
-          { name: 'Instagram', url: 'https://instagram.com', icon: svgIcons.instagram }
-        );
-      }
-
-      socialContainer.innerHTML = links.map(item => `
-        <a class="social-link-pill" href="${item.url}" target="_blank" rel="noopener noreferrer">
-          ${item.icon}
-          <span>${item.name}</span>
-        </a>
-      `).join('');
-    }
-  } catch {}
+  } catch (e) {}
 })();
 
 /* =====================================================

@@ -2,7 +2,23 @@
 <html lang="en" class="ak-intro-active">
 
 <head>
-  <script>try { if (sessionStorage.getItem('ak_intro_seen_v1') === 'true') { document.documentElement.classList.remove('ak-intro-active'); } } catch (e) { }</script>
+  <script>
+    try { if (sessionStorage.getItem('ak_intro_seen_v1') === 'true') { document.documentElement.classList.remove('ak-intro-active'); } } catch (e) { }
+    try {
+      var s = JSON.parse(localStorage.getItem('ak_portfolio_settings') || '{}');
+      if (s) {
+        var css = '';
+        if (s.homeHeroPosition) css += '.portrait-wrap img, .hero-visual img { object-position: ' + s.homeHeroPosition + ' !important; } ';
+        if (s.homeCenterPosition) css += '.about-image img { object-position: ' + s.homeCenterPosition + ' !important; } ';
+        if (s.homeCenterColorMode && s.homeCenterColorMode !== 'original') css += '.about-image img { filter: grayscale(100%) contrast(1.1) !important; } ';
+        if (css) {
+          var st = document.createElement('style');
+          st.textContent = css;
+          document.head.appendChild(st);
+        }
+      }
+    } catch(e) {}
+  </script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description"
@@ -228,7 +244,7 @@
         <div class="orbit orbit-two"></div>
         <div class="orbital-dot"></div>
         <div class="portrait-wrap"><img
-            src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=1000&q=90"
+            src="uploads/1786434732886-2p7z9y.png"
             alt="Portrait of Abi Krishna" /></div>
         <p class="scroll-note">SCROLL TO EXPLORE <i></i></p>
       </div>
@@ -279,11 +295,11 @@
     </section>
 
     <section class="metrics section" id="metrics">
-      <div><b id="home-stat1-val">4.5+</b><span id="home-stat1-lbl">Years<br />Experience</span></div>
-      <div><b id="home-stat2-val">1200+</b><span id="home-stat2-lbl">UI Screens<br />Designed</span></div>
-      <div><b id="home-stat3-val">20+</b><span id="home-stat3-lbl">Digital Products<br />& Brands</span></div>
-      <div><b id="home-stat4-val">5+</b><span id="home-stat4-lbl">Products Concept<br />to Launch</span></div>
-      <div><b id="home-stat5-val">15+</b><span id="home-stat5-lbl">Clients &<br />Business Solutions</span></div>
+      <div><b id="home-stat1-val">6+</b><span id="home-stat1-lbl">Years Experience</span></div>
+      <div><b id="home-stat2-val">1200+</b><span id="home-stat2-lbl">UI Screens Designed</span></div>
+      <div><b id="home-stat3-val">20+</b><span id="home-stat3-lbl">Digital Products & Brands</span></div>
+      <div><b id="home-stat4-val">5+</b><span id="home-stat4-lbl">Products Concept to Launch</span></div>
+      <div><b id="home-stat5-val">15+</b><span id="home-stat5-lbl">Clients & Business Solutions</span></div>
     </section>
 
     <section class="process section" id="process">
@@ -309,12 +325,13 @@
         <p>Abi combines curiosity, empathy and sharp product thinking. He makes complex experiences feel effortless.
         </p>
         <div class="person"><img
-            src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=120&q=80"
-            alt="" /><span><b>Sanya Mehra</b><small>Founder, Noma Health</small></span></div>
+            src="uploads/1786101374672-b6fmwg.png"
+            alt="" /><span><b>abi</b><small>Founder, flubn</small></span></div>
       </article>
       <div class="about-image reveal delay-1"><img
-          src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=750&q=90"
-          alt="Abi Krishna in profile" /></div>
+          src="uploads/1786440847869-4jyion.png"
+          alt="Abi Krishna in profile"
+          style="filter: grayscale(100%) contrast(1.1) !important;" /></div>
       <article class="about-copy reveal delay-2">
         <p class="label">✦ ABOUT ME</p>
         <h2>I design digital products that balance user needs with <em>business goals.</em></h2>

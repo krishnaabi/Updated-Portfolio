@@ -16,6 +16,20 @@
   <link
     href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap"
     rel="stylesheet" />
+  <script>
+    try {
+      var s = JSON.parse(localStorage.getItem('ak_portfolio_settings') || '{}');
+      if (s) {
+        var css = '';
+        if (s.workHeroPosition) css += '#work-hero-img, .work-hero-visual img { object-position: ' + s.workHeroPosition + ' !important; } ';
+        if (css) {
+          var st = document.createElement('style');
+          st.textContent = css;
+          document.head.appendChild(st);
+        }
+      }
+    } catch(e) {}
+  </script>
   <link rel="stylesheet" href="styles.css" />
   <link rel="stylesheet" href="enhancements.css?v=63" />
   <link rel="stylesheet" href="responsive.css?v=5" />
@@ -52,7 +66,7 @@
         <a class="scroll-cta" href="#projects"><span>↓</span> Scroll to explore</a>
       </div>
       <div class="work-hero-visual" id="work-hero-visual">
-        <img src="" alt="Work Hero" id="work-hero-img" style="display:none;" />
+        <img src="uploads/1786448592290-wcivgv.png" alt="Work Hero" id="work-hero-img" style="display:block;" />
       </div>
     </section>
 
