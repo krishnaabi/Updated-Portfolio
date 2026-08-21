@@ -280,11 +280,10 @@
     const btnList = document.querySelector('#btn-view-list');
     const hintText = document.querySelector('#galaxy-hint-text');
 
-    let currentMode = localStorage.getItem('ak_portal_view_mode') || 'galaxy';
+    let currentMode = 'galaxy'; // Always default to Galaxy View on page load and refresh
 
     function setViewMode(mode) {
       currentMode = mode;
-      localStorage.setItem('ak_portal_view_mode', mode);
 
       if (mode === 'galaxy') {
         btnGalaxy?.classList.add('active');
@@ -310,7 +309,7 @@
     if (btnGalaxy) btnGalaxy.onclick = () => setViewMode('galaxy');
     if (btnList) btnList.onclick = () => setViewMode('list');
 
-    setViewMode(currentMode);
+    setViewMode('galaxy');
 
     // ══════════════════════════════════════════════════════════
     // 4. SILKY-SMOOTH GALAXY PHYSICS & FLUID DRAG/FLING ENGINE
