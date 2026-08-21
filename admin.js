@@ -3707,9 +3707,8 @@ function renderLiveWorksList() {
               <span style="font-size:10px;font-family:'DM Mono',monospace;color:#888;">${escapeHtml(sizeTierLabel)}</span>
             </div>
           </div>
-          <h4 style="margin:0 0 4px;font-size:16px;font-weight:800;color:#111;">${escapeHtml(item.title)}</h4>
-          <p style="margin:0 0 8px;font-size:12.5px;color:#666;line-height:1.4;">${escapeHtml(item.description || '')}</p>
-          <div style="font-size:11px;font-family:'DM Mono',monospace;color:#888;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+          <h4 style="margin:0 0 6px;font-size:16px;font-weight:800;color:#111;">${escapeHtml(item.title)}</h4>
+          <div style="font-size:11.5px;font-family:'DM Mono',monospace;color:#888;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
             <span>✦ ${escapeHtml(item.category)}</span>
             <span>·</span>
             <a href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer" style="color:var(--accent,#ff4e1b);text-decoration:none;font-weight:700;">Test Link ↗</a>
@@ -3744,7 +3743,6 @@ window.editLiveWork = function(id) {
   const iconEl = document.querySelector('#lw-icon-input');
   const colorEl = document.querySelector('#lw-color-input');
   const logoUrlEl = document.querySelector('#lw-logo-url-input');
-  const descEl = document.querySelector('#lw-desc-input');
   const formTitle = document.querySelector('#lw-form-title');
   const cancelBtn = document.querySelector('#cancel-live-work-btn');
 
@@ -3757,7 +3755,6 @@ window.editLiveWork = function(id) {
   if (iconEl) iconEl.value = item.icon_text || '';
   if (colorEl) colorEl.value = item.accent_color || '#ff4e1b';
   if (logoUrlEl) logoUrlEl.value = item.image || item.custom_icon_url || '';
-  if (descEl) descEl.value = item.description || '';
   if (formTitle) formTitle.textContent = `Edit Portal Node: "${item.title}"`;
   if (cancelBtn) cancelBtn.style.display = 'inline-block';
 
@@ -3862,7 +3859,6 @@ if (saveLiveWorkBtn) {
     const iconEl = document.querySelector('#lw-icon-input');
     const colorEl = document.querySelector('#lw-color-input');
     const logoUrlEl = document.querySelector('#lw-logo-url-input');
-    const descEl = document.querySelector('#lw-desc-input');
     const formTitle = document.querySelector('#lw-form-title');
 
     const title = (titleEl ? titleEl.value : '').trim();
@@ -3873,7 +3869,6 @@ if (saveLiveWorkBtn) {
     const icon_text = (iconEl ? iconEl.value : '').trim() || (title ? title.slice(0, 2).toUpperCase() : '⚡');
     const accent_color = colorEl ? colorEl.value : '#ff4e1b';
     const image = (logoUrlEl ? logoUrlEl.value : '').trim();
-    const description = (descEl ? descEl.value : '').trim();
     const existingId = idEl ? idEl.value.trim() : '';
 
     if (!title) {
@@ -3897,8 +3892,7 @@ if (saveLiveWorkBtn) {
           badge_status,
           icon_text,
           accent_color,
-          image,
-          description
+          image
         };
       }
     } else {
@@ -3912,7 +3906,6 @@ if (saveLiveWorkBtn) {
         icon_text,
         accent_color,
         image,
-        description,
         display_order: allLiveWorksData.length + 1
       };
       allLiveWorksData.unshift(newWork);
@@ -3927,7 +3920,6 @@ if (saveLiveWorkBtn) {
     if (urlEl) urlEl.value = '';
     if (iconEl) iconEl.value = '';
     if (logoUrlEl) logoUrlEl.value = '';
-    if (descEl) descEl.value = '';
     if (formTitle) formTitle.textContent = 'Add New Circular Portal Node';
     if (cancelLiveWorkBtn) cancelLiveWorkBtn.style.display = 'none';
 
@@ -3943,7 +3935,6 @@ if (cancelLiveWorkBtn) {
     const urlEl = document.querySelector('#lw-url-input');
     const iconEl = document.querySelector('#lw-icon-input');
     const logoUrlEl = document.querySelector('#lw-logo-url-input');
-    const descEl = document.querySelector('#lw-desc-input');
     const formTitle = document.querySelector('#lw-form-title');
 
     if (idEl) idEl.value = '';
@@ -3951,7 +3942,6 @@ if (cancelLiveWorkBtn) {
     if (urlEl) urlEl.value = '';
     if (iconEl) iconEl.value = '';
     if (logoUrlEl) logoUrlEl.value = '';
-    if (descEl) descEl.value = '';
     if (formTitle) formTitle.textContent = 'Add New Circular Portal Node';
     cancelLiveWorkBtn.style.display = 'none';
     updateLivePreviewNode();
