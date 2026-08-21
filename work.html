@@ -39,7 +39,7 @@
   <link rel="stylesheet" href="experience.css?v=1" />
   <link rel="stylesheet" href="process-enhance.css?v=1" />
   <link rel="stylesheet" href="work.css?v=9" />
-  <link rel="stylesheet" href="kinetic-dock.css?v=1" />
+  <link rel="stylesheet" href="kinetic-dock.css?v=2" />
 </head>
 
 <body class="work-page">
@@ -72,18 +72,39 @@
     </section>
 
     <!-- ══════════════════════════════════════════════════════════ -->
-    <!-- KINETIC GALAXY — ZERO-GRAVITY INTERACTIVE ORB PORTALS -->
+    <!-- KINETIC GALAXY — ZERO-GRAVITY ORB PORTALS & LAUNCHPAD LIST -->
     <!-- ══════════════════════════════════════════════════════════ -->
-    <section class="kinetic-galaxy-stage reveal" id="kinetic-galaxy-stage" aria-label="Interactive Live Portals Galaxy">
+    <section class="kinetic-galaxy-stage reveal" id="kinetic-galaxy-stage" aria-label="Interactive Live Portals Galaxy & Launchpad">
       <div class="galaxy-header">
-        <div class="galaxy-badge">
-          <span class="galaxy-radar-dot"></span>
-          <span id="galaxy-count-badge">✦ Interactive Live Portals</span>
+        <div class="galaxy-header-left">
+          <div class="galaxy-badge">
+            <span class="galaxy-radar-dot"></span>
+            <span id="galaxy-count-badge">08 Live Portals</span>
+          </div>
+          <!-- View Mode Switcher Pill -->
+          <div class="galaxy-view-switcher" role="tablist" aria-label="Portals View Switcher">
+            <button type="button" class="galaxy-view-btn active" id="btn-view-galaxy" role="tab" aria-selected="true">
+              <span>🔮</span> Galaxy View
+            </button>
+            <button type="button" class="galaxy-view-btn" id="btn-view-list" role="tab" aria-selected="false">
+              <span>📑</span> List View
+            </button>
+          </div>
         </div>
-        <div class="galaxy-hint">
-          <span>✦ Drag or fling orbs · Click to launch</span>
+        <div class="galaxy-hint" id="galaxy-hint-box">
+          <span id="galaxy-hint-text">✦ Drag or fling orbs · Click to launch</span>
           <kbd>↗</kbd>
         </div>
+      </div>
+
+      <!-- Mode 1: Zero-Gravity Physics Galaxy View -->
+      <div class="galaxy-physics-view" id="galaxy-physics-view">
+        <!-- Rendered by kinetic-dock.js -->
+      </div>
+
+      <!-- Mode 2: Clean Launchpad List View -->
+      <div class="galaxy-list-view hidden" id="galaxy-list-view">
+        <!-- Rendered by kinetic-dock.js -->
       </div>
     </section>
 
@@ -132,7 +153,7 @@
   <script src="icons.js?v=2" defer></script>
   <script src="supabase-config.js"></script>
   <script src="content-render.js?v=105"></script>
-  <script src="kinetic-dock.js?v=1" defer></script>
+  <script src="kinetic-dock.js?v=2" defer></script>
   <script src="work-stack.js" defer></script>
   <script src="motion.js" defer></script>
   <script src="process-enhance.js" defer></script>
