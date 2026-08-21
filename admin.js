@@ -312,6 +312,22 @@ async function apiFetch(path, options = {}) {
           headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}` }
         });
         if (sbRes.ok) return sbRes;
+      } else if (path === '/api/projects/reorder' && options.method === 'POST') {
+        const items = JSON.parse(options.body || '[]');
+        if (Array.isArray(items)) {
+          for (let i = 0; i < items.length; i++) {
+            const item = items[i];
+            const id = typeof item === 'object' ? item.id : item;
+            if (id) {
+              await fetch(`${sbUrl}/rest/v1/portfolio_content?id=eq.${encodeURIComponent(id)}`, {
+                method: 'PATCH',
+                headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ display_order: i + 1 })
+              }).catch(() => {});
+            }
+          }
+        }
+        return { ok: true, status: 200, json: async () => ({ ok: true }) };
       }
     } catch (e) {}
   }
@@ -1030,22 +1046,56 @@ const setSavedMilestonesOrder = data => {
 };
 
 function renderProjectsList() {
-  const active = $('#content-filter')?.value || 'all';
+  const active = ($('#content-filter')?.value || 'all').toLowerCase();
   
   const filtered = active === 'all' ? allProjectsData : allProjectsData.filter(item => {
-    const cat = (item.category || '').toLowerCase();
-    const typeStr = cat.split('|')[0];
-    return typeStr === active.toLowerCase() || cat.startsWith(`${active}|`);
+    const rawCat = (item.category || '').toLowerCase();
+    const catParts = rawCat.split('|').map(s => s.trim());
+    const typeStr = catParts[0] || 'work';
+    const sectionStr = catParts[1] || 'main';
+
+    if (active === 'work') return typeStr === 'work';
+    if (active === 'journal') return typeStr === 'journal';
+    if (active === 'playground') return typeStr === 'playground';
+
+    if (active === 'playground|experiments' || active === 'experiments') {
+      return typeStr === 'playground' && (sectionStr === 'experiments' || sectionStr === 'interactive' || sectionStr === 'main' || !['sketches', 'fun'].includes(sectionStr));
+    }
+    if (active === 'playground|sketches' || active === 'sketches') {
+      return typeStr === 'playground' && (sectionStr === 'sketches' || sectionStr === 'sketch');
+    }
+    if (active === 'playground|fun' || active === 'fun') {
+      return typeStr === 'playground' && (sectionStr === 'fun' || sectionStr === 'visual');
+    }
+
+    return typeStr === active || rawCat.startsWith(`${active}|`) || rawCat === active;
   });
   
   list.innerHTML = filtered.length ? filtered.map((item, idx) => {
     const catParts = (item.category || 'work|main|Product Design').split('|');
     const itemType = catParts[0] || 'work';
-    const displayCategory = catParts.length > 2 ? catParts.slice(2).join('|') : catParts.slice(1).join('|') || 'Product Design';
+    const sectionKey = catParts[1] || 'main';
+    
+    let sectionBadge = '';
+    let displayCategory = '';
+    
+    if (itemType === 'playground') {
+      if (sectionKey === 'sketches') {
+        sectionBadge = '✏️ Quick sketches & Wireframes';
+      } else if (sectionKey === 'fun') {
+        sectionBadge = '🎨 Just for fun & Visual Tests';
+      } else {
+        sectionBadge = '⚡ Interactive Explorations';
+      }
+      displayCategory = catParts.length > 2 ? catParts.slice(2).join('|') : (catParts.length > 1 ? catParts[1] : 'Exploration');
+    } else {
+      displayCategory = catParts.length > 2 ? catParts.slice(2).join('|') : catParts.slice(1).join('|') || 'Product Design';
+    }
+
     const isFeatured = Boolean(item.featured);
     const typeLabel = itemType.toUpperCase();
     const canFeature = itemType !== 'playground';
-    const canReorder = itemType === 'work';
+    const canReorder = true;
     const isFirst = idx === 0;
     const isLast = idx === filtered.length - 1;
     
@@ -1053,6 +1103,7 @@ function renderProjectsList() {
       <div class="content-row-main">
         <div class="content-row-header">
           <span class="type-badge badge-${escapeHtml(itemType)}">${escapeHtml(typeLabel)}</span>
+          ${sectionBadge ? `<span class="section-pill badge-pg-section">${escapeHtml(sectionBadge)}</span>` : ''}
           <span class="cat-pill">${escapeHtml(displayCategory)}</span>
           ${(isFeatured && canFeature) ? '<span class="feature-badge">✦ FEATURED ON HOME</span>' : ''}
         </div>
@@ -1067,8 +1118,8 @@ function renderProjectsList() {
       </div>
       <div class="actions">
         ${canReorder ? `
-        <button type="button" class="btn-move-up" data-move-proj-up="${item.id}" ${isFirst ? 'disabled' : ''} style="padding:6px 10px;border:1px solid #ddd;border-radius:8px;background:${isFirst ? '#f5f5f5' : '#fff'};color:${isFirst ? '#aaa' : '#333'};cursor:${isFirst ? 'default' : 'pointer'};font-weight:700;">↑ Up</button>
-        <button type="button" class="btn-move-down" data-move-proj-down="${item.id}" ${isLast ? 'disabled' : ''} style="padding:6px 10px;border:1px solid #ddd;border-radius:8px;background:${isLast ? '#f5f5f5' : '#fff'};color:${isLast ? '#aaa' : '#333'};cursor:${isLast ? 'default' : 'pointer'};font-weight:700;">↓ Down</button>` : ''}
+        <button type="button" class="btn-move-up" data-move-proj-up="${item.id}" ${isFirst ? 'disabled' : ''} title="Move position up">↑ Up</button>
+        <button type="button" class="btn-move-down" data-move-proj-down="${item.id}" ${isLast ? 'disabled' : ''} title="Move position down">↓ Down</button>` : ''}
         <button class="btn-edit" data-edit-id="${item.id}">✏️ Edit</button>
         ${canFeature ? `
         <button class="${isFeatured ? 'btn-unfeature' : 'btn-feature'}" data-toggle-featured="${item.id}" data-state="${isFeatured}">
@@ -1100,12 +1151,12 @@ function renderProjectsList() {
       renderProjectsList();
 
       try {
-        const res = await fetch('/api/projects/reorder', {
+        const res = await apiFetch('/api/projects/reorder', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(allProjectsData)
         });
-        if (res.ok) {
+        if (res && res.ok) {
           const updated = await res.json();
           if (Array.isArray(updated) && updated.length) {
             allProjectsData = updated;

@@ -14,7 +14,7 @@
   <link
     href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500;600&family=Manrope:wght@400;500;600;700;800&display=swap"
     rel="stylesheet" />
-  <link rel="stylesheet" href="admin.css?v=25" />
+  <link rel="stylesheet" href="admin.css?v=55" />
   <link rel="preload" as="image" href="assets/ak-logo-exact.png" />
 </head>
 
@@ -423,7 +423,10 @@
           <select id="content-filter" class="filter-select">
             <option value="all">All Published Items</option>
             <option value="work">Work Items</option>
-            <option value="playground">Playground Items</option>
+            <option value="playground">Playground (All Items)</option>
+            <option value="playground|experiments">⚡ Playground: Interactive Explorations</option>
+            <option value="playground|sketches">✏️ Playground: Quick sketches &amp; Wireframes</option>
+            <option value="playground|fun">🎨 Playground: Just for fun &amp; Visual Tests</option>
             <option value="journal">Journal Articles</option>
           </select>
         </div>
@@ -1243,7 +1246,7 @@
   </main>
 
   <script src="supabase-config.js"></script>
-  <script src="admin.js?v=44"></script>
+  <script src="admin.js?v=55"></script>
 </body>
 
 </html>
