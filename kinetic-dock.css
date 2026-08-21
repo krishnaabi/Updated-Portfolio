@@ -1,0 +1,388 @@
+/* ═══════════════════════════════════════════════════════════════
+   KINETIC GALAXY — ZERO-GRAVITY INTERACTIVE ORB PORTALS
+   "Make You Proud" Masterpiece Edition · Award-Winning Craft
+   ═══════════════════════════════════════════════════════════════ */
+
+.kinetic-galaxy-stage {
+  position: relative;
+  width: 100%;
+  max-width: 1320px;
+  margin: 50px auto 70px auto;
+  height: 480px;
+  background: radial-gradient(circle at 50% 30%, rgba(255, 78, 27, 0.04) 0%, transparent 60%),
+              radial-gradient(circle at 20% 80%, rgba(121, 40, 202, 0.03) 0%, transparent 50%),
+              linear-gradient(180deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 246, 243, 0.95) 100%);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 36px;
+  box-shadow: 0 30px 80px -20px rgba(0, 0, 0, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  overflow: hidden;
+  box-sizing: border-box;
+  user-select: none;
+  touch-action: none;
+  cursor: default;
+}
+
+[data-theme="dark"] .kinetic-galaxy-stage,
+body.theme-dark .kinetic-galaxy-stage {
+  background: radial-gradient(circle at 50% 30%, rgba(255, 78, 27, 0.07) 0%, transparent 60%),
+              radial-gradient(circle at 20% 80%, rgba(121, 40, 202, 0.05) 0%, transparent 50%),
+              linear-gradient(180deg, #141417 0%, #0c0c0e 100%);
+  border-color: rgba(255, 255, 255, 0.07);
+  box-shadow: 0 35px 90px -25px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+/* Ambient Floating Backdrop Grid / Particles */
+.galaxy-ambient-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Header & Micro Instructions */
+.galaxy-header {
+  position: absolute;
+  top: 24px;
+  left: 32px;
+  right: 32px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.galaxy-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #ff4e1b;
+  background: rgba(255, 78, 27, 0.08);
+  padding: 6px 14px;
+  border-radius: 100px;
+  border: 1px solid rgba(255, 78, 27, 0.2);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  pointer-events: auto;
+}
+
+.galaxy-radar-dot {
+  width: 6.5px;
+  height: 6.5px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 8px #10b981;
+  animation: galaxyPing 2s infinite ease-in-out;
+}
+
+@keyframes galaxyPing {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.4); opacity: 0.4; }
+}
+
+.galaxy-hint {
+  font-family: 'DM Mono', monospace;
+  font-size: 11.5px;
+  color: #888;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.6);
+  padding: 5px 12px;
+  border-radius: 100px;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  backdrop-filter: blur(10px);
+}
+
+[data-theme="dark"] .galaxy-hint,
+body.theme-dark .galaxy-hint {
+  background: rgba(20, 20, 24, 0.6);
+  border-color: rgba(255, 255, 255, 0.08);
+  color: #999;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   FLOATING ZERO-GRAVITY 3D ORB NODES
+   ═══════════════════════════════════════════════════════════════ */
+.galaxy-orb-node {
+  position: absolute;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: grab;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transform-origin: center center;
+  z-index: 5;
+  will-change: transform, left, top;
+}
+
+.galaxy-orb-node:active {
+  cursor: grabbing;
+}
+
+/* 3D Specular Glass Sphere Shell */
+.galaxy-orb-shell {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at 35% 25%, rgba(255, 255, 255, 0.98) 0%, rgba(246, 244, 240, 0.92) 50%, rgba(230, 226, 218, 0.85) 100%);
+  border: 1.5px solid rgba(255, 255, 255, 0.9);
+  box-shadow: 0 12px 28px -6px rgba(0, 0, 0, 0.12),
+              0 3px 8px -2px rgba(0, 0, 0, 0.04),
+              inset 0 3px 5px rgba(255, 255, 255, 1),
+              inset 0 -3px 8px rgba(0, 0, 0, 0.06);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.3s ease;
+  overflow: visible;
+}
+
+[data-theme="dark"] .galaxy-orb-shell,
+body.theme-dark .galaxy-orb-shell {
+  background: radial-gradient(circle at 35% 25%, #2c2c30 0%, #1a1a1d 55%, #101012 100%);
+  border-color: rgba(255, 255, 255, 0.16);
+  box-shadow: 0 16px 36px -8px rgba(0, 0, 0, 0.8),
+              inset 0 2.5px 4px rgba(255, 255, 255, 0.25),
+              inset 0 -3px 10px rgba(0, 0, 0, 0.7);
+}
+
+/* Luminous Ambient Light Ring (Hover Glow) */
+.galaxy-orb-shell::before {
+  content: '';
+  position: absolute;
+  inset: -8px;
+  border-radius: 50%;
+  background: var(--node-accent, #ff4e1b);
+  opacity: 0;
+  filter: blur(12px);
+  transition: opacity 0.35s ease, transform 0.35s ease;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.galaxy-orb-shell::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 50%;
+  border: 2px solid var(--node-accent, #ff4e1b);
+  opacity: 0;
+  transform: scale(0.9);
+  transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+}
+
+.galaxy-orb-node:hover .galaxy-orb-shell::before {
+  opacity: 0.7;
+  transform: scale(1.15);
+}
+
+.galaxy-orb-node:hover .galaxy-orb-shell::after {
+  opacity: 1;
+  transform: scale(1.04);
+}
+
+.galaxy-orb-node:hover .galaxy-orb-shell {
+  transform: scale(1.12);
+  border-color: var(--node-accent, #ff4e1b);
+  box-shadow: 0 20px 45px -10px var(--node-shadow, rgba(255, 78, 27, 0.45)),
+              0 0 26px -2px var(--node-accent, rgba(255, 78, 27, 0.4));
+}
+
+/* Monogram Text */
+.galaxy-monogram {
+  font-family: 'DM Mono', monospace;
+  font-weight: 800;
+  font-size: clamp(14px, 2vw, 20px);
+  color: #111;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  pointer-events: none;
+  transition: color 0.25s ease, transform 0.25s ease;
+}
+
+[data-theme="dark"] .galaxy-monogram,
+body.theme-dark .galaxy-monogram {
+  color: #f5f5f7;
+}
+
+.galaxy-orb-node:hover .galaxy-monogram {
+  color: var(--node-accent, #ff4e1b);
+  transform: scale(1.08);
+}
+
+/* Custom Image Logo in Orb */
+.galaxy-logo-img {
+  width: 55%;
+  height: 55%;
+  object-fit: contain;
+  border-radius: 8px;
+  pointer-events: none;
+  transition: transform 0.25s ease;
+}
+
+.galaxy-orb-node:hover .galaxy-logo-img {
+  transform: scale(1.1);
+}
+
+/* Micro Live Indicator Dot */
+.galaxy-live-beacon {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 7.5px;
+  height: 7.5px;
+  border-radius: 50%;
+  background: var(--node-accent, #10b981);
+  box-shadow: 0 0 8px var(--node-accent, #10b981);
+  border: 1.5px solid #fff;
+  transition: transform 0.25s ease;
+}
+
+[data-theme="dark"] .galaxy-live-beacon {
+  border-color: #16161a;
+}
+
+.galaxy-orb-node:hover .galaxy-live-beacon {
+  transform: scale(1.35);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   FLOATING GLASS HOLOGRAPHIC TOOLTIP (Appears on Hover)
+   ═══════════════════════════════════════════════════════════════ */
+.galaxy-tooltip {
+  position: absolute;
+  bottom: calc(100% + 14px);
+  left: 50%;
+  transform: translateX(-50%) translateY(8px) scale(0.9);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 14px 7px 10px;
+  background: rgba(16, 16, 19, 0.92);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 100px;
+  box-shadow: 0 16px 36px -6px rgba(0, 0, 0, 0.6),
+              0 0 0 1px rgba(255, 255, 255, 0.05);
+  white-space: nowrap;
+  z-index: 100;
+  transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+              visibility 0.25s ease;
+}
+
+.galaxy-tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 5px 5px 0 5px;
+  border-style: solid;
+  border-color: rgba(16, 16, 19, 0.92) transparent transparent transparent;
+}
+
+.galaxy-orb-node:hover .galaxy-tooltip {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0px) scale(1);
+}
+
+.galaxy-tooltip-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--node-accent, #ff4e1b);
+  box-shadow: 0 0 8px var(--node-accent, #ff4e1b);
+  flex-shrink: 0;
+}
+
+.galaxy-tooltip-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.galaxy-tooltip-title {
+  font-family: 'Manrope', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1.2;
+}
+
+.galaxy-tooltip-sub {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  color: #9ca3af;
+  line-height: 1.2;
+}
+
+.galaxy-tooltip-arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--node-accent, #ff4e1b);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 800;
+  transition: transform 0.2s ease;
+  flex-shrink: 0;
+}
+
+.galaxy-orb-node:hover .galaxy-tooltip-arrow {
+  transform: translate(2px, -2px);
+}
+
+/* Click Shockwave */
+.galaxy-ripple {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid var(--node-accent, #ff4e1b);
+  pointer-events: none;
+  animation: galaxyShockwave 0.55s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+}
+
+@keyframes galaxyShockwave {
+  0% { transform: scale(1); opacity: 1; }
+  100% { transform: scale(1.65); opacity: 0; }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .kinetic-galaxy-stage {
+    height: 420px;
+    margin: 30px auto 50px auto;
+    border-radius: 26px;
+  }
+  .galaxy-header {
+    top: 16px;
+    left: 18px;
+    right: 18px;
+  }
+  .galaxy-hint {
+    display: none;
+  }
+}

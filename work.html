@@ -39,7 +39,7 @@
   <link rel="stylesheet" href="experience.css?v=1" />
   <link rel="stylesheet" href="process-enhance.css?v=1" />
   <link rel="stylesheet" href="work.css?v=9" />
-  <link rel="stylesheet" href="live-dock.css?v=6" />
+  <link rel="stylesheet" href="kinetic-dock.css?v=1" />
 </head>
 
 <body class="work-page">
@@ -72,19 +72,20 @@
     </section>
 
     <!-- ══════════════════════════════════════════════════════════ -->
-    <!-- LIQUID SPATIAL MAGNETIC DOCK ("The Best One" Edition) -->
+    <!-- KINETIC GALAXY — ZERO-GRAVITY INTERACTIVE ORB PORTALS -->
     <!-- ══════════════════════════════════════════════════════════ -->
-    <div class="liquid-dock-wrap reveal" id="live-launchpad">
-      <div class="liquid-dock-badge">
-        <span class="liquid-dock-badge-dot"></span>
-        <span id="liquid-dock-count">Live Production Works</span>
+    <section class="kinetic-galaxy-stage reveal" id="kinetic-galaxy-stage" aria-label="Interactive Live Portals Galaxy">
+      <div class="galaxy-header">
+        <div class="galaxy-badge">
+          <span class="galaxy-radar-dot"></span>
+          <span id="galaxy-count-badge">✦ Interactive Live Portals</span>
+        </div>
+        <div class="galaxy-hint">
+          <span>✦ Drag or fling orbs · Click to launch</span>
+          <kbd>↗</kbd>
+        </div>
       </div>
-
-      <!-- Liquid Magnetic Dock Pill Container -->
-      <nav class="liquid-magnetic-dock" id="liquid-magnetic-dock" aria-label="Live Works Navigation Dock">
-        <!-- Rendered dynamically by content-render.js -->
-      </nav>
-    </div>
+    </section>
 
     <section class="projects" id="projects">
       <!-- Projects dynamically populated by content-render.js -->
@@ -131,6 +132,7 @@
   <script src="icons.js?v=2" defer></script>
   <script src="supabase-config.js"></script>
   <script src="content-render.js?v=105"></script>
+  <script src="kinetic-dock.js?v=1" defer></script>
   <script src="work-stack.js" defer></script>
   <script src="motion.js" defer></script>
   <script src="process-enhance.js" defer></script>
