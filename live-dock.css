@@ -1,32 +1,32 @@
 /* ═══════════════════════════════════════════════════════════════
-   WORK PAGE — MINIMAL FLOATING CIRCULAR PORTALS DOCK
-   "Creativity Pro Max" Edition · Zero-Gravity Magnetic Nodes
+   WORK PAGE — ULTRA-PREMIUM MINIMAL CIRCULAR PORTALS DOCK
+   "Creativity Pro Max" Spatial Nodes Edition
    ═══════════════════════════════════════════════════════════════ */
 
 .live-launchpad-section {
   position: relative;
   width: 100%;
   max-width: 1320px;
-  margin: 60px auto 65px auto;
-  padding: 46px 36px 54px 36px;
-  background: radial-gradient(circle at 50% 0%, rgba(255, 78, 27, 0.05) 0%, transparent 60%),
-              radial-gradient(circle at 10% 90%, rgba(121, 40, 202, 0.04) 0%, transparent 50%),
-              linear-gradient(180deg, rgba(255, 255, 255, 0.75) 0%, rgba(250, 248, 246, 0.9) 100%);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(0, 0, 0, 0.06);
+  margin: 60px auto 70px auto;
+  padding: 44px 36px 50px 36px;
+  background: radial-gradient(circle at 50% 0%, rgba(255, 78, 27, 0.05) 0%, transparent 65%),
+              radial-gradient(circle at 85% 100%, rgba(121, 40, 202, 0.05) 0%, transparent 55%),
+              linear-gradient(180deg, rgba(255, 255, 255, 0.85) 0%, rgba(250, 248, 246, 0.95) 100%);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(0, 0, 0, 0.07);
   border-radius: 36px;
-  box-shadow: 0 24px 60px -20px rgba(0, 0, 0, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  box-shadow: 0 24px 60px -20px rgba(0, 0, 0, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.9);
   overflow: visible;
   box-sizing: border-box;
 }
 
 [data-theme="dark"] .live-launchpad-section,
 body.theme-dark .live-launchpad-section {
-  background: radial-gradient(circle at 50% 0%, rgba(255, 78, 27, 0.08) 0%, transparent 60%),
-              radial-gradient(circle at 10% 90%, rgba(121, 40, 202, 0.06) 0%, transparent 50%),
-              linear-gradient(180deg, #141416 0%, #0d0d0e 100%);
-  border-color: rgba(255, 255, 255, 0.07);
+  background: radial-gradient(circle at 50% 0%, rgba(255, 78, 27, 0.08) 0%, transparent 65%),
+              radial-gradient(circle at 85% 100%, rgba(121, 40, 202, 0.07) 0%, transparent 55%),
+              linear-gradient(180deg, #151518 0%, #0d0d0f 100%);
+  border-color: rgba(255, 255, 255, 0.08);
   box-shadow: 0 28px 70px -20px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
@@ -35,9 +35,16 @@ body.theme-dark .live-launchpad-section {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 40px;
+  margin-bottom: 24px;
   flex-wrap: wrap;
   gap: 16px;
+}
+
+.portals-header-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
 }
 
 .portals-badge {
@@ -53,7 +60,7 @@ body.theme-dark .live-launchpad-section {
   background: rgba(255, 78, 27, 0.08);
   padding: 6px 14px;
   border-radius: 100px;
-  border: 1px solid rgba(255, 78, 27, 0.18);
+  border: 1px solid rgba(255, 78, 27, 0.2);
 }
 
 .portals-radar-dot {
@@ -68,6 +75,61 @@ body.theme-dark .live-launchpad-section {
 @keyframes radarPing {
   0%, 100% { transform: scale(1); opacity: 1; }
   50% { transform: scale(1.4); opacity: 0.4; }
+}
+
+/* Minimal Filter Pills */
+.portals-filter-pills {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(0, 0, 0, 0.03);
+  padding: 4px;
+  border-radius: 100px;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+[data-theme="dark"] .portals-filter-pills,
+body.theme-dark .portals-filter-pills {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.portals-filter-btn {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 6px 14px;
+  background: transparent;
+  color: #666;
+  border: 0;
+  border-radius: 100px;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+[data-theme="dark"] .portals-filter-btn,
+body.theme-dark .portals-filter-btn {
+  color: #9ca3af;
+}
+
+.portals-filter-btn:hover {
+  color: #111;
+}
+
+[data-theme="dark"] .portals-filter-btn:hover {
+  color: #fff;
+}
+
+.portals-filter-btn.active {
+  background: #111;
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+[data-theme="dark"] .portals-filter-btn.active {
+  background: #ff4e1b;
+  color: #fff;
+  box-shadow: 0 2px 12px rgba(255, 78, 27, 0.35);
 }
 
 .portals-hint {
@@ -110,8 +172,8 @@ body.theme-dark .portals-hint {
   flex-wrap: wrap;
   justify-content: center;
   align-items: center;
-  gap: 32px 36px;
-  padding: 24px 10px 10px 10px;
+  gap: 34px 38px;
+  padding: 30px 10px 10px 10px;
   min-height: 180px;
   overflow: visible;
 }
@@ -136,24 +198,24 @@ body.theme-dark .portals-hint {
 
 /* Three Dynamic Scale Tiers (Organic Spatial Hierarchy) */
 .circular-portal-node.node-size-lg .portal-orb {
-  width: 116px;
-  height: 116px;
+  width: 118px;
+  height: 118px;
 }
 .circular-portal-node.node-size-lg .portal-monogram {
-  font-size: 22px;
+  font-size: 23px;
 }
 
 .circular-portal-node.node-size-md .portal-orb {
-  width: 96px;
-  height: 96px;
+  width: 98px;
+  height: 98px;
 }
 .circular-portal-node.node-size-md .portal-monogram {
   font-size: 18px;
 }
 
 .circular-portal-node.node-size-sm .portal-orb {
-  width: 82px;
-  height: 82px;
+  width: 84px;
+  height: 84px;
 }
 .circular-portal-node.node-size-sm .portal-monogram {
   font-size: 15px;
@@ -167,26 +229,28 @@ body.theme-dark .portals-hint {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: radial-gradient(circle at 35% 30%, rgba(255, 255, 255, 0.95) 0%, rgba(245, 242, 238, 0.85) 60%, rgba(230, 225, 218, 0.75) 100%);
+  background: radial-gradient(circle at 35% 25%, rgba(255, 255, 255, 0.98) 0%, rgba(248, 246, 242, 0.92) 55%, rgba(234, 230, 224, 0.85) 100%);
   border: 1.5px solid rgba(0, 0, 0, 0.08);
-  box-shadow: 0 12px 28px -6px rgba(0, 0, 0, 0.08),
+  box-shadow: 0 14px 30px -8px rgba(0, 0, 0, 0.08),
               0 4px 10px -2px rgba(0, 0, 0, 0.04),
-              inset 0 2px 4px rgba(255, 255, 255, 1),
+              inset 0 2.5px 4px rgba(255, 255, 255, 1),
               inset 0 -2px 6px rgba(0, 0, 0, 0.04);
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.35s ease,
+              box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   overflow: visible;
 }
 
 [data-theme="dark"] .portal-orb,
 body.theme-dark .portal-orb {
-  background: radial-gradient(circle at 35% 30%, #252528 0%, #171719 65%, #0f0f11 100%);
-  border-color: rgba(255, 255, 255, 0.1);
-  box-shadow: 0 14px 35px -8px rgba(0, 0, 0, 0.7),
-              inset 0 1.5px 2px rgba(255, 255, 255, 0.18),
-              inset 0 -2px 6px rgba(0, 0, 0, 0.5);
+  background: radial-gradient(circle at 35% 25%, #2a2a2e 0%, #1a1a1d 60%, #111113 100%);
+  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 16px 40px -10px rgba(0, 0, 0, 0.75),
+              inset 0 2px 3px rgba(255, 255, 255, 0.22),
+              inset 0 -2px 8px rgba(0, 0, 0, 0.6);
 }
 
-/* Floating Ambient Zero-Gravity Keyframes (Staggered Buoyancy) */
+/* Floating Ambient Zero-Gravity Keyframes */
 .circular-portal-node:nth-child(4n+1) {
   animation: orbLevitate1 7s ease-in-out infinite alternate;
 }
@@ -202,33 +266,33 @@ body.theme-dark .portal-orb {
 
 @keyframes orbLevitate1 {
   0% { transform: translateY(0px) rotate(0deg); }
-  100% { transform: translateY(-9px) rotate(2deg); }
+  100% { transform: translateY(-10px) rotate(2deg); }
 }
 
 @keyframes orbLevitate2 {
   0% { transform: translateY(0px) rotate(0deg); }
-  100% { transform: translateY(-12px) rotate(-2deg); }
+  100% { transform: translateY(-13px) rotate(-2deg); }
 }
 
 @keyframes orbLevitate3 {
   0% { transform: translateY(0px) rotate(0deg); }
-  100% { transform: translateY(-7px) rotate(1.5deg); }
+  100% { transform: translateY(-8px) rotate(1.5deg); }
 }
 
 @keyframes orbLevitate4 {
   0% { transform: translateY(0px) rotate(0deg); }
-  100% { transform: translateY(-10px) rotate(-1.5deg); }
+  100% { transform: translateY(-11px) rotate(-1.5deg); }
 }
 
-/* Luminous Accent Ring (Glow Flare on Hover) */
+/* Rotating Specular Chromatic Flare Ring on Hover */
 .portal-orb::before {
   content: '';
   position: absolute;
-  inset: -4px;
+  inset: -6px;
   border-radius: 50%;
   background: var(--node-accent, #ff4e1b);
   opacity: 0;
-  filter: blur(8px);
+  filter: blur(10px);
   transition: opacity 0.4s ease, transform 0.4s ease;
   z-index: -1;
   pointer-events: none;
@@ -237,7 +301,7 @@ body.theme-dark .portal-orb {
 .portal-orb::after {
   content: '';
   position: absolute;
-  inset: -2px;
+  inset: -3px;
   border-radius: 50%;
   border: 2px solid var(--node-accent, #ff4e1b);
   opacity: 0;
@@ -253,20 +317,20 @@ body.theme-dark .portal-orb {
 }
 
 .circular-portal-node:hover .portal-orb {
-  transform: scale(1.1) translateY(-4px);
+  transform: scale(1.12) translateY(-4px);
   border-color: var(--node-accent, #ff4e1b);
-  box-shadow: 0 20px 45px -10px var(--node-shadow, rgba(255, 78, 27, 0.35)),
-              0 0 24px -4px var(--node-accent, rgba(255, 78, 27, 0.4));
+  box-shadow: 0 22px 50px -12px var(--node-shadow, rgba(255, 78, 27, 0.4)),
+              0 0 28px -4px var(--node-accent, rgba(255, 78, 27, 0.45));
 }
 
 .circular-portal-node:hover .portal-orb::before {
-  opacity: 0.6;
-  transform: scale(1.15);
+  opacity: 0.65;
+  transform: scale(1.18);
 }
 
 .circular-portal-node:hover .portal-orb::after {
   opacity: 1;
-  transform: scale(1.04);
+  transform: scale(1.05);
 }
 
 /* Monogram Text & Brand Label */
@@ -287,16 +351,30 @@ body.theme-dark .portal-monogram {
 
 .circular-portal-node:hover .portal-monogram {
   color: var(--node-accent, #ff4e1b);
-  transform: scale(1.08);
+  transform: scale(1.1);
+}
+
+/* Custom Brand Logo Image in Node */
+.portal-logo-img {
+  width: 55%;
+  height: 55%;
+  object-fit: contain;
+  border-radius: 8px;
+  pointer-events: none;
+  transition: transform 0.3s ease;
+}
+
+.circular-portal-node:hover .portal-logo-img {
+  transform: scale(1.1);
 }
 
 /* Micro Live Beacon on Circle Perimeter */
 .portal-beacon {
   position: absolute;
-  top: 6px;
-  right: 6px;
-  width: 8px;
-  height: 8px;
+  top: 7px;
+  right: 7px;
+  width: 8.5px;
+  height: 8.5px;
   border-radius: 50%;
   background: var(--node-accent, #10b981);
   box-shadow: 0 0 8px var(--node-accent, #10b981);
@@ -309,19 +387,19 @@ body.theme-dark .portal-monogram {
 }
 
 .circular-portal-node:hover .portal-beacon {
-  transform: scale(1.3);
+  transform: scale(1.35);
 }
 
 /* Node Bottom Mini Caption */
 .portal-caption {
   margin-top: 10px;
   font-family: 'Manrope', sans-serif;
-  font-size: 12px;
+  font-size: 12.5px;
   font-weight: 700;
-  color: #444;
+  color: #333;
   letter-spacing: -0.01em;
   text-align: center;
-  max-width: 105px;
+  max-width: 110px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -352,12 +430,12 @@ body.theme-dark .portal-caption {
   align-items: center;
   gap: 12px;
   padding: 8px 14px 8px 12px;
-  background: rgba(20, 20, 22, 0.88);
+  background: rgba(18, 18, 20, 0.92);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.16);
   border-radius: 100px;
-  box-shadow: 0 14px 34px -6px rgba(0, 0, 0, 0.5),
+  box-shadow: 0 16px 36px -6px rgba(0, 0, 0, 0.55),
               0 0 0 1px rgba(255, 255, 255, 0.05);
   white-space: nowrap;
   z-index: 200;
@@ -375,7 +453,7 @@ body.theme-dark .portal-caption {
   transform: translateX(-50%);
   border-width: 5px 5px 0 5px;
   border-style: solid;
-  border-color: rgba(20, 20, 22, 0.88) transparent transparent transparent;
+  border-color: rgba(18, 18, 20, 0.92) transparent transparent transparent;
 }
 
 .circular-portal-node:hover .portal-holo-tooltip {
@@ -385,8 +463,8 @@ body.theme-dark .portal-caption {
 }
 
 .holo-dot {
-  width: 6px;
-  height: 6px;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
   background: var(--node-accent, #ff4e1b);
   box-shadow: 0 0 8px var(--node-accent, #ff4e1b);
@@ -400,7 +478,7 @@ body.theme-dark .portal-caption {
 
 .holo-title {
   font-family: 'Manrope', sans-serif;
-  font-size: 12px;
+  font-size: 12.5px;
   font-weight: 700;
   color: #ffffff;
   line-height: 1.2;
@@ -408,7 +486,7 @@ body.theme-dark .portal-caption {
 
 .holo-domain {
   font-family: 'DM Mono', monospace;
-  font-size: 10px;
+  font-size: 10.5px;
   color: #9ca3af;
   line-height: 1.2;
 }
@@ -459,15 +537,15 @@ body.theme-dark .portal-caption {
     padding: 10px 0;
   }
   .circular-portal-node.node-size-lg .portal-orb {
-    width: 88px;
-    height: 88px;
+    width: 90px;
+    height: 90px;
   }
   .circular-portal-node.node-size-lg .portal-monogram {
     font-size: 17px;
   }
   .circular-portal-node.node-size-md .portal-orb {
-    width: 76px;
-    height: 76px;
+    width: 78px;
+    height: 78px;
   }
   .circular-portal-node.node-size-md .portal-monogram {
     font-size: 15px;
@@ -486,6 +564,6 @@ body.theme-dark .portal-caption {
   .portals-header {
     flex-direction: column;
     align-items: flex-start;
-    gap: 8px;
+    gap: 12px;
   }
 }

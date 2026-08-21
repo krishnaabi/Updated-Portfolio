@@ -39,7 +39,7 @@
   <link rel="stylesheet" href="experience.css?v=1" />
   <link rel="stylesheet" href="process-enhance.css?v=1" />
   <link rel="stylesheet" href="work.css?v=9" />
-  <link rel="stylesheet" href="live-dock.css?v=3" />
+  <link rel="stylesheet" href="live-dock.css?v=4" />
 </head>
 
 <body class="work-page">
@@ -76,9 +76,16 @@
     <!-- ══════════════════════════════════════════════════════════ -->
     <section class="live-launchpad-section reveal" id="live-launchpad">
       <div class="portals-header">
-        <div class="portals-badge">
-          <span class="portals-radar-dot"></span>
-          <span id="portals-count-badge">✦ LIVE REDIRECTION PORTALS</span>
+        <div class="portals-header-left">
+          <div class="portals-badge">
+            <span class="portals-radar-dot"></span>
+            <span id="portals-count-badge">✦ LIVE REDIRECTION PORTALS</span>
+          </div>
+          <div class="portals-filter-pills" id="portals-filters">
+            <button type="button" class="portals-filter-btn active" data-filter="all">All</button>
+            <button type="button" class="portals-filter-btn" data-filter="Websites & Apps">Websites &amp; Apps</button>
+            <button type="button" class="portals-filter-btn" data-filter="Graphic Design & Branding">Graphic Design</button>
+          </div>
         </div>
         <div class="portals-hint">
           <span>Hover node for details · Click to launch</span>
@@ -136,7 +143,7 @@
   <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js" defer></script>
   <script src="icons.js?v=2" defer></script>
   <script src="supabase-config.js"></script>
-  <script src="content-render.js?v=95"></script>
+  <script src="content-render.js?v=99"></script>
   <script src="work-stack.js" defer></script>
   <script src="motion.js" defer></script>
   <script src="process-enhance.js" defer></script>

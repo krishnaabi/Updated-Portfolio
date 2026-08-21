@@ -1738,81 +1738,113 @@
           return defaultLiveWorks;
         };
 
-        const list = getLiveWorks();
-        if (portalsCountBadge) {
-          portalsCountBadge.textContent = `✦ ${String(list.length).padStart(2, '0')} LIVE REDIRECTION PORTALS`;
-        }
+        let activeCategoryFilter = 'all';
 
-        portalsStage.innerHTML = list.map((item, index) => {
-          let domain = '';
-          try {
-            if (item.url && item.url.startsWith('http')) {
-              domain = new URL(item.url).hostname.replace(/^www\./, '');
-            } else {
-              domain = item.url || 'Live Demo';
-            }
-          } catch {
-            domain = item.url || 'Live Demo';
+        const renderPortals = () => {
+          const rawList = getLiveWorks();
+          const filteredList = rawList.filter(item => {
+            if (activeCategoryFilter === 'all') return true;
+            return item.category === activeCategoryFilter;
+          });
+
+          if (portalsCountBadge) {
+            portalsCountBadge.textContent = `✦ ${String(filteredList.length).padStart(2, '0')} LIVE REDIRECTION PORTALS`;
           }
 
-          const accent = item.accent_color || '#ff4e1b';
-          const iconText = item.icon_text || (item.title ? item.title.slice(0, 2).toUpperCase() : '⚡');
-          
-          // Organic tiered sizing
-          let sizeClass = 'node-size-md';
-          if (index < 2) sizeClass = 'node-size-lg';
-          else if (index >= 5) sizeClass = 'node-size-sm';
+          if (!filteredList.length) {
+            portalsStage.innerHTML = `<div style="padding:20px;color:#888;font-family:'DM Mono',monospace;font-size:12px;">No portals found in this category.</div>`;
+            return;
+          }
 
-          return `
-            <a href="${escape(item.url || '#')}" ${item.url && item.url.startsWith('http') ? 'target="_blank" rel="noopener noreferrer"' : ''} class="circular-portal-node ${sizeClass}" style="--node-accent:${escape(accent)};" aria-label="Visit ${escape(item.title)}">
-              <!-- Holographic Expansion Capsule Tooltip -->
-              <div class="portal-holo-tooltip">
-                <span class="holo-dot"></span>
-                <div class="holo-info">
-                  <span class="holo-title">${escape(item.title)}</span>
-                  <span class="holo-domain">${escape(domain)} · ${escape(item.category)}</span>
-                </div>
-                <span class="holo-arrow">↗</span>
-              </div>
-
-              <!-- Core Floating Orb -->
-              <div class="portal-orb">
-                <span class="portal-beacon"></span>
-                <span class="portal-monogram">${escape(iconText)}</span>
-              </div>
-
-              <!-- Minimal Caption Label -->
-              <span class="portal-caption">${escape(item.title)}</span>
-            </a>
-          `;
-        }).join('');
-
-        // Magnetic Cursor Physics & Interactive Shockwave Engine
-        const nodes = portalsStage.querySelectorAll('.circular-portal-node');
-        nodes.forEach(node => {
-          node.addEventListener('mousemove', (e) => {
-            const rect = node.getBoundingClientRect();
-            const nodeX = rect.left + rect.width / 2;
-            const nodeY = rect.top + rect.height / 2;
-            const deltaX = (e.clientX - nodeX) * 0.28;
-            const deltaY = (e.clientY - nodeY) * 0.28;
-            node.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
-          });
-
-          node.addEventListener('mouseleave', () => {
-            node.style.transform = '';
-          });
-
-          node.addEventListener('click', () => {
-            const orb = node.querySelector('.portal-orb');
-            if (orb) {
-              const ripple = document.createElement('span');
-              ripple.className = 'portal-ripple';
-              orb.appendChild(ripple);
-              setTimeout(() => ripple.remove(), 700);
+          portalsStage.innerHTML = filteredList.map((item, index) => {
+            let domain = '';
+            try {
+              if (item.url && item.url.startsWith('http')) {
+                domain = new URL(item.url).hostname.replace(/^www\./, '');
+              } else {
+                domain = item.url || 'Live Demo';
+              }
+            } catch {
+              domain = item.url || 'Live Demo';
             }
+
+            const accent = item.accent_color || '#ff4e1b';
+            const iconText = item.icon_text || (item.title ? item.title.slice(0, 2).toUpperCase() : '⚡');
+            const customImg = item.image || item.custom_icon_url || item.iconUrl || '';
+            
+            // Organic tiered sizing or custom tier
+            let sizeClass = item.size_tier ? `node-size-${item.size_tier}` : (index < 2 ? 'node-size-lg' : (index >= 5 ? 'node-size-sm' : 'node-size-md'));
+
+            const orbInner = customImg
+              ? `<img src="${escape(customImg)}" alt="${escape(item.title)}" class="portal-logo-img" />`
+              : `<span class="portal-monogram">${escape(iconText)}</span>`;
+
+            return `
+              <a href="${escape(item.url || '#')}" ${item.url && item.url.startsWith('http') ? 'target="_blank" rel="noopener noreferrer"' : ''} class="circular-portal-node ${sizeClass}" style="--node-accent:${escape(accent)};" aria-label="Visit ${escape(item.title)}">
+                <!-- Holographic Expansion Capsule Tooltip -->
+                <div class="portal-holo-tooltip">
+                  <span class="holo-dot"></span>
+                  <div class="holo-info">
+                    <span class="holo-title">${escape(item.title)}</span>
+                    <span class="holo-domain">${escape(domain)} · ${escape(item.category)}</span>
+                  </div>
+                  <span class="holo-arrow">↗</span>
+                </div>
+
+                <!-- Core Floating Orb -->
+                <div class="portal-orb">
+                  <span class="portal-beacon"></span>
+                  ${orbInner}
+                </div>
+
+                <!-- Minimal Caption Label -->
+                <span class="portal-caption">${escape(item.title)}</span>
+              </a>
+            `;
+          }).join('');
+
+          // Magnetic Cursor Physics & Interactive Shockwave Engine
+          const nodes = portalsStage.querySelectorAll('.circular-portal-node');
+          nodes.forEach(node => {
+            node.addEventListener('mousemove', (e) => {
+              const rect = node.getBoundingClientRect();
+              const nodeX = rect.left + rect.width / 2;
+              const nodeY = rect.top + rect.height / 2;
+              const deltaX = (e.clientX - nodeX) * 0.28;
+              const deltaY = (e.clientY - nodeY) * 0.28;
+              node.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
+            });
+
+            node.addEventListener('mouseleave', () => {
+              node.style.transform = '';
+            });
+
+            node.addEventListener('click', () => {
+              const orb = node.querySelector('.portal-orb');
+              if (orb) {
+                const ripple = document.createElement('span');
+                ripple.className = 'portal-ripple';
+                orb.appendChild(ripple);
+                setTimeout(() => ripple.remove(), 700);
+              }
+            });
           });
-        });
+        };
+
+        renderPortals();
+
+        // Wire category filter pills
+        const filterPills = document.querySelector('#portals-filters');
+        if (filterPills) {
+          filterPills.querySelectorAll('.portals-filter-btn').forEach(btn => {
+            btn.onclick = () => {
+              filterPills.querySelectorAll('.portals-filter-btn').forEach(b => b.classList.remove('active'));
+              btn.classList.add('active');
+              activeCategoryFilter = btn.dataset.filter || 'all';
+              renderPortals();
+            };
+          });
+        }
       }
 
       const projects = document.querySelector('.projects');

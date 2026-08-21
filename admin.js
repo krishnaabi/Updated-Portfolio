@@ -3465,7 +3465,7 @@ if ($('#journal-date') && !$('#journal-date').value) {
 }
 
 // ══════════════════════════════════════════════════════════
-// LIVE WORKS LAUNCHPAD STUDIO MANAGER
+// LIVE WORKS LAUNCHPAD STUDIO MANAGER (Upgraded Edition)
 // ══════════════════════════════════════════════════════════
 const STORAGE_KEY_LIVE_WORKS = 'ak_portfolio_live_works';
 
@@ -3476,10 +3476,11 @@ const defaultLiveWorksPresets = [
     category: 'Websites & Apps',
     tag: 'Live Production Site',
     url: 'https://honeyuniversal.com',
-    description: 'Premium brand & global digital commerce experience with interactive product visualizer.',
+    description: 'Premium brand & global digital commerce experience.',
     icon_text: 'HU',
     accent_color: '#ff4e1b',
     badge_status: '● Live Site',
+    size_tier: 'lg',
     display_order: 1
   },
   {
@@ -3488,22 +3489,24 @@ const defaultLiveWorksPresets = [
     category: 'Websites & Apps',
     tag: 'SaaS Platform',
     url: 'https://hanioo.com',
-    description: 'On-demand multilingual interpretation booking ecosystem across Web, iOS & Android.',
+    description: 'Multilingual interpretation booking ecosystem.',
     icon_text: 'HN',
     accent_color: '#7928ca',
     badge_status: '● Live Site',
+    size_tier: 'lg',
     display_order: 2
   },
   {
     id: 'lw3',
-    title: 'Flubn Digital Studio',
+    title: 'Flubn Studio',
     category: 'Graphic Design & Branding',
     tag: 'Brand Identity & Web',
     url: 'https://flubn.com',
-    description: 'Experimental creative studio brand system, typography guidelines, and digital portfolio.',
+    description: 'Creative studio brand system and digital portfolio.',
     icon_text: 'FL',
     accent_color: '#0070f3',
     badge_status: '🎨 Graphic Showcase',
+    size_tier: 'md',
     display_order: 3
   },
   {
@@ -3512,63 +3515,69 @@ const defaultLiveWorksPresets = [
     category: 'Graphic Design & Branding',
     tag: 'Visual Identity',
     url: 'https://www.behance.net/krishnaabi',
-    description: 'Dynamic automotive tech visual identity, iconography suite, and graphic campaign assets.',
+    description: 'Dynamic automotive visual identity & campaign suite.',
     icon_text: 'GF',
     accent_color: '#10b981',
     badge_status: '🎨 Graphic Showcase',
+    size_tier: 'md',
     display_order: 4
   },
   {
     id: 'lw5',
-    title: 'Stuak Creative Lab',
+    title: 'Stuak Lab',
     category: 'Websites & Apps',
     tag: 'Interactive Web',
     url: 'https://github.com/krishnaabi',
-    description: 'Curated digital lab showcasing interactive generative prototypes and UI micro-animations.',
+    description: 'Interactive generative prototypes & UI animations.',
     icon_text: 'ST',
     accent_color: '#f59e0b',
     badge_status: '⚡ Web App',
+    size_tier: 'md',
     display_order: 5
   },
   {
     id: 'lw6',
-    title: 'Noma Health Hub',
+    title: 'Noma Health',
     category: 'Websites & Apps',
     tag: 'Healthcare Web App',
     url: 'https://nomahealth.com',
-    description: 'Telehealth consultation platform featuring intuitive doctor-patient scheduling workflows.',
+    description: 'Telehealth consultation platform workflows.',
     icon_text: 'NM',
     accent_color: '#06b6d4',
     badge_status: '● Live Site',
+    size_tier: 'sm',
     display_order: 6
   },
   {
     id: 'lw7',
-    title: 'Veloce Brand & Packaging',
+    title: 'Veloce Brand',
     category: 'Graphic Design & Branding',
     tag: 'Print & Packaging',
     url: 'https://dribbble.com',
-    description: 'Luxury minimalist packaging design, bespoke typography treatment, and art direction.',
+    description: 'Luxury minimal packaging design & typography.',
     icon_text: 'VL',
     accent_color: '#ec4899',
     badge_status: '🎨 Graphic Showcase',
+    size_tier: 'sm',
     display_order: 7
   },
   {
     id: 'lw8',
-    title: 'Apex Design System',
+    title: 'Apex System',
     category: 'Websites & Apps',
     tag: 'Design Tokens & Docs',
     url: 'work.html',
-    description: 'Comprehensive multi-brand enterprise UI design token library and interactive component docs.',
+    description: 'Multi-brand enterprise design token library.',
     icon_text: 'AP',
     accent_color: '#8b5cf6',
     badge_status: '⚡ System Docs',
+    size_tier: 'sm',
     display_order: 8
   }
 ];
 
 let allLiveWorksData = [];
+let adminLiveWorksFilterQuery = '';
 
 function loadLiveWorksFromStorage() {
   try {
@@ -3593,6 +3602,66 @@ function fetchLiveWorks() {
     saveLiveWorksToStorage(allLiveWorksData);
   }
   renderLiveWorksList();
+  updateLivePreviewNode();
+}
+
+function updateLivePreviewNode() {
+  const titleEl = document.querySelector('#lw-title-input');
+  const colorEl = document.querySelector('#lw-color-input');
+  const iconEl = document.querySelector('#lw-icon-input');
+  const sizeEl = document.querySelector('#lw-size-input');
+  const logoUrlEl = document.querySelector('#lw-logo-url-input');
+
+  const prevOrb = document.querySelector('#lw-prev-orb');
+  const prevMonogram = document.querySelector('#lw-prev-monogram');
+  const prevBeacon = document.querySelector('#lw-prev-beacon');
+  const prevCaption = document.querySelector('#lw-prev-caption');
+  const prevLogoImg = document.querySelector('#lw-prev-logo-img');
+
+  if (!prevOrb) return;
+
+  const title = (titleEl?.value || 'Honey Universal').trim();
+  const color = colorEl?.value || '#ff4e1b';
+  const icon = (iconEl?.value || (title ? title.slice(0, 2).toUpperCase() : 'HU')).trim();
+  const size = sizeEl?.value || 'md';
+  const logoUrl = (logoUrlEl?.value || '').trim();
+
+  prevOrb.style.setProperty('--prev-accent', color);
+  if (prevBeacon) {
+    prevBeacon.style.background = color;
+    prevBeacon.style.boxShadow = `0 0 8px ${color}`;
+  }
+
+  // Size
+  if (size === 'lg') {
+    prevOrb.style.width = '118px';
+    prevOrb.style.height = '118px';
+    if (prevMonogram) prevMonogram.style.fontSize = '23px';
+  } else if (size === 'sm') {
+    prevOrb.style.width = '84px';
+    prevOrb.style.height = '84px';
+    if (prevMonogram) prevMonogram.style.fontSize = '15px';
+  } else {
+    prevOrb.style.width = '98px';
+    prevOrb.style.height = '98px';
+    if (prevMonogram) prevMonogram.style.fontSize = '18px';
+  }
+
+  if (prevCaption) prevCaption.textContent = title || 'Untitled Project';
+
+  if (logoUrl) {
+    if (prevLogoImg) {
+      prevLogoImg.src = logoUrl;
+      prevLogoImg.style.display = 'block';
+    }
+    if (prevMonogram) prevMonogram.style.display = 'none';
+  } else {
+    if (prevLogoImg) prevLogoImg.style.display = 'none';
+    if (prevMonogram) {
+      prevMonogram.style.display = 'block';
+      prevMonogram.textContent = icon;
+    }
+  }
 }
 
 function renderLiveWorksList() {
@@ -3601,37 +3670,58 @@ function renderLiveWorksList() {
   if (countEl) countEl.textContent = allLiveWorksData.length;
   if (!container) return;
 
-  if (!allLiveWorksData.length) {
-    container.innerHTML = `<div style="grid-column:1/-1;padding:24px;text-align:center;color:#888;background:#fff;border-radius:12px;border:1px dashed #ccc;">No live works configured yet. Add your first website or graphic design project above!</div>`;
+  const q = adminLiveWorksFilterQuery.toLowerCase().trim();
+  const filtered = allLiveWorksData.filter(item => {
+    if (!q) return true;
+    return (item.title && item.title.toLowerCase().includes(q)) ||
+           (item.category && item.category.toLowerCase().includes(q)) ||
+           (item.url && item.url.toLowerCase().includes(q));
+  });
+
+  if (!filtered.length) {
+    container.innerHTML = `<div style="grid-column:1/-1;padding:28px;text-align:center;color:#888;background:#fff;border-radius:14px;border:1px dashed #ccc;font-family:'DM Mono',monospace;font-size:12px;">No portal nodes found matching "${escapeHtml(adminLiveWorksFilterQuery)}".</div>`;
     return;
   }
 
-  container.innerHTML = allLiveWorksData.map((item, index) => {
+  container.innerHTML = filtered.map((item, index) => {
     const accent = item.accent_color || '#ff4e1b';
     const iconText = item.icon_text || (item.title ? item.title.slice(0, 2).toUpperCase() : '⚡');
+    const sizeTierLabel = item.size_tier === 'lg' ? '🌟 Flagship (118px)' : (item.size_tier === 'sm' ? '✨ Compact (84px)' : '⭐ Core (98px)');
+    const customImg = item.image || item.custom_icon_url || item.iconUrl || '';
+
+    const badgeContent = customImg
+      ? `<img src="${escapeHtml(customImg)}" alt="${escapeHtml(item.title)}" style="width:100%;height:100%;object-fit:contain;border-radius:8px;" />`
+      : escapeHtml(iconText);
+
     return `
-      <div class="live-work-admin-card" style="padding:16px;background:#ffffff;border:1px solid #e7e2dc;border-radius:14px;display:flex;flex-direction:column;justify-content:space-between;gap:12px;box-shadow:0 2px 8px rgba(0,0,0,0.03);">
+      <div class="live-work-admin-card" style="padding:18px;background:#ffffff;border:1px solid #e7e2dc;border-radius:16px;display:flex;flex-direction:column;justify-content:space-between;gap:12px;box-shadow:0 2px 10px rgba(0,0,0,0.03);position:relative;transition:all 0.25s ease;">
         <div>
-          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
-            <div style="width:38px;height:38px;border-radius:10px;background:${accent};color:#fff;font-weight:800;font-family:'DM Mono',monospace;display:grid;place-items:center;font-size:14px;">
-              ${iconText}
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;">
+            <div style="width:42px;height:42px;border-radius:50%;background:radial-gradient(circle at 35% 25%, #fff 0%, #f4f0ec 100%);border:1.5px solid rgba(0,0,0,0.08);color:${escapeHtml(accent)};font-weight:800;font-family:'DM Mono',monospace;display:grid;place-items:center;font-size:14px;box-shadow:0 4px 12px -2px rgba(0,0,0,0.08), 0 0 12px -2px ${escapeHtml(accent)};">
+              ${badgeContent}
             </div>
-            <span style="font-size:11px;font-family:'DM Mono',monospace;font-weight:700;padding:3px 8px;border-radius:99px;background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0;">
-              ${item.badge_status || '● Live Site'}
-            </span>
+            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+              <span style="font-size:10.5px;font-family:'DM Mono',monospace;font-weight:700;padding:2px 8px;border-radius:99px;background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0;">
+                ${escapeHtml(item.badge_status || '● Live Site')}
+              </span>
+              <span style="font-size:10px;font-family:'DM Mono',monospace;color:#888;">${escapeHtml(sizeTierLabel)}</span>
+            </div>
           </div>
-          <h4 style="margin:0 0 4px;font-size:15px;font-weight:800;color:#111;">${item.title}</h4>
-          <p style="margin:0 0 6px;font-size:12.5px;color:#666;line-height:1.4;">${item.description || ''}</p>
-          <div style="font-size:11px;font-family:'DM Mono',monospace;color:#888;">
-            <span>✦ ${item.category}</span> · <a href="${item.url}" target="_blank" style="color:var(--accent,#ff4e1b);text-decoration:none;">${item.url} ↗</a>
+          <h4 style="margin:0 0 4px;font-size:16px;font-weight:800;color:#111;">${escapeHtml(item.title)}</h4>
+          <p style="margin:0 0 8px;font-size:12.5px;color:#666;line-height:1.4;">${escapeHtml(item.description || '')}</p>
+          <div style="font-size:11px;font-family:'DM Mono',monospace;color:#888;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+            <span>✦ ${escapeHtml(item.category)}</span>
+            <span>·</span>
+            <a href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer" style="color:var(--accent,#ff4e1b);text-decoration:none;font-weight:700;">Test Link ↗</a>
           </div>
         </div>
-        <div style="display:flex;justify-content:space-between;align-items:center;padding-top:10px;border-top:1px solid #f2ede7;">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding-top:12px;border-top:1px solid #f2ede7;">
           <div style="display:flex;gap:4px;">
-            <button type="button" onclick="moveLiveWork('${item.id}', -1)" ${index === 0 ? 'disabled style="opacity:0.3;"' : ''} style="padding:4px 8px;border:1px solid #ddd;border-radius:6px;background:#fff;cursor:pointer;">↑</button>
-            <button type="button" onclick="moveLiveWork('${item.id}', 1)" ${index === allLiveWorksData.length - 1 ? 'disabled style="opacity:0.3;"' : ''} style="padding:4px 8px;border:1px solid #ddd;border-radius:6px;background:#fff;cursor:pointer;">↓</button>
+            <button type="button" title="Move Up" onclick="moveLiveWork('${item.id}', -1)" ${index === 0 ? 'disabled style="opacity:0.3;"' : ''} style="padding:4px 8px;border:1px solid #ddd;border-radius:6px;background:#fff;cursor:pointer;font-weight:700;">↑</button>
+            <button type="button" title="Move Down" onclick="moveLiveWork('${item.id}', 1)" ${index === allLiveWorksData.length - 1 ? 'disabled style="opacity:0.3;"' : ''} style="padding:4px 8px;border:1px solid #ddd;border-radius:6px;background:#fff;cursor:pointer;font-weight:700;">↓</button>
           </div>
           <div style="display:flex;gap:6px;">
+            <button type="button" onclick="cloneLiveWork('${item.id}')" title="Duplicate this node" style="padding:6px 10px;background:#f5f3f0;color:#333;border:1px solid #ddd;border-radius:8px;font-size:11.5px;font-weight:700;cursor:pointer;">Clone</button>
             <button type="button" onclick="editLiveWork('${item.id}')" style="padding:6px 12px;background:#111;color:#fff;border:0;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;">Edit</button>
             <button type="button" onclick="deleteLiveWork('${item.id}')" style="padding:6px 12px;background:#fff1f1;color:#d32f2f;border:1px solid #ffcdd2;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;">Delete</button>
           </div>
@@ -3649,10 +3739,11 @@ window.editLiveWork = function(id) {
   const titleEl = document.querySelector('#lw-title-input');
   const catEl = document.querySelector('#lw-category-input');
   const urlEl = document.querySelector('#lw-url-input');
-  const tagEl = document.querySelector('#lw-tag-input');
+  const sizeEl = document.querySelector('#lw-size-input');
   const statusEl = document.querySelector('#lw-status-input');
   const iconEl = document.querySelector('#lw-icon-input');
   const colorEl = document.querySelector('#lw-color-input');
+  const logoUrlEl = document.querySelector('#lw-logo-url-input');
   const descEl = document.querySelector('#lw-desc-input');
   const formTitle = document.querySelector('#lw-form-title');
   const cancelBtn = document.querySelector('#cancel-live-work-btn');
@@ -3661,19 +3752,38 @@ window.editLiveWork = function(id) {
   if (titleEl) titleEl.value = item.title;
   if (catEl) catEl.value = item.category;
   if (urlEl) urlEl.value = item.url;
-  if (tagEl) tagEl.value = item.tag || '';
+  if (sizeEl) sizeEl.value = item.size_tier || 'md';
   if (statusEl) statusEl.value = item.badge_status || '● Live Site';
   if (iconEl) iconEl.value = item.icon_text || '';
   if (colorEl) colorEl.value = item.accent_color || '#ff4e1b';
+  if (logoUrlEl) logoUrlEl.value = item.image || item.custom_icon_url || '';
   if (descEl) descEl.value = item.description || '';
-  if (formTitle) formTitle.textContent = `Edit Live Work: "${item.title}"`;
+  if (formTitle) formTitle.textContent = `Edit Portal Node: "${item.title}"`;
   if (cancelBtn) cancelBtn.style.display = 'inline-block';
 
+  updateLivePreviewNode();
   document.querySelector('#subpanel-live-works')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 };
 
+window.cloneLiveWork = function(id) {
+  const item = allLiveWorksData.find(w => String(w.id) === String(id));
+  if (!item) return;
+
+  const cloned = {
+    ...item,
+    id: 'lw_' + Date.now(),
+    title: item.title + ' (Copy)',
+    display_order: allLiveWorksData.length + 1
+  };
+
+  allLiveWorksData.unshift(cloned);
+  saveLiveWorksToStorage(allLiveWorksData);
+  renderLiveWorksList();
+  showLiveWorkStatus(`✓ Cloned "${item.title}" as a new portal node!`);
+};
+
 window.deleteLiveWork = function(id) {
-  if (!confirm('Are you sure you want to remove this live work card?')) return;
+  if (!confirm('Are you sure you want to remove this circular portal node?')) return;
   allLiveWorksData = allLiveWorksData.filter(w => String(w.id) !== String(id));
   saveLiveWorksToStorage(allLiveWorksData);
   renderLiveWorksList();
@@ -3690,10 +3800,56 @@ window.moveLiveWork = function(id, dir) {
   renderLiveWorksList();
 };
 
+function showLiveWorkStatus(msg) {
+  const liveWorkStatusMsg = document.querySelector('#live-work-save-status');
+  if (liveWorkStatusMsg) {
+    liveWorkStatusMsg.textContent = msg;
+    liveWorkStatusMsg.style.display = 'block';
+    setTimeout(() => { liveWorkStatusMsg.style.display = 'none'; }, 3500);
+  }
+}
+
+// Live Node Preview Event Listeners on Form inputs
+['#lw-title-input', '#lw-color-input', '#lw-icon-input', '#lw-size-input', '#lw-status-input', '#lw-logo-url-input'].forEach(selector => {
+  const el = document.querySelector(selector);
+  if (el) {
+    el.addEventListener('input', updateLivePreviewNode);
+    el.addEventListener('change', updateLivePreviewNode);
+  }
+});
+
+// Logo File Upload listener
+const logoFileInput = document.querySelector('#lw-logo-file-input');
+if (logoFileInput) {
+  logoFileInput.onchange = async () => {
+    const file = logoFileInput.files[0];
+    if (!file) return;
+    try {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const logoUrlEl = document.querySelector('#lw-logo-url-input');
+        if (logoUrlEl) logoUrlEl.value = e.target.result;
+        updateLivePreviewNode();
+      };
+      reader.readAsDataURL(file);
+    } catch (e) {
+      console.error('File read error:', e);
+    }
+  };
+}
+
+// Admin Search input listener
+const adminSearchInput = document.querySelector('#lw-admin-search-input');
+if (adminSearchInput) {
+  adminSearchInput.oninput = () => {
+    adminLiveWorksFilterQuery = adminSearchInput.value;
+    renderLiveWorksList();
+  };
+}
+
 // Wire Save Live Work button
 const saveLiveWorkBtn = document.querySelector('#save-live-work-btn');
 const cancelLiveWorkBtn = document.querySelector('#cancel-live-work-btn');
-const liveWorkStatusMsg = document.querySelector('#live-work-save-status');
 
 if (saveLiveWorkBtn) {
   saveLiveWorkBtn.onclick = function() {
@@ -3701,25 +3857,27 @@ if (saveLiveWorkBtn) {
     const titleEl = document.querySelector('#lw-title-input');
     const catEl = document.querySelector('#lw-category-input');
     const urlEl = document.querySelector('#lw-url-input');
-    const tagEl = document.querySelector('#lw-tag-input');
+    const sizeEl = document.querySelector('#lw-size-input');
     const statusEl = document.querySelector('#lw-status-input');
     const iconEl = document.querySelector('#lw-icon-input');
     const colorEl = document.querySelector('#lw-color-input');
+    const logoUrlEl = document.querySelector('#lw-logo-url-input');
     const descEl = document.querySelector('#lw-desc-input');
     const formTitle = document.querySelector('#lw-form-title');
 
     const title = (titleEl ? titleEl.value : '').trim();
     const url = (urlEl ? urlEl.value : '').trim();
     const category = catEl ? catEl.value : 'Websites & Apps';
-    const tag = (tagEl ? tagEl.value : '').trim() || (category === 'Websites & Apps' ? 'Live Production Site' : 'Brand Identity & Web');
+    const size_tier = sizeEl ? sizeEl.value : 'md';
     const badge_status = statusEl ? statusEl.value : '● Live Site';
     const icon_text = (iconEl ? iconEl.value : '').trim() || (title ? title.slice(0, 2).toUpperCase() : '⚡');
     const accent_color = colorEl ? colorEl.value : '#ff4e1b';
+    const image = (logoUrlEl ? logoUrlEl.value : '').trim();
     const description = (descEl ? descEl.value : '').trim();
     const existingId = idEl ? idEl.value.trim() : '';
 
     if (!title) {
-      alert('Please enter a Project / Website Name.');
+      alert('Please enter a Project / Platform Name.');
       return;
     }
     if (!url) {
@@ -3735,10 +3893,11 @@ if (saveLiveWorkBtn) {
           title,
           url,
           category,
-          tag,
+          size_tier,
           badge_status,
           icon_text,
           accent_color,
+          image,
           description
         };
       }
@@ -3748,10 +3907,11 @@ if (saveLiveWorkBtn) {
         title,
         url,
         category,
-        tag,
+        size_tier,
         badge_status,
         icon_text,
         accent_color,
+        image,
         description,
         display_order: allLiveWorksData.length + 1
       };
@@ -3765,17 +3925,14 @@ if (saveLiveWorkBtn) {
     if (idEl) idEl.value = '';
     if (titleEl) titleEl.value = '';
     if (urlEl) urlEl.value = '';
-    if (tagEl) tagEl.value = '';
     if (iconEl) iconEl.value = '';
+    if (logoUrlEl) logoUrlEl.value = '';
     if (descEl) descEl.value = '';
-    if (formTitle) formTitle.textContent = 'Add New Live Work / Website URL';
+    if (formTitle) formTitle.textContent = 'Add New Circular Portal Node';
     if (cancelLiveWorkBtn) cancelLiveWorkBtn.style.display = 'none';
 
-    if (liveWorkStatusMsg) {
-      liveWorkStatusMsg.textContent = `✓ Live work "${title}" successfully saved!`;
-      liveWorkStatusMsg.style.display = 'block';
-      setTimeout(() => { liveWorkStatusMsg.style.display = 'none'; }, 3000);
-    }
+    updateLivePreviewNode();
+    showLiveWorkStatus(`✓ Portal node "${title}" successfully saved!`);
   };
 }
 
@@ -3784,22 +3941,24 @@ if (cancelLiveWorkBtn) {
     const idEl = document.querySelector('#lw-id-input');
     const titleEl = document.querySelector('#lw-title-input');
     const urlEl = document.querySelector('#lw-url-input');
-    const tagEl = document.querySelector('#lw-tag-input');
     const iconEl = document.querySelector('#lw-icon-input');
+    const logoUrlEl = document.querySelector('#lw-logo-url-input');
     const descEl = document.querySelector('#lw-desc-input');
     const formTitle = document.querySelector('#lw-form-title');
 
     if (idEl) idEl.value = '';
     if (titleEl) titleEl.value = '';
     if (urlEl) urlEl.value = '';
-    if (tagEl) tagEl.value = '';
     if (iconEl) iconEl.value = '';
+    if (logoUrlEl) logoUrlEl.value = '';
     if (descEl) descEl.value = '';
-    if (formTitle) formTitle.textContent = 'Add New Live Work / Website URL';
+    if (formTitle) formTitle.textContent = 'Add New Circular Portal Node';
     cancelLiveWorkBtn.style.display = 'none';
+    updateLivePreviewNode();
   };
 }
 
 // Initial fetch of Live Works in Admin Studio
 fetchLiveWorks();
+
 

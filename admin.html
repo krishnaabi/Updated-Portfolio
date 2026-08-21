@@ -858,82 +858,124 @@
           <!-- Subpanel: Live Works Launchpad Studio -->
           <div class="config-subpanel" id="subpanel-live-works">
             <div class="spotlight-admin-section">
-              <h3 class="admin-section-heading">Work Page — Floating Live Works &amp; Graphic Launchpad</h3>
-              <p class="admin-section-sub">Add and manage live website URLs, client web applications, and graphic design portfolios that redirect clients on click.</p>
-
-              <div class="milestone-form-card" style="padding:24px;background:#fcfbf9;border:1px solid #e7e2dc;border-radius:18px;margin-bottom:28px;">
-                <h4 style="margin:0 0 16px;font-size:16px;font-weight:800;" id="lw-form-title">Add New Live Work / Website URL</h4>
-                <input type="hidden" id="lw-id-input" value="" />
-
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-                  <label class="group-label">Project / Website Name
-                    <input id="lw-title-input" type="text" placeholder="e.g. Honey Universal or Hanioo Marketplace">
-                  </label>
-                  <label class="group-label">Category Filter Group
-                    <select id="lw-category-input">
-                      <option value="Websites & Apps">🌐 Websites &amp; Apps</option>
-                      <option value="Graphic Design & Branding">🎨 Graphic Design &amp; Branding</option>
-                    </select>
-                  </label>
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;margin-bottom:18px;">
+                <div>
+                  <h3 class="admin-section-heading" style="margin-bottom:4px;">Work Page — Minimal Zero-Gravity Circular Portals Studio</h3>
+                  <p class="admin-section-sub" style="margin:0;">Add, customize, reorder, or duplicate live websites &amp; graphic portfolio portal nodes with real-time magnetic physics.</p>
                 </div>
-
-                <div style="display:grid;grid-template-columns:1.5fr 1fr;gap:12px;margin-top:10px;">
-                  <label class="group-label">Live Destination URL
-                    <input id="lw-url-input" type="text" placeholder="https://example.com or https://behance.net/...">
-                  </label>
-                  <label class="group-label">Live Status Badge
-                    <select id="lw-status-input">
-                      <option value="● Live Site">● Live Site (Active Production)</option>
-                      <option value="🎨 Graphic Showcase">🎨 Graphic Showcase (Brand/Visual)</option>
-                      <option value="⚡ Web App">⚡ Web App (Interactive Prototype)</option>
-                      <option value="⚡ System Docs">⚡ System Docs (Design Tokens)</option>
-                    </select>
-                  </label>
-                </div>
-
-                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:10px;">
-                  <label class="group-label">Sub-Tag / Platform
-                    <input id="lw-tag-input" type="text" placeholder="e.g. Live Production Site, SaaS Platform">
-                  </label>
-                  <label class="group-label">Icon / Monogram Initials
-                    <input id="lw-icon-input" type="text" placeholder="e.g. HU, HN, FL, ⚡" maxlength="4">
-                  </label>
-                  <label class="group-label">Brand Accent Color
-                    <select id="lw-color-input">
-                      <option value="#ff4e1b">🔥 Warm Coral (#ff4e1b)</option>
-                      <option value="#7928ca">💜 Royal Purple (#7928ca)</option>
-                      <option value="#0070f3">💙 Electric Blue (#0070f3)</option>
-                      <option value="#10b981">💚 Emerald Green (#10b981)</option>
-                      <option value="#f59e0b">⚡ Amber Gold (#f59e0b)</option>
-                      <option value="#06b6d4">🌊 Cyan Teal (#06b6d4)</option>
-                      <option value="#ec4899">🌸 Vibrant Pink (#ec4899)</option>
-                      <option value="#8b5cf6">🔮 Violet Indigo (#8b5cf6)</option>
-                      <option value="#111111">🖤 Onyx Dark (#111111)</option>
-                    </select>
-                  </label>
-                </div>
-
-                <label class="group-label" style="margin-top:10px;">Short Description / Excerpt
-                  <textarea id="lw-desc-input" rows="2" style="width:100%;padding:12px;border:1px solid #dfddda;border-radius:10px;font:inherit;" placeholder="Brief highlight of the live project or graphic design work..."></textarea>
-                </label>
-
-                <div style="display:flex;align-items:center;gap:10px;margin-top:16px;">
-                  <button type="button" id="save-live-work-btn" class="primary-btn" style="flex:1;padding:14px;background:var(--accent, #ff4e1b);color:#fff;border:0;border-radius:99px;font-weight:800;cursor:pointer;">
-                    ✨ Save Live Work Link
-                  </button>
-                  <button type="button" id="cancel-live-work-btn" style="display:none;padding:14px 20px;background:#eee;color:#333;border:0;border-radius:99px;font-weight:700;cursor:pointer;">
-                    Cancel
-                  </button>
-                </div>
-                <div id="live-work-save-status" style="display:none;margin-top:14px;padding:11px 16px;background:#eefbf3;border:1px solid #b7ebd0;color:#0d7f44;border-radius:12px;font-size:13px;font-weight:700;text-align:center;animation:fadeIn 0.25s ease;"></div>
               </div>
 
-              <!-- List of Published Live Works -->
-              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
-                <h4 style="margin:0;font-size:16px;font-weight:800;">Published Live Works (<span id="live-works-count-num">0</span>)</h4>
-                <small style="color:#74716e;">Interactive cards rendered on Selected Work page</small>
+              <!-- Form & Real-time Node Preview Grid -->
+              <div style="display:grid;grid-template-columns:1fr 280px;gap:20px;align-items:start;margin-bottom:28px;">
+                <div class="milestone-form-card" style="padding:24px;background:#fcfbf9;border:1px solid #e7e2dc;border-radius:18px;">
+                  <h4 style="margin:0 0 16px;font-size:16px;font-weight:800;" id="lw-form-title">Add New Circular Portal Node</h4>
+                  <input type="hidden" id="lw-id-input" value="" />
+
+                  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                    <label class="group-label">Project / Platform Name
+                      <input id="lw-title-input" type="text" placeholder="e.g. Honey Universal, Hanioo, Flubn">
+                    </label>
+                    <label class="group-label">Category Group
+                      <select id="lw-category-input">
+                        <option value="Websites & Apps">🌐 Websites &amp; Apps</option>
+                        <option value="Graphic Design & Branding">🎨 Graphic Design &amp; Branding</option>
+                      </select>
+                    </label>
+                  </div>
+
+                  <div style="display:grid;grid-template-columns:1.5fr 1fr;gap:12px;margin-top:10px;">
+                    <label class="group-label">Live Destination URL
+                      <input id="lw-url-input" type="text" placeholder="https://honeyuniversal.com or https://behance.net/...">
+                    </label>
+                    <label class="group-label">Orb Scale Tier
+                      <select id="lw-size-input">
+                        <option value="lg">🌟 Flagship Large (118px)</option>
+                        <option value="md" selected>⭐ Core Medium (98px)</option>
+                        <option value="sm">✨ Compact Small (84px)</option>
+                      </select>
+                    </label>
+                  </div>
+
+                  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:10px;">
+                    <label class="group-label">Monogram Initials
+                      <input id="lw-icon-input" type="text" placeholder="e.g. HU, HN, FL" maxlength="4">
+                    </label>
+                    <label class="group-label">Brand Accent Color
+                      <select id="lw-color-input">
+                        <option value="#ff4e1b">🔥 Warm Coral (#ff4e1b)</option>
+                        <option value="#7928ca">💜 Royal Purple (#7928ca)</option>
+                        <option value="#0070f3">💙 Electric Blue (#0070f3)</option>
+                        <option value="#10b981">💚 Emerald Green (#10b981)</option>
+                        <option value="#f59e0b">⚡ Amber Gold (#f59e0b)</option>
+                        <option value="#06b6d4">🌊 Cyan Teal (#06b6d4)</option>
+                        <option value="#ec4899">🌸 Vibrant Pink (#ec4899)</option>
+                        <option value="#8b5cf6">🔮 Violet Indigo (#8b5cf6)</option>
+                        <option value="#111111">🖤 Onyx Dark (#111111)</option>
+                      </select>
+                    </label>
+                    <label class="group-label">Live Status
+                      <select id="lw-status-input">
+                        <option value="● Live Site">● Live Site</option>
+                        <option value="🎨 Graphic Showcase">🎨 Graphic Showcase</option>
+                        <option value="⚡ Web App">⚡ Web App</option>
+                        <option value="⚡ System Docs">⚡ System Docs</option>
+                      </select>
+                    </label>
+                  </div>
+
+                  <!-- Optional Custom Logo Image -->
+                  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px;">
+                    <label class="group-label">Custom Logo URL (Optional)
+                      <input id="lw-logo-url-input" type="text" placeholder="https://... or /uploads/...">
+                    </label>
+                    <label class="group-label">Or Upload Logo File
+                      <input id="lw-logo-file-input" type="file" accept="image/*">
+                    </label>
+                  </div>
+
+                  <label class="group-label" style="margin-top:10px;">Short Description / Excerpt
+                    <textarea id="lw-desc-input" rows="2" style="width:100%;padding:12px;border:1px solid #dfddda;border-radius:10px;font:inherit;" placeholder="Brief highlight of the live project experience..."></textarea>
+                  </label>
+
+                  <div style="display:flex;align-items:center;gap:10px;margin-top:16px;">
+                    <button type="button" id="save-live-work-btn" class="primary-btn" style="flex:1;padding:14px;background:var(--accent, #ff4e1b);color:#fff;border:0;border-radius:99px;font-weight:800;cursor:pointer;">
+                      ✨ Save Portal Node
+                    </button>
+                    <button type="button" id="cancel-live-work-btn" style="display:none;padding:14px 20px;background:#eee;color:#333;border:0;border-radius:99px;font-weight:700;cursor:pointer;">
+                      Cancel
+                    </button>
+                  </div>
+                  <div id="live-work-save-status" style="display:none;margin-top:14px;padding:11px 16px;background:#eefbf3;border:1px solid #b7ebd0;color:#0d7f44;border-radius:12px;font-size:13px;font-weight:700;text-align:center;animation:fadeIn 0.25s ease;"></div>
+                </div>
+
+                <!-- Real-time Interactive Node Preview Card -->
+                <div style="padding:20px;background:#ffffff;border:1px solid #e7e2dc;border-radius:18px;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:300px;text-align:center;">
+                  <span style="font-family:'DM Mono',monospace;font-size:10.5px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;color:#888;margin-bottom:18px;">LIVE NODE PREVIEW</span>
+                  
+                  <div id="lw-live-preview-box" style="position:relative;margin-bottom:14px;display:flex;flex-direction:column;align-items:center;">
+                    <div id="lw-prev-orb" style="width:98px;height:98px;border-radius:50%;background:radial-gradient(circle at 35% 25%, #ffffff 0%, #f5f2ee 60%, #e6e1da 100%);border:1.5px solid rgba(0,0,0,0.08);box-shadow:0 12px 28px -6px rgba(0,0,0,0.08), 0 0 20px -4px var(--prev-accent, rgba(255,78,27,0.3));display:flex;align-items:center;justify-content:center;position:relative;transition:all 0.3s ease;">
+                      <span id="lw-prev-beacon" style="position:absolute;top:7px;right:7px;width:8px;height:8px;border-radius:50%;background:#ff4e1b;box-shadow:0 0 8px #ff4e1b;border:1.5px solid #fff;"></span>
+                      <span id="lw-prev-monogram" style="font-family:'DM Mono',monospace;font-weight:800;font-size:18px;color:#111;">HU</span>
+                      <img id="lw-prev-logo-img" src="" alt="Preview Logo" style="display:none;width:55%;height:55%;object-fit:contain;" />
+                    </div>
+                    <span id="lw-prev-caption" style="margin-top:10px;font-family:'Manrope',sans-serif;font-size:12px;font-weight:700;color:#222;">Honey Universal</span>
+                  </div>
+
+                  <small style="font-family:'DM Mono',monospace;font-size:10.5px;color:#777;line-height:1.4;">Live specular reflection &amp; brand aura updates in real time.</small>
+                </div>
               </div>
-              <div id="live-works-admin-list" style="display:grid;grid-template-columns:repeat(auto-fill, minmax(280px, 1fr));gap:12px;">
+
+              <!-- List of Published Live Works with Search -->
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px;">
+                <div style="display:flex;align-items:center;gap:10px;">
+                  <h4 style="margin:0;font-size:16px;font-weight:800;">Published Portal Nodes (<span id="live-works-count-num">0</span>)</h4>
+                  <small style="color:#74716e;">Zero-gravity circular orbs rendered on Selected Work</small>
+                </div>
+                <div style="position:relative;min-width:220px;">
+                  <input type="text" id="lw-admin-search-input" placeholder="Search portal nodes..." style="width:100%;padding:6px 12px;font-size:12px;border:1px solid #ddd;border-radius:100px;box-sizing:border-box;">
+                </div>
+              </div>
+              <div id="live-works-admin-list" style="display:grid;grid-template-columns:repeat(auto-fill, minmax(300px, 1fr));gap:14px;">
                 <!-- Dynamically rendered live works -->
               </div>
             </div>
@@ -1331,7 +1373,7 @@
   </main>
 
   <script src="supabase-config.js"></script>
-  <script src="admin.js?v=65"></script>
+  <script src="admin.js?v=70"></script>
 </body>
 
 </html>
