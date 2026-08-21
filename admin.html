@@ -541,6 +541,7 @@
           <!-- Subtab Controller Bar -->
           <div class="config-nav-bar" id="config-subnav-bar">
             <button type="button" class="config-tab active" data-subtab="heroes">🖼️ Page Hero Visuals</button>
+            <button type="button" class="config-tab" data-subtab="live-works">🚀 Live Works Launchpad</button>
             <button type="button" class="config-tab" data-subtab="tools">🛠️ Toolkit & Tools</button>
             <button type="button" class="config-tab" data-subtab="topics">🧪 Playground Filter Topics</button>
             <button type="button" class="config-tab" data-subtab="journal-topics">📝 Journal Filter Topics</button>
@@ -850,6 +851,90 @@
               <div style="display:flex; align-items:center; gap:12px; margin-top:20px;">
                 <button type="submit" class="submit-publish-btn">Save Hero Visuals <b>↗</b></button>
                 <span class="status asset-status-msg" style="font-weight:700; font-size:13px; color:#2e7d32;"></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Subpanel: Live Works Launchpad Studio -->
+          <div class="config-subpanel" id="subpanel-live-works">
+            <div class="spotlight-admin-section">
+              <h3 class="admin-section-heading">Work Page — Floating Live Works &amp; Graphic Launchpad</h3>
+              <p class="admin-section-sub">Add and manage live website URLs, client web applications, and graphic design portfolios that redirect clients on click.</p>
+
+              <div class="milestone-form-card" style="padding:24px;background:#fcfbf9;border:1px solid #e7e2dc;border-radius:18px;margin-bottom:28px;">
+                <h4 style="margin:0 0 16px;font-size:16px;font-weight:800;" id="lw-form-title">Add New Live Work / Website URL</h4>
+                <input type="hidden" id="lw-id-input" value="" />
+
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                  <label class="group-label">Project / Website Name
+                    <input id="lw-title-input" type="text" placeholder="e.g. Honey Universal or Hanioo Marketplace">
+                  </label>
+                  <label class="group-label">Category Filter Group
+                    <select id="lw-category-input">
+                      <option value="Websites & Apps">🌐 Websites &amp; Apps</option>
+                      <option value="Graphic Design & Branding">🎨 Graphic Design &amp; Branding</option>
+                    </select>
+                  </label>
+                </div>
+
+                <div style="display:grid;grid-template-columns:1.5fr 1fr;gap:12px;margin-top:10px;">
+                  <label class="group-label">Live Destination URL
+                    <input id="lw-url-input" type="text" placeholder="https://example.com or https://behance.net/...">
+                  </label>
+                  <label class="group-label">Live Status Badge
+                    <select id="lw-status-input">
+                      <option value="● Live Site">● Live Site (Active Production)</option>
+                      <option value="🎨 Graphic Showcase">🎨 Graphic Showcase (Brand/Visual)</option>
+                      <option value="⚡ Web App">⚡ Web App (Interactive Prototype)</option>
+                      <option value="⚡ System Docs">⚡ System Docs (Design Tokens)</option>
+                    </select>
+                  </label>
+                </div>
+
+                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:10px;">
+                  <label class="group-label">Sub-Tag / Platform
+                    <input id="lw-tag-input" type="text" placeholder="e.g. Live Production Site, SaaS Platform">
+                  </label>
+                  <label class="group-label">Icon / Monogram Initials
+                    <input id="lw-icon-input" type="text" placeholder="e.g. HU, HN, FL, ⚡" maxlength="4">
+                  </label>
+                  <label class="group-label">Brand Accent Color
+                    <select id="lw-color-input">
+                      <option value="#ff4e1b">🔥 Warm Coral (#ff4e1b)</option>
+                      <option value="#7928ca">💜 Royal Purple (#7928ca)</option>
+                      <option value="#0070f3">💙 Electric Blue (#0070f3)</option>
+                      <option value="#10b981">💚 Emerald Green (#10b981)</option>
+                      <option value="#f59e0b">⚡ Amber Gold (#f59e0b)</option>
+                      <option value="#06b6d4">🌊 Cyan Teal (#06b6d4)</option>
+                      <option value="#ec4899">🌸 Vibrant Pink (#ec4899)</option>
+                      <option value="#8b5cf6">🔮 Violet Indigo (#8b5cf6)</option>
+                      <option value="#111111">🖤 Onyx Dark (#111111)</option>
+                    </select>
+                  </label>
+                </div>
+
+                <label class="group-label" style="margin-top:10px;">Short Description / Excerpt
+                  <textarea id="lw-desc-input" rows="2" style="width:100%;padding:12px;border:1px solid #dfddda;border-radius:10px;font:inherit;" placeholder="Brief highlight of the live project or graphic design work..."></textarea>
+                </label>
+
+                <div style="display:flex;align-items:center;gap:10px;margin-top:16px;">
+                  <button type="button" id="save-live-work-btn" class="primary-btn" style="flex:1;padding:14px;background:var(--accent, #ff4e1b);color:#fff;border:0;border-radius:99px;font-weight:800;cursor:pointer;">
+                    ✨ Save Live Work Link
+                  </button>
+                  <button type="button" id="cancel-live-work-btn" style="display:none;padding:14px 20px;background:#eee;color:#333;border:0;border-radius:99px;font-weight:700;cursor:pointer;">
+                    Cancel
+                  </button>
+                </div>
+                <div id="live-work-save-status" style="display:none;margin-top:14px;padding:11px 16px;background:#eefbf3;border:1px solid #b7ebd0;color:#0d7f44;border-radius:12px;font-size:13px;font-weight:700;text-align:center;animation:fadeIn 0.25s ease;"></div>
+              </div>
+
+              <!-- List of Published Live Works -->
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+                <h4 style="margin:0;font-size:16px;font-weight:800;">Published Live Works (<span id="live-works-count-num">0</span>)</h4>
+                <small style="color:#74716e;">Interactive cards rendered on Selected Work page</small>
+              </div>
+              <div id="live-works-admin-list" style="display:grid;grid-template-columns:repeat(auto-fill, minmax(280px, 1fr));gap:12px;">
+                <!-- Dynamically rendered live works -->
               </div>
             </div>
           </div>
@@ -1246,7 +1331,7 @@
   </main>
 
   <script src="supabase-config.js"></script>
-  <script src="admin.js?v=60"></script>
+  <script src="admin.js?v=65"></script>
 </body>
 
 </html>

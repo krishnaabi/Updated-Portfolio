@@ -1,0 +1,541 @@
+/* ═══════════════════════════════════════════════════════════════
+   WORK PAGE — FLOATING LIVE WORKS LAUNCHPAD & WEB DOCK
+   ═══════════════════════════════════════════════════════════════ */
+
+.live-launchpad-section {
+  position: relative;
+  width: 100%;
+  max-width: 1320px;
+  margin: 70px auto 60px auto;
+  padding: 50px 32px;
+  background: radial-gradient(circle at 15% 20%, rgba(255, 78, 27, 0.05) 0%, transparent 45%),
+              radial-gradient(circle at 85% 80%, rgba(121, 40, 202, 0.04) 0%, transparent 45%),
+              linear-gradient(180deg, rgba(255, 255, 255, 0.85) 0%, rgba(249, 248, 246, 0.95) 100%);
+  border: 1px solid rgba(0, 0, 0, 0.07);
+  border-radius: 32px;
+  box-shadow: 0 20px 50px -15px rgba(0, 0, 0, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+/* Dark mode support */
+[data-theme="dark"] .live-launchpad-section,
+body.theme-dark .live-launchpad-section {
+  background: radial-gradient(circle at 15% 20%, rgba(255, 78, 27, 0.08) 0%, transparent 45%),
+              radial-gradient(circle at 85% 80%, rgba(121, 40, 202, 0.06) 0%, transparent 45%),
+              linear-gradient(180deg, #151515 0%, #0d0d0d 100%);
+  border-color: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 24px 60px -20px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+/* Floating Ambient Orbs */
+.live-launchpad-section::before,
+.live-launchpad-section::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(50px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.live-launchpad-section::before {
+  width: 280px;
+  height: 280px;
+  top: -60px;
+  right: -40px;
+  background: rgba(255, 78, 27, 0.08);
+  animation: orbDrift 12s ease-in-out infinite alternate;
+}
+
+.live-launchpad-section::after {
+  width: 320px;
+  height: 320px;
+  bottom: -80px;
+  left: -50px;
+  background: rgba(121, 40, 202, 0.06);
+  animation: orbDrift 14s ease-in-out infinite alternate-reverse;
+}
+
+@keyframes orbDrift {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(20px, -25px) scale(1.1); }
+  100% { transform: translate(-15px, 15px) scale(0.95); }
+}
+
+/* Launchpad Header */
+.launchpad-header {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 36px;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.launchpad-header-left {
+  max-width: 680px;
+}
+
+.launchpad-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #ff4e1b;
+  background: rgba(255, 78, 27, 0.1);
+  padding: 6px 14px;
+  border-radius: 100px;
+  border: 1px solid rgba(255, 78, 27, 0.2);
+  margin-bottom: 12px;
+}
+
+.launchpad-badge-beacon {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 10px #10b981;
+  animation: beaconPulse 2s infinite ease-in-out;
+}
+
+@keyframes beaconPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(1.3); }
+}
+
+.launchpad-title {
+  font-family: 'Manrope', sans-serif;
+  font-size: clamp(26px, 3.4vw, 36px);
+  font-weight: 800;
+  line-height: 1.15;
+  color: #111;
+  letter-spacing: -0.03em;
+  margin: 0 0 8px 0;
+}
+
+[data-theme="dark"] .launchpad-title,
+body.theme-dark .launchpad-title {
+  color: #f5f5f7;
+}
+
+.launchpad-title em {
+  font-style: italic;
+  font-weight: 400;
+  font-family: 'Newsreader', serif;
+  color: #ff4e1b;
+}
+
+.launchpad-desc {
+  font-size: 15px;
+  line-height: 1.5;
+  color: #666;
+  margin: 0;
+}
+
+[data-theme="dark"] .launchpad-desc,
+body.theme-dark .launchpad-desc {
+  color: #a0a0a5;
+}
+
+/* Controls Bar (Filter Pills + Live Search) */
+.launchpad-controls-bar {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 32px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+[data-theme="dark"] .launchpad-controls-bar,
+body.theme-dark .launchpad-controls-bar {
+  border-color: rgba(255, 255, 255, 0.06);
+}
+
+.launchpad-filter-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.launchpad-pill {
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 8px 16px;
+  background: rgba(0, 0, 0, 0.03);
+  color: #555;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 100px;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+[data-theme="dark"] .launchpad-pill,
+body.theme-dark .launchpad-pill {
+  background: rgba(255, 255, 255, 0.04);
+  color: #a0a0a5;
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.launchpad-pill:hover {
+  background: rgba(0, 0, 0, 0.07);
+  color: #111;
+  transform: translateY(-1px);
+}
+
+[data-theme="dark"] .launchpad-pill:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+
+.launchpad-pill.active {
+  background: #111;
+  color: #fff;
+  border-color: #111;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+}
+
+[data-theme="dark"] .launchpad-pill.active {
+  background: #ff4e1b;
+  color: #fff;
+  border-color: #ff4e1b;
+  box-shadow: 0 4px 18px rgba(255, 78, 27, 0.35);
+}
+
+/* Search input */
+.launchpad-search-wrap {
+  position: relative;
+  min-width: 240px;
+  flex: 1;
+  max-width: 320px;
+}
+
+.launchpad-search-input {
+  width: 100%;
+  padding: 9px 14px 9px 36px;
+  font-family: 'Manrope', sans-serif;
+  font-size: 13px;
+  color: #111;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 100px;
+  outline: none;
+  transition: all 0.25s ease;
+  box-sizing: border-box;
+}
+
+[data-theme="dark"] .launchpad-search-input,
+body.theme-dark .launchpad-search-input {
+  background: rgba(25, 25, 25, 0.85);
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.launchpad-search-input:focus {
+  border-color: #ff4e1b;
+  box-shadow: 0 0 0 3px rgba(255, 78, 27, 0.15);
+}
+
+.launchpad-search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 13px;
+  color: #888;
+  pointer-events: none;
+}
+
+/* Grid of Floating Live Cards */
+.launchpad-grid {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+/* Individual Floating Card */
+.launchpad-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 22px;
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(0, 0, 0, 0.07);
+  border-radius: 20px;
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.3s ease,
+              background 0.3s ease;
+  box-shadow: 0 8px 24px -6px rgba(0, 0, 0, 0.04);
+  cursor: pointer;
+  overflow: hidden;
+}
+
+[data-theme="dark"] .launchpad-card,
+body.theme-dark .launchpad-card {
+  background: rgba(24, 24, 26, 0.65);
+  border-color: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 30px -10px rgba(0, 0, 0, 0.5);
+}
+
+/* Staggered Ambient Floating Keyframes */
+.launchpad-card:nth-child(3n+1) {
+  animation: cardFloatA 8s ease-in-out infinite alternate;
+}
+.launchpad-card:nth-child(3n+2) {
+  animation: cardFloatB 9s ease-in-out infinite alternate 1.5s;
+}
+.launchpad-card:nth-child(3n+3) {
+  animation: cardFloatC 7.5s ease-in-out infinite alternate 0.8s;
+}
+
+@keyframes cardFloatA {
+  0% { transform: translateY(0px); }
+  100% { transform: translateY(-5px); }
+}
+
+@keyframes cardFloatB {
+  0% { transform: translateY(0px); }
+  100% { transform: translateY(-7px); }
+}
+
+@keyframes cardFloatC {
+  0% { transform: translateY(0px); }
+  100% { transform: translateY(-4px); }
+}
+
+/* Card Hover Elevation */
+.launchpad-card:hover {
+  animation-play-state: paused;
+  transform: translateY(-8px) scale(1.015) !important;
+  border-color: var(--card-accent, #ff4e1b);
+  box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.12),
+              0 0 0 1px var(--card-accent, #ff4e1b);
+  background: rgba(255, 255, 255, 0.95);
+}
+
+[data-theme="dark"] .launchpad-card:hover {
+  background: rgba(32, 32, 36, 0.85);
+  box-shadow: 0 20px 45px -12px rgba(0, 0, 0, 0.7),
+              0 0 20px -5px var(--card-accent, rgba(255, 78, 27, 0.4));
+}
+
+/* Top Row: Icon + Beacon + Tag */
+.launchpad-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+
+.launchpad-icon-badge {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'DM Mono', monospace;
+  font-weight: 800;
+  font-size: 15px;
+  color: #fff;
+  background: var(--card-accent, #111);
+  box-shadow: 0 6px 14px -3px var(--card-accent-shadow, rgba(0, 0, 0, 0.25));
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  flex-shrink: 0;
+}
+
+.launchpad-card:hover .launchpad-icon-badge {
+  transform: scale(1.1) rotate(-3deg);
+}
+
+.launchpad-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: 'DM Mono', monospace;
+  font-size: 10.5px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 100px;
+  background: rgba(16, 185, 129, 0.1);
+  color: #059669;
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+[data-theme="dark"] .launchpad-status-pill {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+  border-color: rgba(16, 185, 129, 0.3);
+}
+
+.launchpad-status-pill.status-graphic {
+  background: rgba(121, 40, 202, 0.1);
+  color: #7928ca;
+  border-color: rgba(121, 40, 202, 0.2);
+}
+
+[data-theme="dark"] .launchpad-status-pill.status-graphic {
+  background: rgba(121, 40, 202, 0.18);
+  color: #c084fc;
+  border-color: rgba(121, 40, 202, 0.3);
+}
+
+.launchpad-status-pill.status-webapp {
+  background: rgba(245, 158, 11, 0.1);
+  color: #d97706;
+  border-color: rgba(245, 158, 11, 0.2);
+}
+
+[data-theme="dark"] .launchpad-status-pill.status-webapp {
+  background: rgba(245, 158, 11, 0.18);
+  color: #fbbf24;
+  border-color: rgba(245, 158, 11, 0.3);
+}
+
+/* Card Body */
+.launchpad-card-body {
+  margin-bottom: 18px;
+}
+
+.launchpad-card-title {
+  font-family: 'Manrope', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.3;
+  color: #111;
+  margin: 0 0 6px 0;
+  letter-spacing: -0.02em;
+}
+
+[data-theme="dark"] .launchpad-card-title,
+body.theme-dark .launchpad-card-title {
+  color: #f5f5f7;
+}
+
+.launchpad-card-desc {
+  font-size: 13px;
+  line-height: 1.5;
+  color: #666;
+  margin: 0 0 10px 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+[data-theme="dark"] .launchpad-card-desc,
+body.theme-dark .launchpad-card-desc {
+  color: #a0a0a5;
+}
+
+.launchpad-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: #888;
+}
+
+/* Card Footer (Domain + Redirect Link Button) */
+.launchpad-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 14px;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="dark"] .launchpad-card-footer,
+body.theme-dark .launchpad-card-footer {
+  border-color: rgba(255, 255, 255, 0.06);
+}
+
+.launchpad-domain {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: #777;
+  max-width: 170px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+[data-theme="dark"] .launchpad-domain {
+  color: #999;
+}
+
+.launchpad-cta-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: 'DM Mono', monospace;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--card-accent, #ff4e1b);
+  transition: transform 0.25s ease, color 0.2s ease;
+}
+
+.launchpad-cta-btn span {
+  transition: transform 0.25s ease;
+}
+
+.launchpad-card:hover .launchpad-cta-btn span {
+  transform: translate(3px, -3px);
+}
+
+/* Empty State */
+.launchpad-empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 40px 20px;
+  color: #888;
+  font-family: 'DM Mono', monospace;
+  font-size: 13px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .live-launchpad-section {
+    padding: 32px 20px;
+    margin: 40px auto 40px auto;
+    border-radius: 24px;
+  }
+  .launchpad-grid {
+    grid-template-columns: 1fr;
+  }
+  .launchpad-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .launchpad-controls-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .launchpad-search-wrap {
+    max-width: 100%;
+  }
+}

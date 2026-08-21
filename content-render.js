@@ -1632,6 +1632,201 @@
         }
       ];
 
+      // ══════════════════════════════════════════════════════════
+      // FLOATING LIVE WORKS LAUNCHPAD & QUICK REDIRECTION DOCK
+      // ══════════════════════════════════════════════════════════
+      const launchpadGrid = document.querySelector('#launchpad-cards-grid');
+      const launchpadFilters = document.querySelector('#launchpad-filters');
+      const launchpadSearch = document.querySelector('#launchpad-search-input');
+
+      if (launchpadGrid) {
+        let activeFilter = 'all';
+        let searchQuery = '';
+
+        const defaultLiveWorks = [
+          {
+            id: 'lw1',
+            title: 'Honey Universal',
+            category: 'Websites & Apps',
+            tag: 'Live Production Site',
+            url: 'https://honeyuniversal.com',
+            description: 'Premium brand & global digital commerce experience with interactive product visualizer.',
+            icon_text: 'HU',
+            accent_color: '#ff4e1b',
+            badge_status: '● Live Site'
+          },
+          {
+            id: 'lw2',
+            title: 'Hanioo Marketplace',
+            category: 'Websites & Apps',
+            tag: 'SaaS Platform',
+            url: 'https://hanioo.com',
+            description: 'On-demand multilingual interpretation booking ecosystem across Web, iOS & Android.',
+            icon_text: 'HN',
+            accent_color: '#7928ca',
+            badge_status: '● Live Site'
+          },
+          {
+            id: 'lw3',
+            title: 'Flubn Digital Studio',
+            category: 'Graphic Design & Branding',
+            tag: 'Brand Identity & Web',
+            url: 'https://flubn.com',
+            description: 'Experimental creative studio brand system, typography guidelines, and digital portfolio.',
+            icon_text: 'FL',
+            accent_color: '#0070f3',
+            badge_status: '🎨 Graphic Showcase'
+          },
+          {
+            id: 'lw4',
+            title: 'G-Force Tech',
+            category: 'Graphic Design & Branding',
+            tag: 'Visual Identity',
+            url: 'https://www.behance.net/krishnaabi',
+            description: 'Dynamic automotive tech visual identity, iconography suite, and graphic campaign assets.',
+            icon_text: 'GF',
+            accent_color: '#10b981',
+            badge_status: '🎨 Graphic Showcase'
+          },
+          {
+            id: 'lw5',
+            title: 'Stuak Creative Lab',
+            category: 'Websites & Apps',
+            tag: 'Interactive Web',
+            url: 'https://github.com/krishnaabi',
+            description: 'Curated digital lab showcasing interactive generative prototypes and UI micro-animations.',
+            icon_text: 'ST',
+            accent_color: '#f59e0b',
+            badge_status: '⚡ Web App'
+          },
+          {
+            id: 'lw6',
+            title: 'Noma Health Hub',
+            category: 'Websites & Apps',
+            tag: 'Healthcare Web App',
+            url: 'https://nomahealth.com',
+            description: 'Telehealth consultation platform featuring intuitive doctor-patient scheduling workflows.',
+            icon_text: 'NM',
+            accent_color: '#06b6d4',
+            badge_status: '● Live Site'
+          },
+          {
+            id: 'lw7',
+            title: 'Veloce Brand & Packaging',
+            category: 'Graphic Design & Branding',
+            tag: 'Print & Packaging',
+            url: 'https://dribbble.com',
+            description: 'Luxury minimalist packaging design, bespoke typography treatment, and art direction.',
+            icon_text: 'VL',
+            accent_color: '#ec4899',
+            badge_status: '🎨 Graphic Showcase'
+          },
+          {
+            id: 'lw8',
+            title: 'Apex Design System',
+            category: 'Websites & Apps',
+            tag: 'Design Tokens & Docs',
+            url: 'work.html',
+            description: 'Comprehensive multi-brand enterprise UI design token library and interactive component docs.',
+            icon_text: 'AP',
+            accent_color: '#8b5cf6',
+            badge_status: '⚡ System Docs'
+          }
+        ];
+
+        const getLiveWorks = () => {
+          try {
+            const local = JSON.parse(localStorage.getItem('ak_portfolio_live_works') || 'null');
+            if (Array.isArray(local) && local.length > 0) return local;
+          } catch (e) {}
+          return defaultLiveWorks;
+        };
+
+        const renderCards = () => {
+          const list = getLiveWorks();
+          const filtered = list.filter(item => {
+            const matchFilter = activeFilter === 'all' || item.category === activeFilter;
+            const q = searchQuery.toLowerCase().trim();
+            const matchSearch = !q ||
+              (item.title && item.title.toLowerCase().includes(q)) ||
+              (item.description && item.description.toLowerCase().includes(q)) ||
+              (item.tag && item.tag.toLowerCase().includes(q)) ||
+              (item.url && item.url.toLowerCase().includes(q));
+            return matchFilter && matchSearch;
+          });
+
+          if (!filtered.length) {
+            launchpadGrid.innerHTML = `
+              <div class="launchpad-empty">
+                <span>No live works found matching "<strong>${escape(searchQuery)}</strong>"</span>
+              </div>
+            `;
+            return;
+          }
+
+          launchpadGrid.innerHTML = filtered.map(item => {
+            let domain = '';
+            try {
+              if (item.url && item.url.startsWith('http')) {
+                domain = new URL(item.url).hostname.replace(/^www\./, '');
+              } else {
+                domain = item.url || 'Internal Demo';
+              }
+            } catch {
+              domain = item.url || 'Live Site';
+            }
+
+            const accent = item.accent_color || '#ff4e1b';
+            const statusClass = (item.badge_status || '').includes('Graphic') ? 'status-graphic' : ((item.badge_status || '').includes('Web App') || (item.badge_status || '').includes('System') ? 'status-webapp' : '');
+            const iconText = item.icon_text || (item.title ? item.title.slice(0, 2).toUpperCase() : '⚡');
+
+            return `
+              <a href="${escape(item.url || '#')}" ${item.url && item.url.startsWith('http') ? 'target="_blank" rel="noopener noreferrer"' : ''} class="launchpad-card" style="--card-accent:${escape(accent)};">
+                <div>
+                  <div class="launchpad-card-top">
+                    <div class="launchpad-icon-badge">${escape(iconText)}</div>
+                    <span class="launchpad-status-pill ${statusClass}">${escape(item.badge_status || '● Live Site')}</span>
+                  </div>
+                  <div class="launchpad-card-body">
+                    <h3 class="launchpad-card-title">${escape(item.title)}</h3>
+                    <p class="launchpad-card-desc">${escape(item.description || 'Explore live digital experience.')}</p>
+                    <div class="launchpad-card-meta">
+                      <span>✦ ${escape(item.tag || item.category || 'Live Site')}</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="launchpad-card-footer">
+                  <span class="launchpad-domain" title="${escape(domain)}">${escape(domain)}</span>
+                  <span class="launchpad-cta-btn">Redirect <span>↗</span></span>
+                </div>
+              </a>
+            `;
+          }).join('');
+        };
+
+        renderCards();
+
+        // Wire filter buttons
+        if (launchpadFilters) {
+          launchpadFilters.querySelectorAll('.launchpad-pill').forEach(btn => {
+            btn.onclick = () => {
+              launchpadFilters.querySelectorAll('.launchpad-pill').forEach(b => b.classList.remove('active'));
+              btn.classList.add('active');
+              activeFilter = btn.dataset.filter || 'all';
+              renderCards();
+            };
+          });
+        }
+
+        // Wire live search
+        if (launchpadSearch) {
+          launchpadSearch.oninput = () => {
+            searchQuery = launchpadSearch.value;
+            renderCards();
+          };
+        }
+      }
+
       const projects = document.querySelector('.projects');
       const rawWork = items.filter(item => isWorkType(item));
       const workItems = rawWork.length ? rawWork : defaultWorkItems;

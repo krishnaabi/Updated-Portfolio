@@ -39,6 +39,7 @@
   <link rel="stylesheet" href="experience.css?v=1" />
   <link rel="stylesheet" href="process-enhance.css?v=1" />
   <link rel="stylesheet" href="work.css?v=9" />
+  <link rel="stylesheet" href="live-dock.css?v=1" />
 </head>
 
 <body class="work-page">
@@ -67,6 +68,40 @@
       </div>
       <div class="work-hero-visual" id="work-hero-visual">
         <img src="uploads/1786448592290-wcivgv.png" alt="Work Hero" id="work-hero-img" style="display:block;" />
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════════ -->
+    <!-- FLOATING LIVE WORKS LAUNCHPAD & QUICK REDIRECTION DOCK -->
+    <!-- ══════════════════════════════════════════════════════════ -->
+    <section class="live-launchpad-section reveal" id="live-launchpad">
+      <div class="launchpad-header">
+        <div class="launchpad-header-left">
+          <div class="launchpad-badge">
+            <span class="launchpad-badge-beacon"></span>
+            <span>✦ Live Sites &amp; Graphic Works</span>
+          </div>
+          <h2 class="launchpad-title">Interactive <em>Launchpad</em></h2>
+          <p class="launchpad-desc">Direct interactive redirection to live production websites, client platforms, and graphic design portfolios.</p>
+        </div>
+      </div>
+
+      <!-- Controls: Category Filters & Search -->
+      <div class="launchpad-controls-bar">
+        <div class="launchpad-filter-pills" id="launchpad-filters">
+          <button class="launchpad-pill active" data-filter="all">✦ All Works</button>
+          <button class="launchpad-pill" data-filter="Websites & Apps">🌐 Websites &amp; Apps</button>
+          <button class="launchpad-pill" data-filter="Graphic Design & Branding">🎨 Graphic Design &amp; Brand</button>
+        </div>
+        <div class="launchpad-search-wrap">
+          <span class="launchpad-search-icon">⌕</span>
+          <input type="text" id="launchpad-search-input" class="launchpad-search-input" placeholder="Search live sites or domains..." aria-label="Search live works" />
+        </div>
+      </div>
+
+      <!-- Floating Grid of Cards -->
+      <div class="launchpad-grid" id="launchpad-cards-grid">
+        <!-- Rendered dynamically by content-render.js -->
       </div>
     </section>
 
@@ -114,11 +149,11 @@
   <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js" defer></script>
   <script src="icons.js?v=2" defer></script>
   <script src="supabase-config.js"></script>
-  <script src="content-render.js?v=81"></script>
+  <script src="content-render.js?v=90"></script>
   <script src="work-stack.js" defer></script>
   <script src="motion.js" defer></script>
   <script src="process-enhance.js" defer></script>
-  <script src="script.js?v=15"></script>
+  <script src="script.js?v=16"></script>
 </body>
 
 </html>

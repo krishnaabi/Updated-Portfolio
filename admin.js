@@ -3463,3 +3463,343 @@ renderJournalTopicsUI();
 if ($('#journal-date') && !$('#journal-date').value) {
   $('#journal-date').value = getTodayDateString();
 }
+
+// ══════════════════════════════════════════════════════════
+// LIVE WORKS LAUNCHPAD STUDIO MANAGER
+// ══════════════════════════════════════════════════════════
+const STORAGE_KEY_LIVE_WORKS = 'ak_portfolio_live_works';
+
+const defaultLiveWorksPresets = [
+  {
+    id: 'lw1',
+    title: 'Honey Universal',
+    category: 'Websites & Apps',
+    tag: 'Live Production Site',
+    url: 'https://honeyuniversal.com',
+    description: 'Premium brand & global digital commerce experience with interactive product visualizer.',
+    icon_text: 'HU',
+    accent_color: '#ff4e1b',
+    badge_status: '● Live Site',
+    display_order: 1
+  },
+  {
+    id: 'lw2',
+    title: 'Hanioo Marketplace',
+    category: 'Websites & Apps',
+    tag: 'SaaS Platform',
+    url: 'https://hanioo.com',
+    description: 'On-demand multilingual interpretation booking ecosystem across Web, iOS & Android.',
+    icon_text: 'HN',
+    accent_color: '#7928ca',
+    badge_status: '● Live Site',
+    display_order: 2
+  },
+  {
+    id: 'lw3',
+    title: 'Flubn Digital Studio',
+    category: 'Graphic Design & Branding',
+    tag: 'Brand Identity & Web',
+    url: 'https://flubn.com',
+    description: 'Experimental creative studio brand system, typography guidelines, and digital portfolio.',
+    icon_text: 'FL',
+    accent_color: '#0070f3',
+    badge_status: '🎨 Graphic Showcase',
+    display_order: 3
+  },
+  {
+    id: 'lw4',
+    title: 'G-Force Tech',
+    category: 'Graphic Design & Branding',
+    tag: 'Visual Identity',
+    url: 'https://www.behance.net/krishnaabi',
+    description: 'Dynamic automotive tech visual identity, iconography suite, and graphic campaign assets.',
+    icon_text: 'GF',
+    accent_color: '#10b981',
+    badge_status: '🎨 Graphic Showcase',
+    display_order: 4
+  },
+  {
+    id: 'lw5',
+    title: 'Stuak Creative Lab',
+    category: 'Websites & Apps',
+    tag: 'Interactive Web',
+    url: 'https://github.com/krishnaabi',
+    description: 'Curated digital lab showcasing interactive generative prototypes and UI micro-animations.',
+    icon_text: 'ST',
+    accent_color: '#f59e0b',
+    badge_status: '⚡ Web App',
+    display_order: 5
+  },
+  {
+    id: 'lw6',
+    title: 'Noma Health Hub',
+    category: 'Websites & Apps',
+    tag: 'Healthcare Web App',
+    url: 'https://nomahealth.com',
+    description: 'Telehealth consultation platform featuring intuitive doctor-patient scheduling workflows.',
+    icon_text: 'NM',
+    accent_color: '#06b6d4',
+    badge_status: '● Live Site',
+    display_order: 6
+  },
+  {
+    id: 'lw7',
+    title: 'Veloce Brand & Packaging',
+    category: 'Graphic Design & Branding',
+    tag: 'Print & Packaging',
+    url: 'https://dribbble.com',
+    description: 'Luxury minimalist packaging design, bespoke typography treatment, and art direction.',
+    icon_text: 'VL',
+    accent_color: '#ec4899',
+    badge_status: '🎨 Graphic Showcase',
+    display_order: 7
+  },
+  {
+    id: 'lw8',
+    title: 'Apex Design System',
+    category: 'Websites & Apps',
+    tag: 'Design Tokens & Docs',
+    url: 'work.html',
+    description: 'Comprehensive multi-brand enterprise UI design token library and interactive component docs.',
+    icon_text: 'AP',
+    accent_color: '#8b5cf6',
+    badge_status: '⚡ System Docs',
+    display_order: 8
+  }
+];
+
+let allLiveWorksData = [];
+
+function loadLiveWorksFromStorage() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY_LIVE_WORKS);
+    if (raw) return JSON.parse(raw);
+  } catch (e) {}
+  return null;
+}
+
+function saveLiveWorksToStorage(list) {
+  try {
+    localStorage.setItem(STORAGE_KEY_LIVE_WORKS, JSON.stringify(list));
+  } catch (e) {}
+}
+
+function fetchLiveWorks() {
+  const localSaved = loadLiveWorksFromStorage();
+  if (localSaved !== null && Array.isArray(localSaved)) {
+    allLiveWorksData = localSaved;
+  } else {
+    allLiveWorksData = [...defaultLiveWorksPresets];
+    saveLiveWorksToStorage(allLiveWorksData);
+  }
+  renderLiveWorksList();
+}
+
+function renderLiveWorksList() {
+  const container = document.querySelector('#live-works-admin-list');
+  const countEl = document.querySelector('#live-works-count-num');
+  if (countEl) countEl.textContent = allLiveWorksData.length;
+  if (!container) return;
+
+  if (!allLiveWorksData.length) {
+    container.innerHTML = `<div style="grid-column:1/-1;padding:24px;text-align:center;color:#888;background:#fff;border-radius:12px;border:1px dashed #ccc;">No live works configured yet. Add your first website or graphic design project above!</div>`;
+    return;
+  }
+
+  container.innerHTML = allLiveWorksData.map((item, index) => {
+    const accent = item.accent_color || '#ff4e1b';
+    const iconText = item.icon_text || (item.title ? item.title.slice(0, 2).toUpperCase() : '⚡');
+    return `
+      <div class="live-work-admin-card" style="padding:16px;background:#ffffff;border:1px solid #e7e2dc;border-radius:14px;display:flex;flex-direction:column;justify-content:space-between;gap:12px;box-shadow:0 2px 8px rgba(0,0,0,0.03);">
+        <div>
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
+            <div style="width:38px;height:38px;border-radius:10px;background:${accent};color:#fff;font-weight:800;font-family:'DM Mono',monospace;display:grid;place-items:center;font-size:14px;">
+              ${iconText}
+            </div>
+            <span style="font-size:11px;font-family:'DM Mono',monospace;font-weight:700;padding:3px 8px;border-radius:99px;background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0;">
+              ${item.badge_status || '● Live Site'}
+            </span>
+          </div>
+          <h4 style="margin:0 0 4px;font-size:15px;font-weight:800;color:#111;">${item.title}</h4>
+          <p style="margin:0 0 6px;font-size:12.5px;color:#666;line-height:1.4;">${item.description || ''}</p>
+          <div style="font-size:11px;font-family:'DM Mono',monospace;color:#888;">
+            <span>✦ ${item.category}</span> · <a href="${item.url}" target="_blank" style="color:var(--accent,#ff4e1b);text-decoration:none;">${item.url} ↗</a>
+          </div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding-top:10px;border-top:1px solid #f2ede7;">
+          <div style="display:flex;gap:4px;">
+            <button type="button" onclick="moveLiveWork('${item.id}', -1)" ${index === 0 ? 'disabled style="opacity:0.3;"' : ''} style="padding:4px 8px;border:1px solid #ddd;border-radius:6px;background:#fff;cursor:pointer;">↑</button>
+            <button type="button" onclick="moveLiveWork('${item.id}', 1)" ${index === allLiveWorksData.length - 1 ? 'disabled style="opacity:0.3;"' : ''} style="padding:4px 8px;border:1px solid #ddd;border-radius:6px;background:#fff;cursor:pointer;">↓</button>
+          </div>
+          <div style="display:flex;gap:6px;">
+            <button type="button" onclick="editLiveWork('${item.id}')" style="padding:6px 12px;background:#111;color:#fff;border:0;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;">Edit</button>
+            <button type="button" onclick="deleteLiveWork('${item.id}')" style="padding:6px 12px;background:#fff1f1;color:#d32f2f;border:1px solid #ffcdd2;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;">Delete</button>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+window.editLiveWork = function(id) {
+  const item = allLiveWorksData.find(w => String(w.id) === String(id));
+  if (!item) return;
+
+  const idEl = document.querySelector('#lw-id-input');
+  const titleEl = document.querySelector('#lw-title-input');
+  const catEl = document.querySelector('#lw-category-input');
+  const urlEl = document.querySelector('#lw-url-input');
+  const tagEl = document.querySelector('#lw-tag-input');
+  const statusEl = document.querySelector('#lw-status-input');
+  const iconEl = document.querySelector('#lw-icon-input');
+  const colorEl = document.querySelector('#lw-color-input');
+  const descEl = document.querySelector('#lw-desc-input');
+  const formTitle = document.querySelector('#lw-form-title');
+  const cancelBtn = document.querySelector('#cancel-live-work-btn');
+
+  if (idEl) idEl.value = item.id;
+  if (titleEl) titleEl.value = item.title;
+  if (catEl) catEl.value = item.category;
+  if (urlEl) urlEl.value = item.url;
+  if (tagEl) tagEl.value = item.tag || '';
+  if (statusEl) statusEl.value = item.badge_status || '● Live Site';
+  if (iconEl) iconEl.value = item.icon_text || '';
+  if (colorEl) colorEl.value = item.accent_color || '#ff4e1b';
+  if (descEl) descEl.value = item.description || '';
+  if (formTitle) formTitle.textContent = `Edit Live Work: "${item.title}"`;
+  if (cancelBtn) cancelBtn.style.display = 'inline-block';
+
+  document.querySelector('#subpanel-live-works')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+};
+
+window.deleteLiveWork = function(id) {
+  if (!confirm('Are you sure you want to remove this live work card?')) return;
+  allLiveWorksData = allLiveWorksData.filter(w => String(w.id) !== String(id));
+  saveLiveWorksToStorage(allLiveWorksData);
+  renderLiveWorksList();
+};
+
+window.moveLiveWork = function(id, dir) {
+  const index = allLiveWorksData.findIndex(w => String(w.id) === String(id));
+  if (index === -1) return;
+  const newIndex = index + dir;
+  if (newIndex < 0 || newIndex >= allLiveWorksData.length) return;
+  const [removed] = allLiveWorksData.splice(index, 1);
+  allLiveWorksData.splice(newIndex, 0, removed);
+  saveLiveWorksToStorage(allLiveWorksData);
+  renderLiveWorksList();
+};
+
+// Wire Save Live Work button
+const saveLiveWorkBtn = document.querySelector('#save-live-work-btn');
+const cancelLiveWorkBtn = document.querySelector('#cancel-live-work-btn');
+const liveWorkStatusMsg = document.querySelector('#live-work-save-status');
+
+if (saveLiveWorkBtn) {
+  saveLiveWorkBtn.onclick = function() {
+    const idEl = document.querySelector('#lw-id-input');
+    const titleEl = document.querySelector('#lw-title-input');
+    const catEl = document.querySelector('#lw-category-input');
+    const urlEl = document.querySelector('#lw-url-input');
+    const tagEl = document.querySelector('#lw-tag-input');
+    const statusEl = document.querySelector('#lw-status-input');
+    const iconEl = document.querySelector('#lw-icon-input');
+    const colorEl = document.querySelector('#lw-color-input');
+    const descEl = document.querySelector('#lw-desc-input');
+    const formTitle = document.querySelector('#lw-form-title');
+
+    const title = (titleEl ? titleEl.value : '').trim();
+    const url = (urlEl ? urlEl.value : '').trim();
+    const category = catEl ? catEl.value : 'Websites & Apps';
+    const tag = (tagEl ? tagEl.value : '').trim() || (category === 'Websites & Apps' ? 'Live Production Site' : 'Brand Identity & Web');
+    const badge_status = statusEl ? statusEl.value : '● Live Site';
+    const icon_text = (iconEl ? iconEl.value : '').trim() || (title ? title.slice(0, 2).toUpperCase() : '⚡');
+    const accent_color = colorEl ? colorEl.value : '#ff4e1b';
+    const description = (descEl ? descEl.value : '').trim();
+    const existingId = idEl ? idEl.value.trim() : '';
+
+    if (!title) {
+      alert('Please enter a Project / Website Name.');
+      return;
+    }
+    if (!url) {
+      alert('Please enter a Destination URL (e.g. https://...).');
+      return;
+    }
+
+    if (existingId) {
+      const idx = allLiveWorksData.findIndex(w => String(w.id) === String(existingId));
+      if (idx !== -1) {
+        allLiveWorksData[idx] = {
+          ...allLiveWorksData[idx],
+          title,
+          url,
+          category,
+          tag,
+          badge_status,
+          icon_text,
+          accent_color,
+          description
+        };
+      }
+    } else {
+      const newWork = {
+        id: 'lw_' + Date.now(),
+        title,
+        url,
+        category,
+        tag,
+        badge_status,
+        icon_text,
+        accent_color,
+        description,
+        display_order: allLiveWorksData.length + 1
+      };
+      allLiveWorksData.unshift(newWork);
+    }
+
+    saveLiveWorksToStorage(allLiveWorksData);
+    renderLiveWorksList();
+
+    // Reset Form
+    if (idEl) idEl.value = '';
+    if (titleEl) titleEl.value = '';
+    if (urlEl) urlEl.value = '';
+    if (tagEl) tagEl.value = '';
+    if (iconEl) iconEl.value = '';
+    if (descEl) descEl.value = '';
+    if (formTitle) formTitle.textContent = 'Add New Live Work / Website URL';
+    if (cancelLiveWorkBtn) cancelLiveWorkBtn.style.display = 'none';
+
+    if (liveWorkStatusMsg) {
+      liveWorkStatusMsg.textContent = `✓ Live work "${title}" successfully saved!`;
+      liveWorkStatusMsg.style.display = 'block';
+      setTimeout(() => { liveWorkStatusMsg.style.display = 'none'; }, 3000);
+    }
+  };
+}
+
+if (cancelLiveWorkBtn) {
+  cancelLiveWorkBtn.onclick = function() {
+    const idEl = document.querySelector('#lw-id-input');
+    const titleEl = document.querySelector('#lw-title-input');
+    const urlEl = document.querySelector('#lw-url-input');
+    const tagEl = document.querySelector('#lw-tag-input');
+    const iconEl = document.querySelector('#lw-icon-input');
+    const descEl = document.querySelector('#lw-desc-input');
+    const formTitle = document.querySelector('#lw-form-title');
+
+    if (idEl) idEl.value = '';
+    if (titleEl) titleEl.value = '';
+    if (urlEl) urlEl.value = '';
+    if (tagEl) tagEl.value = '';
+    if (iconEl) iconEl.value = '';
+    if (descEl) descEl.value = '';
+    if (formTitle) formTitle.textContent = 'Add New Live Work / Website URL';
+    cancelLiveWorkBtn.style.display = 'none';
+  };
+}
+
+// Initial fetch of Live Works in Admin Studio
+fetchLiveWorks();
+
