@@ -543,7 +543,6 @@
             <button type="button" class="config-tab active" data-subtab="heroes">🖼️ Page Hero Visuals</button>
             <button type="button" class="config-tab" data-subtab="live-works">🚀 Live Works Launchpad</button>
             <button type="button" class="config-tab" data-subtab="tools">🛠️ Toolkit & Tools</button>
-            <button type="button" class="config-tab" data-subtab="topics">🧪 Playground Filter Topics</button>
             <button type="button" class="config-tab" data-subtab="journal-topics">📝 Journal Filter Topics</button>
             <button type="button" class="config-tab" data-subtab="brands">🏢 Trusted Brands & Ticker</button>
             <button type="button" class="config-tab" data-subtab="achievements">🌟 Achievements & Stage Showcase</button>
@@ -1299,32 +1298,6 @@
             </div>
           </div>
 
-          <!-- Subpanel: Playground Filter Topics Studio -->
-          <div class="config-subpanel" id="subpanel-topics">
-            <div class="spotlight-admin-section">
-              <h3 class="admin-section-heading">Playground Page — Filter Topics & Categories</h3>
-              <p class="admin-section-sub">Add, remove, and manage the filter pill buttons displayed on the Playground page. Items in your Playground showcase can be tagged with these topics.</p>
-
-              <div class="topic-management-card">
-                <div class="topic-mgr-top">
-                  <h4>Active Playground Topics (<span id="pg-topics-count">0</span>)</h4>
-                  <button type="button" id="pg-topics-reset-btn" class="secondary-mini-btn">↺ Reset to Defaults</button>
-                </div>
-                <p class="topic-mgr-desc">These topics appear as filter buttons in the interactive experiments switcher on <b>playground.html</b>.</p>
-
-                <div id="assets-pg-topics-list" class="admin-topics-grid"></div>
-
-                <div class="topic-add-form-group">
-                  <input type="text" id="assets-new-pg-topic" placeholder="Enter new topic name (e.g. Mobile UX, Generative 3D, Design Systems)..." class="topic-main-input" />
-                  <button type="button" id="assets-add-pg-topic-btn" class="topic-main-add-btn">
-                    ✨ Add Topic
-                  </button>
-                </div>
-                <small class="topic-status-msg" id="pg-topic-status-msg"></small>
-              </div>
-            </div>
-          </div>
-
           <!-- Subpanel: Journal Filter Topics Studio -->
           <div class="config-subpanel" id="subpanel-journal-topics">
             <div class="spotlight-admin-section">
@@ -1369,7 +1342,7 @@
   </main>
 
   <script src="supabase-config.js"></script>
-  <script src="admin.js?v=75"></script>
+  <script src="admin.js?v=80"></script>
 </body>
 
 </html>

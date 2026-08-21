@@ -3094,34 +3094,7 @@ function renderPlaygroundTopicsUI() {
     `).join('');
   }
 
-  // 2. Assets Config Subpanel Grid & Count
-  const countEl = $('#pg-topics-count');
-  if (countEl) countEl.textContent = topics.length;
-
-  const assetsList = $('#assets-pg-topics-list');
-  if (assetsList) {
-    assetsList.innerHTML = topics.map((t, idx) => {
-      const num = String(idx + 1).padStart(2, '0');
-      const isFirst = idx === 0;
-      const isLast = idx === topics.length - 1;
-      return `
-        <div class="admin-topic-row">
-          <div class="admin-topic-left">
-            <span class="admin-topic-order">${num}</span>
-            <strong class="admin-topic-name">${escapeHtml(t)}</strong>
-            <span class="admin-topic-pill-preview">Filter Pill</span>
-          </div>
-          <div class="admin-topic-actions">
-            <button type="button" class="topic-icon-btn" onclick="movePlaygroundTopic(${idx}, -1)" ${isFirst ? 'disabled style="opacity:0.3;cursor:not-allowed;"' : ''} title="Move Up">↑</button>
-            <button type="button" class="topic-icon-btn" onclick="movePlaygroundTopic(${idx}, 1)" ${isLast ? 'disabled style="opacity:0.3;cursor:not-allowed;"' : ''} title="Move Down">↓</button>
-            <button type="button" class="topic-icon-btn danger" onclick="removePlaygroundTopic(${idx})" title="Delete Topic">🗑</button>
-          </div>
-        </div>
-      `;
-    }).join('');
-  }
-
-  // 3. Category Select Dropdown (if playground is currently selected)
+  // 2. Category Select Dropdown (if playground is currently selected)
   if (typeInput && typeInput.value === 'playground' && category) {
     const currentVal = category.value;
     category.innerHTML = topics.map(val => `<option value="${escapeHtml(val)}">${escapeHtml(val)}</option>`).join('');
@@ -3242,27 +3215,6 @@ if (contentAddTopicBtn && contentTopicInput) {
   };
   contentAddTopicBtn.onclick = handleContentAdd;
   contentTopicInput.onkeydown = e => { if (e.key === 'Enter') { e.preventDefault(); handleContentAdd(); } };
-}
-
-// Wire Add Topic from Assets Config Subpanel
-const assetsAddTopicBtn = $('#assets-add-pg-topic-btn');
-const assetsTopicInput = $('#assets-new-pg-topic');
-if (assetsAddTopicBtn && assetsTopicInput) {
-  const handleAssetsAdd = async () => {
-    const val = assetsTopicInput.value.trim();
-    if (val) {
-      await window.addPlaygroundTopic(val);
-      assetsTopicInput.value = '';
-    }
-  };
-  assetsAddTopicBtn.onclick = handleAssetsAdd;
-  assetsTopicInput.onkeydown = e => { if (e.key === 'Enter') { e.preventDefault(); handleAssetsAdd(); } };
-}
-
-// Wire Reset button
-const pgResetBtn = $('#pg-topics-reset-btn');
-if (pgResetBtn) {
-  pgResetBtn.onclick = () => window.resetPlaygroundTopics();
 }
 
 // Initial render of topics UI
