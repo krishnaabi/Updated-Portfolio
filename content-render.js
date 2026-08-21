@@ -1633,12 +1633,12 @@
       ];
 
       // ══════════════════════════════════════════════════════════
-      // MINIMAL ZERO-GRAVITY CIRCULAR PORTALS DOCK
+      // LIQUID SPATIAL MAGNETIC DOCK ("The Best One" Edition)
       // ══════════════════════════════════════════════════════════
-      const portalsStage = document.querySelector('#circular-portals-stage');
-      const portalsCountBadge = document.querySelector('#portals-count-badge');
+      const liquidDock = document.querySelector('#liquid-magnetic-dock');
+      const liquidDockCount = document.querySelector('#liquid-dock-count');
 
-      if (portalsStage) {
+      if (liquidDock) {
         const defaultLiveWorks = [
           {
             id: 'lw1',
@@ -1738,113 +1738,90 @@
           return defaultLiveWorks;
         };
 
-        let activeCategoryFilter = 'all';
+        const rawList = getLiveWorks();
+        if (liquidDockCount) {
+          liquidDockCount.textContent = `${String(rawList.length).padStart(2, '0')} Live Production & Graphic Works`;
+        }
 
-        const renderPortals = () => {
-          const rawList = getLiveWorks();
-          const filteredList = rawList.filter(item => {
-            if (activeCategoryFilter === 'all') return true;
-            return item.category === activeCategoryFilter;
-          });
+        liquidDock.innerHTML = rawList.map(item => {
+          const accent = item.accent_color || '#ff4e1b';
+          const iconText = item.icon_text || (item.title ? item.title.slice(0, 2).toUpperCase() : '⚡');
+          const customImg = item.image || item.custom_icon_url || item.iconUrl || '';
 
-          if (portalsCountBadge) {
-            portalsCountBadge.textContent = `✦ ${String(filteredList.length).padStart(2, '0')} LIVE REDIRECTION PORTALS`;
-          }
+          const orbInner = customImg
+            ? `<img src="${escape(customImg)}" alt="${escape(item.title)}" class="spatial-logo-img" />`
+            : `<span class="spatial-monogram">${escape(iconText)}</span>`;
 
-          if (!filteredList.length) {
-            portalsStage.innerHTML = `<div style="padding:20px;color:#888;font-family:'DM Mono',monospace;font-size:12px;">No portals found in this category.</div>`;
-            return;
-          }
+          return `
+            <a href="${escape(item.url || '#')}" ${item.url && item.url.startsWith('http') ? 'target="_blank" rel="noopener noreferrer"' : ''} class="spatial-dock-item" style="--orb-accent:${escape(accent)};" aria-label="Visit ${escape(item.title)}">
+              <!-- Floating Minimal Tooltip -->
+              <div class="spatial-tooltip">
+                <span class="spatial-tooltip-dot"></span>
+                <span class="spatial-tooltip-text">${escape(item.title)}</span>
+                <span class="spatial-tooltip-arrow">↗</span>
+              </div>
 
-          portalsStage.innerHTML = filteredList.map((item, index) => {
-            let domain = '';
-            try {
-              if (item.url && item.url.startsWith('http')) {
-                domain = new URL(item.url).hostname.replace(/^www\./, '');
-              } else {
-                domain = item.url || 'Live Demo';
-              }
-            } catch {
-              domain = item.url || 'Live Demo';
+              <!-- 3D Glass Sphere -->
+              <div class="spatial-orb">
+                <span class="spatial-live-beacon"></span>
+                ${orbInner}
+              </div>
+            </a>
+          `;
+        }).join('');
+
+        // ══════════════════════════════════════════════════════════
+        // PARABOLIC WAVE MAGNIFICATION ENGINE (macOS / VisionOS)
+        // ══════════════════════════════════════════════════════════
+        const dockItems = Array.from(liquidDock.querySelectorAll('.spatial-dock-item'));
+        const maxScale = 1.48;
+        const influenceDistance = 120; // Radius of magnetic wave effect
+
+        const handleDockMouseMove = (e) => {
+          if (window.innerWidth <= 768) return; // Touch scrolling on mobile
+
+          const mouseX = e.clientX;
+          dockItems.forEach(item => {
+            const rect = item.getBoundingClientRect();
+            const itemCenterX = rect.left + rect.width / 2;
+            const dist = Math.abs(mouseX - itemCenterX);
+
+            if (dist < influenceDistance) {
+              // Smooth cosine parabolic wave curve
+              const factor = Math.cos((dist / influenceDistance) * (Math.PI / 2));
+              const scale = 1 + (maxScale - 1) * factor;
+              const liftY = -(scale - 1) * 22;
+              item.style.transform = `scale(${scale.toFixed(3)}) translateY(${liftY.toFixed(1)}px)`;
+              item.style.zIndex = '50';
+            } else {
+              item.style.transform = 'scale(1) translateY(0px)';
+              item.style.zIndex = '1';
             }
-
-            const accent = item.accent_color || '#ff4e1b';
-            const iconText = item.icon_text || (item.title ? item.title.slice(0, 2).toUpperCase() : '⚡');
-            const customImg = item.image || item.custom_icon_url || item.iconUrl || '';
-            
-            // Organic tiered sizing or custom tier
-            let sizeClass = item.size_tier ? `node-size-${item.size_tier}` : (index < 2 ? 'node-size-lg' : (index >= 5 ? 'node-size-sm' : 'node-size-md'));
-
-            const orbInner = customImg
-              ? `<img src="${escape(customImg)}" alt="${escape(item.title)}" class="portal-logo-img" />`
-              : `<span class="portal-monogram">${escape(iconText)}</span>`;
-
-            return `
-              <a href="${escape(item.url || '#')}" ${item.url && item.url.startsWith('http') ? 'target="_blank" rel="noopener noreferrer"' : ''} class="circular-portal-node ${sizeClass}" style="--node-accent:${escape(accent)};" aria-label="Visit ${escape(item.title)}">
-                <!-- Holographic Expansion Capsule Tooltip -->
-                <div class="portal-holo-tooltip">
-                  <span class="holo-dot"></span>
-                  <div class="holo-info">
-                    <span class="holo-title">${escape(item.title)}</span>
-                    <span class="holo-domain">${escape(domain)} · ${escape(item.category)}</span>
-                  </div>
-                  <span class="holo-arrow">↗</span>
-                </div>
-
-                <!-- Core Floating Orb -->
-                <div class="portal-orb">
-                  <span class="portal-beacon"></span>
-                  ${orbInner}
-                </div>
-
-                <!-- Minimal Caption Label -->
-                <span class="portal-caption">${escape(item.title)}</span>
-              </a>
-            `;
-          }).join('');
-
-          // Magnetic Cursor Physics & Interactive Shockwave Engine
-          const nodes = portalsStage.querySelectorAll('.circular-portal-node');
-          nodes.forEach(node => {
-            node.addEventListener('mousemove', (e) => {
-              const rect = node.getBoundingClientRect();
-              const nodeX = rect.left + rect.width / 2;
-              const nodeY = rect.top + rect.height / 2;
-              const deltaX = (e.clientX - nodeX) * 0.28;
-              const deltaY = (e.clientY - nodeY) * 0.28;
-              node.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
-            });
-
-            node.addEventListener('mouseleave', () => {
-              node.style.transform = '';
-            });
-
-            node.addEventListener('click', () => {
-              const orb = node.querySelector('.portal-orb');
-              if (orb) {
-                const ripple = document.createElement('span');
-                ripple.className = 'portal-ripple';
-                orb.appendChild(ripple);
-                setTimeout(() => ripple.remove(), 700);
-              }
-            });
           });
         };
 
-        renderPortals();
-
-        // Wire category filter pills
-        const filterPills = document.querySelector('#portals-filters');
-        if (filterPills) {
-          filterPills.querySelectorAll('.portals-filter-btn').forEach(btn => {
-            btn.onclick = () => {
-              filterPills.querySelectorAll('.portals-filter-btn').forEach(b => b.classList.remove('active'));
-              btn.classList.add('active');
-              activeCategoryFilter = btn.dataset.filter || 'all';
-              renderPortals();
-            };
+        const handleDockMouseLeave = () => {
+          dockItems.forEach(item => {
+            item.style.transform = 'scale(1) translateY(0px)';
+            item.style.zIndex = '1';
           });
-        }
+        };
+
+        liquidDock.addEventListener('mousemove', handleDockMouseMove);
+        liquidDock.addEventListener('mouseleave', handleDockMouseLeave);
+
+        // Click Shockwave
+        dockItems.forEach(item => {
+          item.addEventListener('click', () => {
+            const orb = item.querySelector('.spatial-orb');
+            if (orb) {
+              const ripple = document.createElement('span');
+              ripple.className = 'spatial-ripple';
+              orb.appendChild(ripple);
+              setTimeout(() => ripple.remove(), 600);
+            }
+          });
+        });
       }
 
       const projects = document.querySelector('.projects');

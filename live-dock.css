@@ -1,569 +1,353 @@
 /* ═══════════════════════════════════════════════════════════════
-   WORK PAGE — ULTRA-PREMIUM MINIMAL CIRCULAR PORTALS DOCK
-   "Creativity Pro Max" Spatial Nodes Edition
+   WORK PAGE — LIQUID SPATIAL MAGNETIC DOCK
+   "The Best One" · VisionOS Parabolic Magnification Edition
    ═══════════════════════════════════════════════════════════════ */
 
-.live-launchpad-section {
+.liquid-dock-wrap {
   position: relative;
   width: 100%;
-  max-width: 1320px;
-  margin: 60px auto 70px auto;
-  padding: 44px 36px 50px 36px;
-  background: radial-gradient(circle at 50% 0%, rgba(255, 78, 27, 0.05) 0%, transparent 65%),
-              radial-gradient(circle at 85% 100%, rgba(121, 40, 202, 0.05) 0%, transparent 55%),
-              linear-gradient(180deg, rgba(255, 255, 255, 0.85) 0%, rgba(250, 248, 246, 0.95) 100%);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(0, 0, 0, 0.07);
-  border-radius: 36px;
-  box-shadow: 0 24px 60px -20px rgba(0, 0, 0, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.9);
-  overflow: visible;
+  max-width: 1200px;
+  margin: 40px auto 65px auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0 20px;
   box-sizing: border-box;
+  z-index: 40;
 }
 
-[data-theme="dark"] .live-launchpad-section,
-body.theme-dark .live-launchpad-section {
-  background: radial-gradient(circle at 50% 0%, rgba(255, 78, 27, 0.08) 0%, transparent 65%),
-              radial-gradient(circle at 85% 100%, rgba(121, 40, 202, 0.07) 0%, transparent 55%),
-              linear-gradient(180deg, #151518 0%, #0d0d0f 100%);
-  border-color: rgba(255, 255, 255, 0.08);
-  box-shadow: 0 28px 70px -20px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.06);
-}
-
-/* Minimal Top Header Bar */
-.portals-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
-  flex-wrap: wrap;
-  gap: 16px;
-}
-
-.portals-header-left {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  flex-wrap: wrap;
-}
-
-.portals-badge {
+/* Minimalist Top Indicator Label */
+.liquid-dock-badge {
   display: inline-flex;
   align-items: center;
   gap: 8px;
   font-family: 'DM Mono', monospace;
   font-size: 11px;
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: #ff4e1b;
-  background: rgba(255, 78, 27, 0.08);
-  padding: 6px 14px;
-  border-radius: 100px;
-  border: 1px solid rgba(255, 78, 27, 0.2);
+  color: #777;
+  margin-bottom: 20px;
+  user-select: none;
 }
 
-.portals-radar-dot {
-  width: 7px;
-  height: 7px;
+[data-theme="dark"] .liquid-dock-badge,
+body.theme-dark .liquid-dock-badge {
+  color: #999;
+}
+
+.liquid-dock-badge-dot {
+  width: 6.5px;
+  height: 6.5px;
   border-radius: 50%;
   background: #10b981;
   box-shadow: 0 0 10px #10b981;
-  animation: radarPing 2s infinite ease-in-out;
+  animation: liveDockPulse 2s infinite ease-in-out;
 }
 
-@keyframes radarPing {
-  0%, 100% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(1.4); opacity: 0.4; }
-}
-
-/* Minimal Filter Pills */
-.portals-filter-pills {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: rgba(0, 0, 0, 0.03);
-  padding: 4px;
-  border-radius: 100px;
-  border: 1px solid rgba(0, 0, 0, 0.06);
-}
-
-[data-theme="dark"] .portals-filter-pills,
-body.theme-dark .portals-filter-pills {
-  background: rgba(255, 255, 255, 0.04);
-  border-color: rgba(255, 255, 255, 0.08);
-}
-
-.portals-filter-btn {
-  font-family: 'DM Mono', monospace;
-  font-size: 11px;
-  font-weight: 700;
-  padding: 6px 14px;
-  background: transparent;
-  color: #666;
-  border: 0;
-  border-radius: 100px;
-  cursor: pointer;
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-[data-theme="dark"] .portals-filter-btn,
-body.theme-dark .portals-filter-btn {
-  color: #9ca3af;
-}
-
-.portals-filter-btn:hover {
-  color: #111;
-}
-
-[data-theme="dark"] .portals-filter-btn:hover {
-  color: #fff;
-}
-
-.portals-filter-btn.active {
-  background: #111;
-  color: #fff;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-}
-
-[data-theme="dark"] .portals-filter-btn.active {
-  background: #ff4e1b;
-  color: #fff;
-  box-shadow: 0 2px 12px rgba(255, 78, 27, 0.35);
-}
-
-.portals-hint {
-  font-family: 'DM Mono', monospace;
-  font-size: 12px;
-  color: #777;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-[data-theme="dark"] .portals-hint,
-body.theme-dark .portals-hint {
-  color: #888;
-}
-
-.portals-hint kbd {
-  display: inline-block;
-  padding: 2px 7px;
-  font-size: 10.5px;
-  font-weight: 700;
-  background: rgba(0, 0, 0, 0.05);
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  border-radius: 6px;
-  color: #111;
-}
-
-[data-theme="dark"] .portals-hint kbd {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.15);
-  color: #eee;
+@keyframes liveDockPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(1.35); }
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   CIRCULAR PORTALS CONSTELLATION STAGE (Organic Zero-Gravity Dock)
+   THE FLOATING LIQUID GLASS DOCK (Pill Container)
    ═══════════════════════════════════════════════════════════════ */
-.circular-portals-stage {
+.liquid-magnetic-dock {
   position: relative;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
+  display: inline-flex;
   align-items: center;
-  gap: 34px 38px;
-  padding: 30px 10px 10px 10px;
-  min-height: 180px;
+  justify-content: center;
+  gap: 16px;
+  padding: 14px 22px;
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(30px) saturate(180%);
+  -webkit-backdrop-filter: blur(30px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  border-radius: 100px;
+  box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.08),
+              0 0 0 1px rgba(0, 0, 0, 0.04),
+              inset 0 1px 2px rgba(255, 255, 255, 0.95);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   overflow: visible;
 }
 
-/* Individual Circular Portal Node */
-.circular-portal-node {
+[data-theme="dark"] .liquid-magnetic-dock,
+body.theme-dark .liquid-magnetic-dock {
+  background: rgba(22, 22, 26, 0.75);
+  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 24px 60px -15px rgba(0, 0, 0, 0.7),
+              0 0 0 1px rgba(255, 255, 255, 0.05),
+              inset 0 1px 2px rgba(255, 255, 255, 0.15);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   CIRCULAR 3D GLASS ORBS / SPATIAL APP ICONS
+   ═══════════════════════════════════════════════════════════════ */
+.spatial-dock-item {
   position: relative;
-  display: inline-flex;
+  display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   text-decoration: none;
   color: inherit;
   cursor: pointer;
-  user-select: none;
+  outline: none;
   -webkit-tap-highlight-color: transparent;
-  transform-style: preserve-3d;
-  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
-              box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  transform-origin: bottom center;
   will-change: transform;
 }
 
-/* Three Dynamic Scale Tiers (Organic Spatial Hierarchy) */
-.circular-portal-node.node-size-lg .portal-orb {
-  width: 118px;
-  height: 118px;
-}
-.circular-portal-node.node-size-lg .portal-monogram {
-  font-size: 23px;
-}
-
-.circular-portal-node.node-size-md .portal-orb {
-  width: 98px;
-  height: 98px;
-}
-.circular-portal-node.node-size-md .portal-monogram {
-  font-size: 18px;
-}
-
-.circular-portal-node.node-size-sm .portal-orb {
-  width: 84px;
-  height: 84px;
-}
-.circular-portal-node.node-size-sm .portal-monogram {
-  font-size: 15px;
-}
-
-/* The Core Floating Circular Orb */
-.portal-orb {
+/* The 3D Glass Sphere */
+.spatial-orb {
   position: relative;
+  width: 58px;
+  height: 58px;
   border-radius: 50%;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: radial-gradient(circle at 35% 25%, rgba(255, 255, 255, 0.98) 0%, rgba(248, 246, 242, 0.92) 55%, rgba(234, 230, 224, 0.85) 100%);
-  border: 1.5px solid rgba(0, 0, 0, 0.08);
-  box-shadow: 0 14px 30px -8px rgba(0, 0, 0, 0.08),
-              0 4px 10px -2px rgba(0, 0, 0, 0.04),
+  background: radial-gradient(circle at 35% 25%, rgba(255, 255, 255, 0.98) 0%, rgba(246, 244, 240, 0.92) 50%, rgba(230, 226, 218, 0.85) 100%);
+  border: 1.5px solid rgba(255, 255, 255, 0.85);
+  box-shadow: 0 8px 20px -4px rgba(0, 0, 0, 0.1),
+              0 2px 6px -1px rgba(0, 0, 0, 0.04),
               inset 0 2.5px 4px rgba(255, 255, 255, 1),
-              inset 0 -2px 6px rgba(0, 0, 0, 0.04);
-  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
-              border-color 0.35s ease,
-              box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+              inset 0 -2px 5px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.3s ease;
   overflow: visible;
 }
 
-[data-theme="dark"] .portal-orb,
-body.theme-dark .portal-orb {
-  background: radial-gradient(circle at 35% 25%, #2a2a2e 0%, #1a1a1d 60%, #111113 100%);
-  border-color: rgba(255, 255, 255, 0.12);
-  box-shadow: 0 16px 40px -10px rgba(0, 0, 0, 0.75),
-              inset 0 2px 3px rgba(255, 255, 255, 0.22),
-              inset 0 -2px 8px rgba(0, 0, 0, 0.6);
+[data-theme="dark"] .spatial-orb,
+body.theme-dark .spatial-orb {
+  background: radial-gradient(circle at 35% 25%, #2c2c30 0%, #1a1a1d 55%, #101012 100%);
+  border-color: rgba(255, 255, 255, 0.16);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.8),
+              inset 0 2px 3px rgba(255, 255, 255, 0.25),
+              inset 0 -2px 6px rgba(0, 0, 0, 0.7);
 }
 
-/* Floating Ambient Zero-Gravity Keyframes */
-.circular-portal-node:nth-child(4n+1) {
-  animation: orbLevitate1 7s ease-in-out infinite alternate;
-}
-.circular-portal-node:nth-child(4n+2) {
-  animation: orbLevitate2 8.5s ease-in-out infinite alternate 1s;
-}
-.circular-portal-node:nth-child(4n+3) {
-  animation: orbLevitate3 6.8s ease-in-out infinite alternate 2s;
-}
-.circular-portal-node:nth-child(4n+4) {
-  animation: orbLevitate4 9s ease-in-out infinite alternate 0.5s;
-}
-
-@keyframes orbLevitate1 {
-  0% { transform: translateY(0px) rotate(0deg); }
-  100% { transform: translateY(-10px) rotate(2deg); }
-}
-
-@keyframes orbLevitate2 {
-  0% { transform: translateY(0px) rotate(0deg); }
-  100% { transform: translateY(-13px) rotate(-2deg); }
-}
-
-@keyframes orbLevitate3 {
-  0% { transform: translateY(0px) rotate(0deg); }
-  100% { transform: translateY(-8px) rotate(1.5deg); }
-}
-
-@keyframes orbLevitate4 {
-  0% { transform: translateY(0px) rotate(0deg); }
-  100% { transform: translateY(-11px) rotate(-1.5deg); }
-}
-
-/* Rotating Specular Chromatic Flare Ring on Hover */
-.portal-orb::before {
+/* Luminous Ambient Halo Ring */
+.spatial-orb::before {
   content: '';
   position: absolute;
   inset: -6px;
   border-radius: 50%;
-  background: var(--node-accent, #ff4e1b);
+  background: var(--orb-accent, #ff4e1b);
   opacity: 0;
   filter: blur(10px);
-  transition: opacity 0.4s ease, transform 0.4s ease;
+  transition: opacity 0.35s ease, transform 0.35s ease;
   z-index: -1;
   pointer-events: none;
 }
 
-.portal-orb::after {
+/* Specular Border Highlight */
+.spatial-orb::after {
   content: '';
   position: absolute;
-  inset: -3px;
+  inset: -2px;
   border-radius: 50%;
-  border: 2px solid var(--node-accent, #ff4e1b);
+  border: 2px solid var(--orb-accent, #ff4e1b);
   opacity: 0;
-  transform: scale(0.92);
-  transition: opacity 0.35s ease, transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  transform: scale(0.9);
+  transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   pointer-events: none;
 }
 
-/* Hover Elevation & Magnetic Expansion */
-.circular-portal-node:hover {
-  animation-play-state: paused;
-  z-index: 100;
-}
-
-.circular-portal-node:hover .portal-orb {
-  transform: scale(1.12) translateY(-4px);
-  border-color: var(--node-accent, #ff4e1b);
-  box-shadow: 0 22px 50px -12px var(--node-shadow, rgba(255, 78, 27, 0.4)),
-              0 0 28px -4px var(--node-accent, rgba(255, 78, 27, 0.45));
-}
-
-.circular-portal-node:hover .portal-orb::before {
+/* Hover State - Glow Halo */
+.spatial-dock-item:hover .spatial-orb::before {
   opacity: 0.65;
-  transform: scale(1.18);
+  transform: scale(1.15);
 }
 
-.circular-portal-node:hover .portal-orb::after {
+.spatial-dock-item:hover .spatial-orb::after {
   opacity: 1;
-  transform: scale(1.05);
+  transform: scale(1.04);
 }
 
-/* Monogram Text & Brand Label */
-.portal-monogram {
+.spatial-dock-item:hover .spatial-orb {
+  border-color: var(--orb-accent, #ff4e1b);
+  box-shadow: 0 16px 36px -8px var(--orb-shadow, rgba(255, 78, 27, 0.45)),
+              0 0 24px -2px var(--orb-accent, rgba(255, 78, 27, 0.4));
+}
+
+/* Monogram Text */
+.spatial-monogram {
   font-family: 'DM Mono', monospace;
   font-weight: 800;
+  font-size: 15px;
   color: #111;
   letter-spacing: -0.04em;
-  transition: transform 0.3s ease, color 0.3s ease;
-  pointer-events: none;
   line-height: 1;
+  pointer-events: none;
+  transition: color 0.25s ease, transform 0.25s ease;
 }
 
-[data-theme="dark"] .portal-monogram,
-body.theme-dark .portal-monogram {
+[data-theme="dark"] .spatial-monogram,
+body.theme-dark .spatial-monogram {
   color: #f5f5f7;
 }
 
-.circular-portal-node:hover .portal-monogram {
-  color: var(--node-accent, #ff4e1b);
-  transform: scale(1.1);
+.spatial-dock-item:hover .spatial-monogram {
+  color: var(--orb-accent, #ff4e1b);
+  transform: scale(1.08);
 }
 
-/* Custom Brand Logo Image in Node */
-.portal-logo-img {
+/* Custom Image Logo in Orb */
+.spatial-logo-img {
   width: 55%;
   height: 55%;
   object-fit: contain;
-  border-radius: 8px;
+  border-radius: 6px;
   pointer-events: none;
-  transition: transform 0.3s ease;
+  transition: transform 0.25s ease;
 }
 
-.circular-portal-node:hover .portal-logo-img {
+.spatial-dock-item:hover .spatial-logo-img {
   transform: scale(1.1);
 }
 
-/* Micro Live Beacon on Circle Perimeter */
-.portal-beacon {
+/* Micro Live Indicator Dot */
+.spatial-live-beacon {
   position: absolute;
-  top: 7px;
-  right: 7px;
-  width: 8.5px;
-  height: 8.5px;
+  top: 3px;
+  right: 3px;
+  width: 6.5px;
+  height: 6.5px;
   border-radius: 50%;
-  background: var(--node-accent, #10b981);
-  box-shadow: 0 0 8px var(--node-accent, #10b981);
+  background: var(--orb-accent, #10b981);
+  box-shadow: 0 0 7px var(--orb-accent, #10b981);
   border: 1.5px solid #fff;
-  transition: transform 0.3s ease;
+  transition: transform 0.25s ease;
 }
 
-[data-theme="dark"] .portal-beacon {
-  border-color: #1a1a1c;
+[data-theme="dark"] .spatial-live-beacon {
+  border-color: #16161a;
 }
 
-.circular-portal-node:hover .portal-beacon {
-  transform: scale(1.35);
-}
-
-/* Node Bottom Mini Caption */
-.portal-caption {
-  margin-top: 10px;
-  font-family: 'Manrope', sans-serif;
-  font-size: 12.5px;
-  font-weight: 700;
-  color: #333;
-  letter-spacing: -0.01em;
-  text-align: center;
-  max-width: 110px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  transition: color 0.25s ease;
-}
-
-[data-theme="dark"] .portal-caption,
-body.theme-dark .portal-caption {
-  color: #a5a5ab;
-}
-
-.circular-portal-node:hover .portal-caption {
-  color: var(--node-accent, #ff4e1b);
+.spatial-dock-item:hover .spatial-live-beacon {
+  transform: scale(1.3);
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   HOLOGRAPHIC EXPANSION CAPSULE TOOLTIP (Appears on Hover)
+   MINIMAL FLOATING TOOLTIP CAPSULE (Appears on Hover)
    ═══════════════════════════════════════════════════════════════ */
-.portal-holo-tooltip {
+.spatial-tooltip {
   position: absolute;
   bottom: calc(100% + 14px);
   left: 50%;
-  transform: translateX(-50%) translateY(8px) scale(0.92);
+  transform: translateX(-50%) translateY(6px) scale(0.9);
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 8px 14px 8px 12px;
-  background: rgba(18, 18, 20, 0.92);
+  gap: 7px;
+  padding: 6px 13px 6px 10px;
+  background: rgba(18, 18, 22, 0.9);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.16);
   border-radius: 100px;
-  box-shadow: 0 16px 36px -6px rgba(0, 0, 0, 0.55),
+  box-shadow: 0 12px 30px -4px rgba(0, 0, 0, 0.55),
               0 0 0 1px rgba(255, 255, 255, 0.05);
   white-space: nowrap;
-  z-index: 200;
-  transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1),
-              transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
-              visibility 0.3s ease;
+  z-index: 100;
+  transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+              visibility 0.25s ease;
 }
 
-/* Tooltip Little Pointer Arrow */
-.portal-holo-tooltip::after {
+.spatial-tooltip::after {
   content: '';
   position: absolute;
   top: 100%;
   left: 50%;
   transform: translateX(-50%);
-  border-width: 5px 5px 0 5px;
+  border-width: 4.5px 4.5px 0 4.5px;
   border-style: solid;
-  border-color: rgba(18, 18, 20, 0.92) transparent transparent transparent;
+  border-color: rgba(18, 18, 22, 0.9) transparent transparent transparent;
 }
 
-.circular-portal-node:hover .portal-holo-tooltip {
+.spatial-dock-item:hover .spatial-tooltip {
   opacity: 1;
   visibility: visible;
   transform: translateX(-50%) translateY(0px) scale(1);
 }
 
-.holo-dot {
-  width: 7px;
-  height: 7px;
+.spatial-tooltip-dot {
+  width: 5px;
+  height: 5px;
   border-radius: 50%;
-  background: var(--node-accent, #ff4e1b);
-  box-shadow: 0 0 8px var(--node-accent, #ff4e1b);
+  background: var(--orb-accent, #ff4e1b);
+  box-shadow: 0 0 6px var(--orb-accent, #ff4e1b);
   flex-shrink: 0;
 }
 
-.holo-info {
-  display: flex;
-  flex-direction: column;
-}
-
-.holo-title {
+.spatial-tooltip-text {
   font-family: 'Manrope', sans-serif;
-  font-size: 12.5px;
+  font-size: 11.5px;
   font-weight: 700;
   color: #ffffff;
   line-height: 1.2;
 }
 
-.holo-domain {
-  font-family: 'DM Mono', monospace;
-  font-size: 10.5px;
-  color: #9ca3af;
-  line-height: 1.2;
-}
-
-.holo-arrow {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  background: var(--node-accent, #ff4e1b);
-  color: #fff;
+.spatial-tooltip-arrow {
   font-size: 11px;
   font-weight: 800;
-  transition: transform 0.25s ease;
-  flex-shrink: 0;
+  color: var(--orb-accent, #ff4e1b);
+  transition: transform 0.2s ease;
 }
 
-.circular-portal-node:hover .holo-arrow {
-  transform: translate(2px, -2px) scale(1.1);
+.spatial-dock-item:hover .spatial-tooltip-arrow {
+  transform: translate(2px, -2px);
 }
 
 /* Click Shockwave Ripple */
-.portal-ripple {
+.spatial-ripple {
   position: absolute;
   inset: 0;
   border-radius: 50%;
-  border: 2px solid var(--node-accent, #ff4e1b);
+  border: 2px solid var(--orb-accent, #ff4e1b);
   pointer-events: none;
-  animation: shockwave 0.6s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+  animation: spatialShockwave 0.55s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
 }
 
-@keyframes shockwave {
+@keyframes spatialShockwave {
   0% { transform: scale(1); opacity: 1; }
-  100% { transform: scale(1.7); opacity: 0; }
+  100% { transform: scale(1.6); opacity: 0; }
 }
 
-/* Responsive adjustments */
+/* ═══════════════════════════════════════════════════════════════
+   RESPONSIVE (Mobile Carousel / Fluid Swiper)
+   ═══════════════════════════════════════════════════════════════ */
 @media (max-width: 768px) {
-  .live-launchpad-section {
-    padding: 32px 18px 36px 18px;
-    margin: 40px auto;
-    border-radius: 26px;
+  .liquid-dock-wrap {
+    margin: 30px auto 45px auto;
+    padding: 0 12px;
   }
-  .circular-portals-stage {
-    gap: 22px 20px;
-    padding: 10px 0;
-  }
-  .circular-portal-node.node-size-lg .portal-orb {
-    width: 90px;
-    height: 90px;
-  }
-  .circular-portal-node.node-size-lg .portal-monogram {
-    font-size: 17px;
-  }
-  .circular-portal-node.node-size-md .portal-orb {
-    width: 78px;
-    height: 78px;
-  }
-  .circular-portal-node.node-size-md .portal-monogram {
-    font-size: 15px;
-  }
-  .circular-portal-node.node-size-sm .portal-orb {
-    width: 68px;
-    height: 68px;
-  }
-  .circular-portal-node.node-size-sm .portal-monogram {
-    font-size: 13px;
-  }
-  .portal-caption {
-    font-size: 11px;
-    max-width: 80px;
-  }
-  .portals-header {
-    flex-direction: column;
-    align-items: flex-start;
+  .liquid-magnetic-dock {
+    max-width: 100%;
+    overflow-x: auto;
+    justify-content: flex-start;
+    padding: 12px 16px;
     gap: 12px;
+    border-radius: 28px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .liquid-magnetic-dock::-webkit-scrollbar {
+    display: none;
+  }
+  .spatial-orb {
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
+  }
+  .spatial-monogram {
+    font-size: 13.5px;
   }
 }
