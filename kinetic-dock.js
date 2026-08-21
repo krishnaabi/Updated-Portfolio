@@ -1,7 +1,7 @@
 /**
  * ═══════════════════════════════════════════════════════════════
- * KINETIC GALAXY — ZERO-GRAVITY ORB PORTALS & LAUNCHPAD ENGINE
- * "Make You Proud" Masterpiece Edition · Dual View Mode Switcher
+ * KINETIC GALAXY — WORLD-CLASS ORB PORTALS & LAUNCHPAD ENGINE
+ * "Make You Proud" Masterpiece Edition · High-Precision Physics
  * ═══════════════════════════════════════════════════════════════
  */
 
@@ -17,9 +17,9 @@
         id: 'lw1',
         title: 'Honey Universal',
         category: 'Websites & Apps',
-        tag: 'Live Production Site',
+        tag: 'Live Production Platform',
         url: 'https://honeyuniversal.com',
-        description: 'Premium global digital commerce platform with interactive 3D product visualizer.',
+        description: 'Premium global digital commerce platform with interactive 3D visualizer.',
         icon_text: 'HU',
         accent_color: '#ff4e1b',
         badge_status: '● Live Site',
@@ -30,7 +30,7 @@
         id: 'lw2',
         title: 'Hanioo Marketplace',
         category: 'Websites & Apps',
-        tag: 'SaaS Platform',
+        tag: 'SaaS Ecosystem',
         url: 'https://hanioo.com',
         description: 'On-demand multilingual interpretation booking ecosystem across Web, iOS & Android.',
         icon_text: 'HN',
@@ -139,12 +139,12 @@
     }
 
     // ══════════════════════════════════════════════════════════
-    // 1. RENDER PHYSICS GALAXY VIEW
+    // 1. RENDER PHYSICS GALAXY VIEW (3D Orbs + Soft Shadows)
     // ══════════════════════════════════════════════════════════
     physicsView.innerHTML = '';
     const stageRect = physicsView.getBoundingClientRect();
     let width = stageRect.width || 1200;
-    let height = stageRect.height || 410;
+    let height = stageRect.height || 440;
 
     const orbs = [];
     const numOrbs = items.length;
@@ -173,6 +173,7 @@
         : `<span class="galaxy-monogram">${item.icon_text || (item.title ? item.title.slice(0,2).toUpperCase() : '⚡')}</span>`;
 
       el.innerHTML = `
+        <div class="galaxy-orb-shadow"></div>
         <div class="galaxy-tooltip">
           <span class="galaxy-tooltip-dot"></span>
           <div class="galaxy-tooltip-info">
@@ -195,10 +196,10 @@
       const row = Math.floor(index / cols);
 
       const cellW = (width - 160) / cols;
-      const cellH = (height - 100) / rows;
+      const cellH = (height - 110) / rows;
 
       const initX = 80 + col * cellW + cellW / 2 + (Math.random() - 0.5) * 30;
-      const initY = 50 + row * cellH + cellH / 2 + (Math.random() - 0.5) * 25;
+      const initY = 55 + row * cellH + cellH / 2 + (Math.random() - 0.5) * 25;
 
       orbs.push({
         el,
@@ -218,12 +219,23 @@
     });
 
     // ══════════════════════════════════════════════════════════
-    // 2. RENDER CLEAN LAUNCHPAD LIST VIEW
+    // 2. RENDER ULTRA-MINIMAL LAUNCHPAD TABLE VIEW
     // ══════════════════════════════════════════════════════════
-    listView.innerHTML = items.map(item => {
+    const tableHeadHtml = `
+      <div class="launchpad-table-head">
+        <span>#</span>
+        <span>Project & Platform</span>
+        <span>Category</span>
+        <span>Live Status</span>
+        <span style="text-align:right;">Link ↗</span>
+      </div>
+    `;
+
+    const rowsHtml = items.map((item, idx) => {
       const accent = item.accent_color || '#ff4e1b';
       const iconText = item.icon_text || (item.title ? item.title.slice(0, 2).toUpperCase() : '⚡');
       const customImg = item.image || item.custom_icon_url || item.iconUrl || '';
+      const indexStr = String(idx + 1).padStart(2, '0');
 
       let domain = '';
       try {
@@ -242,22 +254,24 @@
 
       return `
         <a href="${item.url || '#'}" ${item.url && item.url.startsWith('http') ? 'target="_blank" rel="noopener noreferrer"' : ''} class="launchpad-list-row" style="--row-accent:${accent};" aria-label="Visit ${item.title}">
-          <div class="launchpad-row-left">
+          <span class="launchpad-row-index">${indexStr}</span>
+          <div class="launchpad-row-project">
             <div class="launchpad-row-orb">
               ${orbContent}
             </div>
-            <div class="launchpad-row-meta">
-              <h4 class="launchpad-row-title">${item.title}</h4>
-              <span class="launchpad-row-cat">${item.category || 'Website'} · ${item.tag || 'Live Work'}</span>
-            </div>
+            <h4 class="launchpad-row-title">${item.title}</h4>
           </div>
-          <div class="launchpad-row-right">
-            <span class="launchpad-row-status">${item.badge_status || '● Live Site'}</span>
-            <span class="launchpad-row-link">${domain} <span class="launchpad-row-arrow">↗</span></span>
+          <span class="launchpad-row-cat">${item.category || 'Websites & Apps'}</span>
+          <div class="launchpad-row-status">
+            <span class="launchpad-row-status-dot"></span>
+            <span>${item.badge_status ? item.badge_status.replace(/^●\s*/, '') : 'Live Site'}</span>
           </div>
+          <span class="launchpad-row-action">${domain} ↗</span>
         </a>
       `;
     }).join('');
+
+    listView.innerHTML = tableHeadHtml + rowsHtml;
 
     // ══════════════════════════════════════════════════════════
     // 3. DUAL VIEW TOGGLE SWITCHER ENGINE
@@ -289,18 +303,17 @@
 
         listView.classList.remove('hidden');
         physicsView.classList.add('hidden');
-        if (hintText) hintText.textContent = '✦ Click any card to launch live site';
+        if (hintText) hintText.textContent = '✦ Click any row to launch live site';
       }
     }
 
     if (btnGalaxy) btnGalaxy.onclick = () => setViewMode('galaxy');
     if (btnList) btnList.onclick = () => setViewMode('list');
 
-    // Apply saved mode on start
     setViewMode(currentMode);
 
     // ══════════════════════════════════════════════════════════
-    // 4. GALAXY PHYSICS & DRAG/FLING ENGINE
+    // 4. GALAXY PHYSICS & MAGNETIC DRAG/FLING ENGINE
     // ══════════════════════════════════════════════════════════
     let draggedOrb = null;
     let pointerX = 0;
@@ -309,6 +322,8 @@
     let lastPointerY = 0;
     let pointerVx = 0;
     let pointerVy = 0;
+    let hoverMouseX = -9999;
+    let hoverMouseY = -9999;
 
     const onPointerDown = (orb, clientX, clientY) => {
       const rect = physicsView.getBoundingClientRect();
@@ -329,10 +344,13 @@
     };
 
     const onPointerMove = (clientX, clientY) => {
-      if (!draggedOrb) return;
       const rect = physicsView.getBoundingClientRect();
-      pointerX = clientX - rect.left;
-      pointerY = clientY - rect.top;
+      hoverMouseX = clientX - rect.left;
+      hoverMouseY = clientY - rect.top;
+
+      if (!draggedOrb) return;
+      pointerX = hoverMouseX;
+      pointerY = hoverMouseY;
 
       pointerVx = (pointerX - lastPointerX) * 0.5;
       pointerVy = (pointerY - lastPointerY) * 0.5;
@@ -392,6 +410,12 @@
       }, { passive: true });
     });
 
+    physicsView.addEventListener('mousemove', e => onPointerMove(e.clientX, e.clientY));
+    physicsView.addEventListener('mouseleave', () => {
+      hoverMouseX = -9999;
+      hoverMouseY = -9999;
+    });
+
     window.addEventListener('mousemove', e => {
       if (draggedOrb) onPointerMove(e.clientX, e.clientY);
     });
@@ -415,7 +439,7 @@
         width = rect.width;
         height = rect.height;
 
-        // 1. Organic buoyancy drift
+        // 1. Organic buoyancy drift + Magnetic cursor pull
         orbs.forEach(orb => {
           if (orb.isDragging) return;
 
@@ -424,6 +448,18 @@
 
           orb.vx += floatFx;
           orb.vy += floatFy;
+
+          // Magnetic Proximity Pull
+          if (hoverMouseX > 0 && hoverMouseY > 0) {
+            const mdx = hoverMouseX - orb.x;
+            const mdy = hoverMouseY - orb.y;
+            const mDist = Math.hypot(mdx, mdy);
+            if (mDist < 140 && mDist > 5) {
+              const pullForce = (1 - mDist / 140) * 0.18;
+              orb.vx += (mdx / mDist) * pullForce;
+              orb.vy += (mdy / mDist) * pullForce;
+            }
+          }
 
           orb.vx *= 0.975;
           orb.vy *= 0.975;
