@@ -1633,16 +1633,12 @@
       ];
 
       // ══════════════════════════════════════════════════════════
-      // FLOATING LIVE WORKS LAUNCHPAD & QUICK REDIRECTION DOCK
+      // MINIMAL ZERO-GRAVITY CIRCULAR PORTALS DOCK
       // ══════════════════════════════════════════════════════════
-      const launchpadGrid = document.querySelector('#launchpad-cards-grid');
-      const launchpadFilters = document.querySelector('#launchpad-filters');
-      const launchpadSearch = document.querySelector('#launchpad-search-input');
+      const portalsStage = document.querySelector('#circular-portals-stage');
+      const portalsCountBadge = document.querySelector('#portals-count-badge');
 
-      if (launchpadGrid) {
-        let activeFilter = 'all';
-        let searchQuery = '';
-
+      if (portalsStage) {
         const defaultLiveWorks = [
           {
             id: 'lw1',
@@ -1650,7 +1646,7 @@
             category: 'Websites & Apps',
             tag: 'Live Production Site',
             url: 'https://honeyuniversal.com',
-            description: 'Premium brand & global digital commerce experience with interactive product visualizer.',
+            description: 'Premium brand & global digital commerce experience.',
             icon_text: 'HU',
             accent_color: '#ff4e1b',
             badge_status: '● Live Site'
@@ -1661,18 +1657,18 @@
             category: 'Websites & Apps',
             tag: 'SaaS Platform',
             url: 'https://hanioo.com',
-            description: 'On-demand multilingual interpretation booking ecosystem across Web, iOS & Android.',
+            description: 'Multilingual interpretation booking ecosystem.',
             icon_text: 'HN',
             accent_color: '#7928ca',
             badge_status: '● Live Site'
           },
           {
             id: 'lw3',
-            title: 'Flubn Digital Studio',
+            title: 'Flubn Studio',
             category: 'Graphic Design & Branding',
             tag: 'Brand Identity & Web',
             url: 'https://flubn.com',
-            description: 'Experimental creative studio brand system, typography guidelines, and digital portfolio.',
+            description: 'Creative studio brand system and digital portfolio.',
             icon_text: 'FL',
             accent_color: '#0070f3',
             badge_status: '🎨 Graphic Showcase'
@@ -1683,51 +1679,51 @@
             category: 'Graphic Design & Branding',
             tag: 'Visual Identity',
             url: 'https://www.behance.net/krishnaabi',
-            description: 'Dynamic automotive tech visual identity, iconography suite, and graphic campaign assets.',
+            description: 'Dynamic automotive visual identity & campaign suite.',
             icon_text: 'GF',
             accent_color: '#10b981',
             badge_status: '🎨 Graphic Showcase'
           },
           {
             id: 'lw5',
-            title: 'Stuak Creative Lab',
+            title: 'Stuak Lab',
             category: 'Websites & Apps',
             tag: 'Interactive Web',
             url: 'https://github.com/krishnaabi',
-            description: 'Curated digital lab showcasing interactive generative prototypes and UI micro-animations.',
+            description: 'Interactive generative prototypes & UI animations.',
             icon_text: 'ST',
             accent_color: '#f59e0b',
             badge_status: '⚡ Web App'
           },
           {
             id: 'lw6',
-            title: 'Noma Health Hub',
+            title: 'Noma Health',
             category: 'Websites & Apps',
             tag: 'Healthcare Web App',
             url: 'https://nomahealth.com',
-            description: 'Telehealth consultation platform featuring intuitive doctor-patient scheduling workflows.',
+            description: 'Telehealth consultation platform workflows.',
             icon_text: 'NM',
             accent_color: '#06b6d4',
             badge_status: '● Live Site'
           },
           {
             id: 'lw7',
-            title: 'Veloce Brand & Packaging',
+            title: 'Veloce Brand',
             category: 'Graphic Design & Branding',
             tag: 'Print & Packaging',
             url: 'https://dribbble.com',
-            description: 'Luxury minimalist packaging design, bespoke typography treatment, and art direction.',
+            description: 'Luxury minimal packaging design & typography.',
             icon_text: 'VL',
             accent_color: '#ec4899',
             badge_status: '🎨 Graphic Showcase'
           },
           {
             id: 'lw8',
-            title: 'Apex Design System',
+            title: 'Apex System',
             category: 'Websites & Apps',
             tag: 'Design Tokens & Docs',
             url: 'work.html',
-            description: 'Comprehensive multi-brand enterprise UI design token library and interactive component docs.',
+            description: 'Multi-brand enterprise design token library.',
             icon_text: 'AP',
             accent_color: '#8b5cf6',
             badge_status: '⚡ System Docs'
@@ -1742,89 +1738,81 @@
           return defaultLiveWorks;
         };
 
-        const renderCards = () => {
-          const list = getLiveWorks();
-          const filtered = list.filter(item => {
-            const matchFilter = activeFilter === 'all' || item.category === activeFilter;
-            const q = searchQuery.toLowerCase().trim();
-            const matchSearch = !q ||
-              (item.title && item.title.toLowerCase().includes(q)) ||
-              (item.description && item.description.toLowerCase().includes(q)) ||
-              (item.tag && item.tag.toLowerCase().includes(q)) ||
-              (item.url && item.url.toLowerCase().includes(q));
-            return matchFilter && matchSearch;
-          });
+        const list = getLiveWorks();
+        if (portalsCountBadge) {
+          portalsCountBadge.textContent = `✦ ${String(list.length).padStart(2, '0')} LIVE REDIRECTION PORTALS`;
+        }
 
-          if (!filtered.length) {
-            launchpadGrid.innerHTML = `
-              <div class="launchpad-empty">
-                <span>No live works found matching "<strong>${escape(searchQuery)}</strong>"</span>
-              </div>
-            `;
-            return;
+        portalsStage.innerHTML = list.map((item, index) => {
+          let domain = '';
+          try {
+            if (item.url && item.url.startsWith('http')) {
+              domain = new URL(item.url).hostname.replace(/^www\./, '');
+            } else {
+              domain = item.url || 'Live Demo';
+            }
+          } catch {
+            domain = item.url || 'Live Demo';
           }
 
-          launchpadGrid.innerHTML = filtered.map(item => {
-            let domain = '';
-            try {
-              if (item.url && item.url.startsWith('http')) {
-                domain = new URL(item.url).hostname.replace(/^www\./, '');
-              } else {
-                domain = item.url || 'Internal Demo';
-              }
-            } catch {
-              domain = item.url || 'Live Site';
-            }
+          const accent = item.accent_color || '#ff4e1b';
+          const iconText = item.icon_text || (item.title ? item.title.slice(0, 2).toUpperCase() : '⚡');
+          
+          // Organic tiered sizing
+          let sizeClass = 'node-size-md';
+          if (index < 2) sizeClass = 'node-size-lg';
+          else if (index >= 5) sizeClass = 'node-size-sm';
 
-            const accent = item.accent_color || '#ff4e1b';
-            const statusClass = (item.badge_status || '').includes('Graphic') ? 'status-graphic' : ((item.badge_status || '').includes('Web App') || (item.badge_status || '').includes('System') ? 'status-webapp' : '');
-            const iconText = item.icon_text || (item.title ? item.title.slice(0, 2).toUpperCase() : '⚡');
-
-            return `
-              <a href="${escape(item.url || '#')}" ${item.url && item.url.startsWith('http') ? 'target="_blank" rel="noopener noreferrer"' : ''} class="launchpad-card" style="--card-accent:${escape(accent)};">
-                <div>
-                  <div class="launchpad-card-top">
-                    <div class="launchpad-icon-badge">${escape(iconText)}</div>
-                    <span class="launchpad-status-pill ${statusClass}">${escape(item.badge_status || '● Live Site')}</span>
-                  </div>
-                  <div class="launchpad-card-body">
-                    <h3 class="launchpad-card-title">${escape(item.title)}</h3>
-                    <p class="launchpad-card-desc">${escape(item.description || 'Explore live digital experience.')}</p>
-                    <div class="launchpad-card-meta">
-                      <span>✦ ${escape(item.tag || item.category || 'Live Site')}</span>
-                    </div>
-                  </div>
+          return `
+            <a href="${escape(item.url || '#')}" ${item.url && item.url.startsWith('http') ? 'target="_blank" rel="noopener noreferrer"' : ''} class="circular-portal-node ${sizeClass}" style="--node-accent:${escape(accent)};" aria-label="Visit ${escape(item.title)}">
+              <!-- Holographic Expansion Capsule Tooltip -->
+              <div class="portal-holo-tooltip">
+                <span class="holo-dot"></span>
+                <div class="holo-info">
+                  <span class="holo-title">${escape(item.title)}</span>
+                  <span class="holo-domain">${escape(domain)} · ${escape(item.category)}</span>
                 </div>
-                <div class="launchpad-card-footer">
-                  <span class="launchpad-domain" title="${escape(domain)}">${escape(domain)}</span>
-                  <span class="launchpad-cta-btn">Redirect <span>↗</span></span>
-                </div>
-              </a>
-            `;
-          }).join('');
-        };
+                <span class="holo-arrow">↗</span>
+              </div>
 
-        renderCards();
+              <!-- Core Floating Orb -->
+              <div class="portal-orb">
+                <span class="portal-beacon"></span>
+                <span class="portal-monogram">${escape(iconText)}</span>
+              </div>
 
-        // Wire filter buttons
-        if (launchpadFilters) {
-          launchpadFilters.querySelectorAll('.launchpad-pill').forEach(btn => {
-            btn.onclick = () => {
-              launchpadFilters.querySelectorAll('.launchpad-pill').forEach(b => b.classList.remove('active'));
-              btn.classList.add('active');
-              activeFilter = btn.dataset.filter || 'all';
-              renderCards();
-            };
+              <!-- Minimal Caption Label -->
+              <span class="portal-caption">${escape(item.title)}</span>
+            </a>
+          `;
+        }).join('');
+
+        // Magnetic Cursor Physics & Interactive Shockwave Engine
+        const nodes = portalsStage.querySelectorAll('.circular-portal-node');
+        nodes.forEach(node => {
+          node.addEventListener('mousemove', (e) => {
+            const rect = node.getBoundingClientRect();
+            const nodeX = rect.left + rect.width / 2;
+            const nodeY = rect.top + rect.height / 2;
+            const deltaX = (e.clientX - nodeX) * 0.28;
+            const deltaY = (e.clientY - nodeY) * 0.28;
+            node.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
           });
-        }
 
-        // Wire live search
-        if (launchpadSearch) {
-          launchpadSearch.oninput = () => {
-            searchQuery = launchpadSearch.value;
-            renderCards();
-          };
-        }
+          node.addEventListener('mouseleave', () => {
+            node.style.transform = '';
+          });
+
+          node.addEventListener('click', () => {
+            const orb = node.querySelector('.portal-orb');
+            if (orb) {
+              const ripple = document.createElement('span');
+              ripple.className = 'portal-ripple';
+              orb.appendChild(ripple);
+              setTimeout(() => ripple.remove(), 700);
+            }
+          });
+        });
       }
 
       const projects = document.querySelector('.projects');
