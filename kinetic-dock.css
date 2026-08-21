@@ -548,7 +548,7 @@ body.theme-dark .galaxy-list-view::-webkit-scrollbar-thumb {
 /* Table Header */
 .launchpad-table-head {
   display: grid;
-  grid-template-columns: 45px 1.8fr 1.2fr 1.2fr 80px;
+  grid-template-columns: 36px 1.8fr 1.2fr 1fr minmax(180px, auto);
   padding: 10px 16px;
   font-family: 'DM Mono', monospace;
   font-size: 10.5px;
@@ -569,7 +569,7 @@ body.theme-dark .launchpad-table-head {
 /* Minimal Interactive Row */
 .launchpad-list-row {
   display: grid;
-  grid-template-columns: 45px 1.8fr 1.2fr 1.2fr 80px;
+  grid-template-columns: 36px 1.8fr 1.2fr 1fr minmax(180px, auto);
   align-items: center;
   padding: 12px 16px;
   border-radius: 12px;
@@ -692,6 +692,7 @@ body.theme-dark .launchpad-row-title {
   font-size: 10.5px;
   font-weight: 700;
   color: #059669;
+  white-space: nowrap;
 }
 
 [data-theme="dark"] .launchpad-row-status {
@@ -704,18 +705,21 @@ body.theme-dark .launchpad-row-title {
   border-radius: 50%;
   background: #10b981;
   box-shadow: 0 0 6px #10b981;
+  flex-shrink: 0;
 }
 
-/* Action Link */
+/* Action Link with same line arrow */
 .launchpad-row-action {
   font-family: 'DM Mono', monospace;
-  font-size: 11px;
+  font-size: 11.5px;
   font-weight: 700;
   color: var(--row-accent, #ff4e1b);
   display: inline-flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 4px;
+  gap: 6px;
+  white-space: nowrap;
+  text-align: right;
   transition: transform 0.2s ease;
 }
 
