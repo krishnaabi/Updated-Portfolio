@@ -313,7 +313,7 @@
     setViewMode(currentMode);
 
     // ══════════════════════════════════════════════════════════
-    // 4. GALAXY PHYSICS & MAGNETIC DRAG/FLING ENGINE
+    // 4. SILKY-SMOOTH GALAXY PHYSICS & FLUID DRAG/FLING ENGINE
     // ══════════════════════════════════════════════════════════
     let draggedOrb = null;
     let pointerX = 0;
@@ -352,14 +352,18 @@
       pointerX = hoverMouseX;
       pointerY = hoverMouseY;
 
-      pointerVx = (pointerX - lastPointerX) * 0.5;
-      pointerVy = (pointerY - lastPointerY) * 0.5;
+      // Exponential moving average for buttery fling velocity
+      const rawVx = (pointerX - lastPointerX);
+      const rawVy = (pointerY - lastPointerY);
+      pointerVx = pointerVx * 0.6 + rawVx * 0.4;
+      pointerVy = pointerVy * 0.6 + rawVy * 0.4;
 
       lastPointerX = pointerX;
       lastPointerY = pointerY;
 
-      draggedOrb.x = pointerX;
-      draggedOrb.y = pointerY;
+      // Smooth lerp toward mouse pointer while dragging
+      draggedOrb.x += (pointerX - draggedOrb.x) * 0.85;
+      draggedOrb.y += (pointerY - draggedOrb.y) * 0.85;
 
       const dx = clientX - draggedOrb.dragStartX;
       const dy = clientY - draggedOrb.dragStartY;
@@ -369,8 +373,8 @@
     const onPointerUp = () => {
       if (!draggedOrb) return;
 
-      if (draggedOrb.movedDistance < 8) {
-        // Trigger Click Action (Shockwave & Open URL)
+      if (draggedOrb.movedDistance < 7) {
+        // Instant Click (Shockwave & Open URL)
         const shell = draggedOrb.el.querySelector('.galaxy-orb-shell');
         if (shell) {
           const ripple = document.createElement('span');
@@ -388,9 +392,9 @@
           }
         }
       } else {
-        // Release with fling inertia momentum
-        draggedOrb.vx = Math.max(-12, Math.min(12, pointerVx * 1.3));
-        draggedOrb.vy = Math.max(-12, Math.min(12, pointerVy * 1.3));
+        // Silky Fling Release with smooth momentum transfer
+        draggedOrb.vx = Math.max(-14, Math.min(14, pointerVx * 1.15));
+        draggedOrb.vy = Math.max(-14, Math.min(14, pointerVy * 1.15));
       }
 
       draggedOrb.isDragging = false;
@@ -429,63 +433,74 @@
     window.addEventListener('mouseup', onPointerUp);
     window.addEventListener('touchend', onPointerUp);
 
-    // Physics Animation Loop
-    let time = 0;
+    // ══════════════════════════════════════════════════════════
+    // HIGH-PRECISION 60–120FPS FLUID SIMULATION LOOP
+    // ══════════════════════════════════════════════════════════
+    let lastTime = performance.now();
+    let animTime = 0;
 
-    const updatePhysics = () => {
+    const updatePhysics = (now) => {
+      const delta = Math.min((now - lastTime) / 16.667, 2.0) || 1.0;
+      lastTime = now;
+
       if (currentMode === 'galaxy') {
-        time += 0.015;
+        animTime += 0.012 * delta;
         const rect = physicsView.getBoundingClientRect();
         width = rect.width;
         height = rect.height;
 
-        // 1. Organic buoyancy drift + Magnetic cursor pull
+        // 1. Organic Harmonic Buoyancy Drift & Proximity Magnetic Glide
         orbs.forEach(orb => {
           if (orb.isDragging) return;
 
-          const floatFx = Math.cos(time + orb.phase) * 0.08;
-          const floatFy = Math.sin(time + orb.phase) * 0.08;
+          // Double harmonic sine levitation
+          const floatFx = (Math.cos(animTime + orb.phase) * 0.05 + Math.sin(animTime * 0.7 + orb.phase) * 0.03) * delta;
+          const floatFy = (Math.sin(animTime + orb.phase) * 0.05 + Math.cos(animTime * 0.6 + orb.phase) * 0.03) * delta;
 
           orb.vx += floatFx;
           orb.vy += floatFy;
 
-          // Magnetic Proximity Pull
+          // Silky Magnetic Proximity Pull with cubic falloff
           if (hoverMouseX > 0 && hoverMouseY > 0) {
             const mdx = hoverMouseX - orb.x;
             const mdy = hoverMouseY - orb.y;
             const mDist = Math.hypot(mdx, mdy);
-            if (mDist < 140 && mDist > 5) {
-              const pullForce = (1 - mDist / 140) * 0.18;
-              orb.vx += (mdx / mDist) * pullForce;
-              orb.vy += (mdy / mDist) * pullForce;
+            const pullRadius = 150;
+            if (mDist < pullRadius && mDist > 6) {
+              const pullFactor = Math.pow(1 - mDist / pullRadius, 2) * 0.16 * delta;
+              orb.vx += (mdx / mDist) * pullFactor;
+              orb.vy += (mdy / mDist) * pullFactor;
             }
           }
 
-          orb.vx *= 0.975;
-          orb.vy *= 0.975;
+          // Natural air damping
+          const damping = Math.pow(0.984, delta);
+          orb.vx *= damping;
+          orb.vy *= damping;
 
-          orb.x += orb.vx;
-          orb.y += orb.vy;
+          orb.x += orb.vx * delta;
+          orb.y += orb.vy * delta;
 
+          // Silky Cushion Stage Boundary Bounce
           const pad = orb.radius + 6;
           if (orb.x < pad) {
             orb.x = pad;
-            orb.vx = Math.abs(orb.vx) * 0.75;
+            orb.vx = Math.abs(orb.vx) * 0.78;
           } else if (orb.x > width - pad) {
             orb.x = width - pad;
-            orb.vx = -Math.abs(orb.vx) * 0.75;
+            orb.vx = -Math.abs(orb.vx) * 0.78;
           }
 
-          if (orb.y < pad + 10) {
-            orb.y = pad + 10;
-            orb.vy = Math.abs(orb.vy) * 0.75;
+          if (orb.y < pad + 8) {
+            orb.y = pad + 8;
+            orb.vy = Math.abs(orb.vy) * 0.78;
           } else if (orb.y > height - pad) {
             orb.y = height - pad;
-            orb.vy = -Math.abs(orb.vy) * 0.75;
+            orb.vy = -Math.abs(orb.vy) * 0.78;
           }
         });
 
-        // 2. Soft-body collision repulsion
+        // 2. Elastic Spring Soft-Body Collision Repulsion
         for (let i = 0; i < orbs.length; i++) {
           for (let j = i + 1; j < orbs.length; j++) {
             const a = orbs[i];
@@ -494,42 +509,46 @@
             const dx = b.x - a.x;
             const dy = b.y - a.y;
             const dist = Math.hypot(dx, dy);
-            const minDist = a.radius + b.radius + 14;
+            const minDist = a.radius + b.radius + 12;
 
             if (dist < minDist && dist > 0.001) {
-              const overlap = (minDist - dist) * 0.5;
+              const overlap = (minDist - dist);
               const nx = dx / dist;
               const ny = dy / dist;
 
+              // Smooth spring repulsion force
+              const springForce = overlap * 0.18 * delta;
+
               if (!a.isDragging) {
-                a.x -= nx * overlap * 0.5;
-                a.y -= ny * overlap * 0.5;
-                a.vx -= nx * 0.15;
-                a.vy -= ny * 0.15;
+                a.x -= nx * overlap * 0.45;
+                a.y -= ny * overlap * 0.45;
+                a.vx -= nx * springForce * 0.5;
+                a.vy -= ny * springForce * 0.5;
               }
 
               if (!b.isDragging) {
-                b.x += nx * overlap * 0.5;
-                b.y += ny * overlap * 0.5;
-                b.vx += nx * 0.15;
-                b.vy += ny * 0.15;
+                b.x += nx * overlap * 0.45;
+                b.y += ny * overlap * 0.45;
+                b.vx += nx * springForce * 0.5;
+                b.vy += ny * springForce * 0.5;
               }
             }
           }
         }
 
-        // 3. Render transforms to DOM
+        // 3. GPU Accelerated DOM Transform with Organic Physics Tilt
         orbs.forEach(orb => {
           const left = orb.x - orb.radius;
           const top = orb.y - orb.radius;
-          orb.el.style.transform = `translate3d(${left.toFixed(2)}px, ${top.toFixed(2)}px, 0)`;
+          const rotDeg = Math.max(-12, Math.min(12, orb.vx * 1.6));
+          orb.el.style.transform = `translate3d(${left.toFixed(2)}px, ${top.toFixed(2)}px, 0) rotate(${rotDeg.toFixed(1)}deg)`;
         });
       }
 
       requestAnimationFrame(updatePhysics);
     };
 
-    updatePhysics();
+    requestAnimationFrame(updatePhysics);
 
     window.addEventListener('resize', () => {
       const r = physicsView.getBoundingClientRect();
