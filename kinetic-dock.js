@@ -241,20 +241,19 @@
         : iconText;
 
       return `
-        <a href="${item.url || '#'}" ${item.url && item.url.startsWith('http') ? 'target="_blank" rel="noopener noreferrer"' : ''} class="launchpad-list-card" style="--card-accent:${accent};">
-          <div class="launchpad-card-top">
-            <div class="launchpad-card-orb">
+        <a href="${item.url || '#'}" ${item.url && item.url.startsWith('http') ? 'target="_blank" rel="noopener noreferrer"' : ''} class="launchpad-list-row" style="--row-accent:${accent};" aria-label="Visit ${item.title}">
+          <div class="launchpad-row-left">
+            <div class="launchpad-row-orb">
               ${orbContent}
             </div>
-            <span class="launchpad-status-tag">${item.badge_status || '● Live Site'}</span>
+            <div class="launchpad-row-meta">
+              <h4 class="launchpad-row-title">${item.title}</h4>
+              <span class="launchpad-row-cat">${item.category || 'Website'} · ${item.tag || 'Live Work'}</span>
+            </div>
           </div>
-          <div>
-            <h4 class="launchpad-card-title">${item.title}</h4>
-            <p class="launchpad-card-desc">${item.description || 'Interactive digital experience and visual design portfolio.'}</p>
-          </div>
-          <div class="launchpad-card-footer">
-            <span class="launchpad-card-domain">${domain}</span>
-            <span class="launchpad-card-btn">Visit Site ↗</span>
+          <div class="launchpad-row-right">
+            <span class="launchpad-row-status">${item.badge_status || '● Live Site'}</span>
+            <span class="launchpad-row-link">${domain} <span class="launchpad-row-arrow">↗</span></span>
           </div>
         </a>
       `;
