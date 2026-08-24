@@ -2032,8 +2032,8 @@
                 <svg class="work-curve-svg" viewBox="0 0 1000 600" preserveAspectRatio="none">
                   <defs>
                     <clipPath id="stageClip-${index}">
-                      <!-- Precise S-curve matching reference with center notch apex -->
-                      <path d="M 430 0 C 420 80, 400 160, 390 230 C 370 255, 420 270, 420 300 C 420 330, 370 345, 390 370 C 400 440, 425 520, 440 600 L 1000 600 L 1000 0 Z"/>
+                      <!-- Precise S-curve matching reference with wide organic center notch -->
+                      <path d="M 420 0 C 410 80, 390 160, 380 210 C 365 240, 455 245, 455 300 C 455 355, 365 360, 380 390 C 390 440, 410 520, 420 600 L 1000 600 L 1000 0 Z"/>
                     </clipPath>
                     <linearGradient id="stageGrad-${index}" x1="0%" y1="0%" x2="100%" y2="100%">
                       <stop offset="0%" stop-color="${isFlubn ? '#1a1918' : '#faf7f3'}" />
@@ -2057,7 +2057,7 @@
                   </g>
 
                   <!-- Dividing Crisp Contour Line -->
-                  <path class="curve-stroke-line" d="M 430 0 C 420 80, 400 160, 390 230 C 370 255, 420 270, 420 300 C 420 330, 370 345, 390 370 C 400 440, 425 520, 440 600" fill="none" stroke="rgba(255, 78, 27, 0.25)" stroke-width="1.6" stroke-linecap="round"/>
+                  <path class="curve-stroke-line" d="M 420 0 C 410 80, 390 160, 380 210 C 365 240, 455 245, 455 300 C 455 355, 365 360, 380 390 C 390 440, 410 520, 420 600" fill="none" stroke="rgba(255, 78, 27, 0.3)" stroke-width="1.8" stroke-linecap="round"/>
                 </svg>
               </div>
 

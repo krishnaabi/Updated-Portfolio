@@ -555,7 +555,7 @@ body.work-page {
 /* ─── NOTCH DIVIDER & ARROW BUTTON ─── */
 .work-card-notch {
   position: absolute;
-  left: 39.5%;
+  left: 38%;
   top: 50%;
   transform: translate(-50%, -50%);
   z-index: 10;
@@ -563,15 +563,15 @@ body.work-page {
 }
 
 .notch-arrow-badge {
-  width: 48px;
-  height: 48px;
+  width: 52px;
+  height: 52px;
   border-radius: 50%;
   background: #ffffff;
-  border: 1.5px solid #ffdecb;
+  border: 1.5px solid #ffdcd0;
   display: grid;
   place-items: center;
   color: var(--accent, #ff4e1b);
-  box-shadow: 0 8px 24px rgba(255, 78, 27, 0.12), 0 2px 6px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 8px 24px rgba(255, 78, 27, 0.14), 0 2px 6px rgba(0, 0, 0, 0.04);
   transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
   cursor: pointer;
   text-decoration: none;
@@ -585,8 +585,8 @@ body.work-page {
 .work-showcase-card:hover .notch-arrow-badge {
   transform: scale(1.08);
   background: #ffffff;
-  border-color: #ffd8c4;
-  box-shadow: 0 12px 30px rgba(255, 78, 27, 0.25);
+  border-color: #ffc4b0;
+  box-shadow: 0 14px 34px rgba(255, 78, 27, 0.28);
 }
 
 .work-showcase-card:hover .notch-arrow-badge svg {
