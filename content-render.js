@@ -1875,15 +1875,16 @@
             const isFlubn = (item.title || '').toLowerCase().includes('flubn');
             const titleParts = (item.title || 'Flubn').split(/\s*[-—–]\s*/);
             const cleanTitle = titleParts[0].trim().replace(/\.+$/, '');
-            const subtitle = item.subtitle || (titleParts.length > 1 ? titleParts.slice(1).join(' — ') : (isFlubn ? 'An influencer Platform' : 'Product Design & Strategy'));
+            let subtitleRaw = item.subtitle || (titleParts.length > 1 ? titleParts.slice(1).join(' — ') : (isFlubn ? 'An Influencer Platform' : 'Product Design & Strategy'));
+            const cleanSubtitle = subtitleRaw.replace(/\bE\s*-\s*Commerce\b/gi, 'E-Commerce').replace(/\s*—\s*/g, ' — ').trim();
 
             const tagsList = (item.tags || 'Product | 2025 - 2026 | APP').split(/[|·•]+/).map(t => t.trim()).filter(Boolean);
             const metaPillsHtml = tagsList.map(tag => {
-              let iconSvg = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#ff4e1b" stroke-width="2"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>`;
+              let iconSvg = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ff4e1b" stroke-width="2"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>`;
               if (tag.toLowerCase().includes('product') || tag.toLowerCase().includes('design')) {
-                iconSvg = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#ff4e1b" stroke-width="2"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>`;
+                iconSvg = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ff4e1b" stroke-width="2"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>`;
               } else if (tag.toLowerCase().includes('app') || tag.toLowerCase().includes('mobile')) {
-                iconSvg = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#ff4e1b" stroke-width="2"><rect width="14" height="20" x="5" y="2" rx="2" ry="2"/><line x1="12" x2="12.01" y1="18" y2="18"/></svg>`;
+                iconSvg = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ff4e1b" stroke-width="2"><rect width="14" height="20" x="5" y="2" rx="2" ry="2"/><line x1="12" x2="12.01" y1="18" y2="18"/></svg>`;
               }
               return `<span class="work-pill">${iconSvg} ${escape(tag)}</span>`;
             }).join('');
@@ -1892,28 +1893,17 @@
             const cleanImage = item.image ? String(item.image).trim() : '';
 
             if (cleanImage.length > 0) {
-              // Custom uploaded artwork/mockup rendered cleanly with true aspect ratio
               rightStageHtml = `
                 <a href="${escape(item.url || '#')}" ${item.url && item.url.startsWith('http') ? 'target="_blank" rel="noreferrer"' : ''} class="work-card-right custom-card-right" aria-label="View ${escape(cleanTitle)} case study">
-                  <div class="work-art-img-wrap">
+                  <div class="work-stage-frame">
                     <img src="${escape(cleanImgUrl(cleanImage))}" alt="${escape(item.title)}" class="work-showcase-img" />
                   </div>
                 </a>
               `;
             } else if (isFlubn) {
-              // Rich 3D Studio Mockup (Exact match for Flubn)
               rightStageHtml = `
-                <a href="${escape(item.url || '#')}" ${item.url && item.url.startsWith('http') ? 'target="_blank" rel="noreferrer"' : ''} class="work-card-right" aria-label="View ${escape(cleanTitle)} case study">
+                <a href="${escape(item.url || '#')}" ${item.url && item.url.startsWith('http') ? 'target="_blank" rel="noreferrer"' : ''} class="work-card-right studio-stage-right" aria-label="View ${escape(cleanTitle)} case study">
                   <div class="studio-ambient-bg"></div>
-
-                  <!-- Decorative subtle connector paths -->
-                  <svg class="studio-connectors" viewBox="0 0 600 500" fill="none" aria-hidden="true">
-                    <path d="M 80 60 Q 200 60 250 120" stroke="#dcd3f5" stroke-width="1.5" stroke-dasharray="4 4"/>
-                    <path d="M 440 60 Q 370 100 330 160" stroke="#dcd3f5" stroke-width="1.5" stroke-dasharray="4 4"/>
-                    <path d="M 450 230 Q 380 240 340 260" stroke="#dcd3f5" stroke-width="1.5" stroke-dasharray="4 4"/>
-                    <path d="M 440 350 Q 370 340 330 320" stroke="#dcd3f5" stroke-width="1.5" stroke-dasharray="4 4"/>
-                    <path d="M 200 390 Q 250 380 280 340" stroke="#dcd3f5" stroke-width="1.5" stroke-dasharray="4 4"/>
-                  </svg>
 
                   <div class="floating-squircle squircle-purple-top" aria-hidden="true">
                     <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
@@ -1993,14 +1983,6 @@
                             </div>
                           </div>
 
-                          <div class="flubn-campaign-row">
-                            <div class="flubn-camp-icon icon-purple">✦</div>
-                            <div class="flubn-camp-info">
-                              <div class="flubn-camp-name">Nothing Phone (3)</div>
-                              <div class="flubn-camp-budget">$24,000 · 15 Creators</div>
-                            </div>
-                          </div>
-
                           <div class="flubn-bottom-dock">
                             <div class="flubn-dock-btn active"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></div>
                             <div class="flubn-dock-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div>
@@ -2028,7 +2010,6 @@
                 </a>
               `;
             } else {
-              // Minimal fallback stage with gradient art
               rightStageHtml = `
                 <a href="${escape(item.url || '#')}" ${item.url && item.url.startsWith('http') ? 'target="_blank" rel="noreferrer"' : ''} class="work-card-right" aria-label="View ${escape(cleanTitle)} case study">
                   <div class="fallback-hero-art">
@@ -2046,43 +2027,9 @@
             article.id = `work-card-${item.id || index}`;
 
             article.innerHTML = `
-              <!-- Left Studio Contour Vector Curve Boundary -->
-              <div class="work-curve-divider-wrap" aria-hidden="true">
-                <svg class="work-curve-svg" viewBox="0 0 1000 600" preserveAspectRatio="none">
-                  <defs>
-                    <clipPath id="stageClip-${index}">
-                      <!-- Precise S-curve matching reference with center notch apex -->
-                      <path d="M 440 0 C 430 80, 415 160, 404 220 C 392 245, 428 260, 428 300 C 428 340, 392 355, 404 380 C 415 440, 430 520, 440 600 L 1000 600 L 1000 0 Z"/>
-                    </clipPath>
-                    <linearGradient id="stageGrad-${index}" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" stop-color="${isFlubn ? '#1a1918' : '#faf7f3'}" />
-                      <stop offset="100%" stop-color="${isFlubn ? '#0d0c0b' : '#f0eae1'}" />
-                    </linearGradient>
-                  </defs>
-
-                  <!-- Filled Right Canvas Area with Smooth Curved Boundary -->
-                  <g clip-path="url(#stageClip-${index})">
-                    <rect x="0" y="0" width="1000" height="600" fill="url(#stageGrad-${index})" />
-                  </g>
-
-                  <!-- Trailing decorative dot pattern behind the curve -->
-                  <g class="curve-dot-matrix" fill="currentColor" opacity="0.15">
-                    <circle cx="410" cy="370" r="1.5"/><circle cx="430" cy="370" r="1.5"/><circle cx="450" cy="370" r="1.5"/>
-                    <circle cx="400" cy="395" r="1.5"/><circle cx="420" cy="395" r="1.5"/><circle cx="440" cy="395" r="1.5"/><circle cx="460" cy="395" r="1.5"/>
-                    <circle cx="410" cy="420" r="1.5"/><circle cx="430" cy="420" r="1.5"/><circle cx="450" cy="420" r="1.5"/><circle cx="470" cy="420" r="1.5"/>
-                    <circle cx="420" cy="445" r="1.5"/><circle cx="440" cy="445" r="1.5"/><circle cx="460" cy="445" r="1.5"/><circle cx="480" cy="445" r="1.5"/>
-                    <circle cx="430" cy="470" r="1.5"/><circle cx="450" cy="470" r="1.5"/><circle cx="470" cy="470" r="1.5"/><circle cx="490" cy="470" r="1.5"/>
-                    <circle cx="440" cy="495" r="1.5"/><circle cx="460" cy="495" r="1.5"/><circle cx="480" cy="495" r="1.5"/><circle cx="500" cy="495" r="1.5"/>
-                    <circle cx="450" cy="520" r="1.5"/><circle cx="470" cy="520" r="1.5"/><circle cx="490" cy="520" r="1.5"/><circle cx="510" cy="520" r="1.5"/>
-                  </g>
-
-                  <!-- Dividing Crisp Contour Line -->
-                  <path class="curve-stroke-line" d="M 440 0 C 430 80, 415 160, 404 220 C 392 245, 428 260, 428 300 C 428 340, 392 355, 404 380 C 415 440, 430 520, 440 600" fill="none" stroke="currentColor" stroke-opacity="0.2" stroke-width="1.8" stroke-linecap="round"/>
-                </svg>
-              </div>
-
+              <!-- Left Editorial Content Column -->
               <div class="work-card-left">
-                <div>
+                <div class="work-card-left-top">
                   <div class="work-eyebrow-row">
                     <span class="work-eyebrow-star">✦</span>
                     <span class="work-eyebrow-num">${num}</span>
@@ -2091,18 +2038,18 @@
                   </div>
 
                   <h2 class="work-title"><a href="${escape(item.url || '#')}" ${item.url && item.url.startsWith('http') ? 'target="_blank" rel="noreferrer"' : ''}>${escape(cleanTitle)}<span class="dot-accent">.</span></a></h2>
-                  <p class="work-subtitle">${escape(subtitle)}</p>
+                  <p class="work-subtitle">${escape(cleanSubtitle)}</p>
 
                   <div class="work-meta-pills">
                     ${metaPillsHtml}
                   </div>
 
                   <p class="work-description">
-                    ${escape(item.description || 'Flubn connects brands and creators in one seamless platform — discover, collaborate and grow impact together.')}
+                    ${escape(item.description || 'A modern devotional product experience designed around trust, cultural authenticity, and a seamless shopping journey.')}
                   </p>
                 </div>
 
-                <div>
+                <div class="work-card-left-bottom">
                   <div class="work-cta-wrap">
                     <a href="${escape(item.url || '#')}" ${item.url && item.url.startsWith('http') ? 'target="_blank" rel="noreferrer"' : ''} class="work-primary-btn">
                       <span>View case study</span>
@@ -2110,25 +2057,20 @@
                     </a>
                     ${item.productUrl ? `<a href="${escape(item.productUrl)}" target="_blank" rel="noreferrer" class="work-secondary-btn">Live Product <b>↗</b></a>` : ''}
                   </div>
-
-                  <div class="work-dot-matrix" aria-hidden="true">
-                    <span></span><span></span><span></span><span></span><span></span><span></span>
-                    <span></span><span></span><span></span><span></span><span></span><span></span>
-                    <span></span><span></span><span></span><span></span><span></span><span></span>
-                  </div>
                 </div>
               </div>
 
-              <!-- Center Notch Circular Arrow Button Nestled Inside Curve -->
-              <div class="work-card-notch">
+              <!-- Refined Floating Notch Arrow Badge on Boundary -->
+              <div class="work-card-divider" aria-hidden="true">
                 <a href="${escape(item.url || '#')}" ${item.url && item.url.startsWith('http') ? 'target="_blank" rel="noreferrer"' : ''} class="notch-arrow-badge" aria-label="View ${escape(cleanTitle)}">
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M5 12h14"/>
                     <path d="m13 6 6 6-6 6"/>
                   </svg>
                 </a>
               </div>
 
+              <!-- Right Stage Visual Column -->
               ${rightStageHtml}
             `;
 
