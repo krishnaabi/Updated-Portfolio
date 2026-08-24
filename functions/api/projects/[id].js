@@ -24,7 +24,6 @@ export async function onRequest(context) {
 
       if (incoming.title !== undefined) payload.title = incoming.title;
       if (incoming.description !== undefined) payload.description = incoming.description;
-      if (incoming.contentBody !== undefined) payload.content_body = incoming.contentBody;
       if (incoming.url !== undefined) payload.destination_url = incoming.url;
       if (incoming.image !== undefined) payload.image_url = incoming.image;
       if (incoming.featured !== undefined) payload.featured = Boolean(incoming.featured);
@@ -43,6 +42,26 @@ export async function onRequest(context) {
         const sec = parts[1] || 'main';
         const cat = parts.slice(2).join('|') || parts[1] || 'Product Design';
         payload.category = `${sec}|${cat}`;
+      }
+
+      if (incoming.productUrl !== undefined || incoming.tools !== undefined || incoming.contentBody !== undefined) {
+        const isWork = !incoming.category || incoming.category.startsWith('work');
+        if (isWork) {
+          let innerBody = incoming.contentBody || '';
+          if (typeof innerBody === 'string' && innerBody.startsWith('{')) {
+            try {
+              const p = JSON.parse(innerBody);
+              innerBody = p.body || '';
+            } catch (e) {}
+          }
+          payload.content_body = JSON.stringify({
+            productUrl: (incoming.productUrl || '').trim(),
+            tools: (incoming.tools || '').trim(),
+            body: innerBody
+          });
+        } else {
+          payload.content_body = incoming.contentBody || '';
+        }
       }
 
       const sbRes = await fetch(`${sbUrl}/rest/v1/portfolio_content?id=eq.${encodeURIComponent(id)}`, {

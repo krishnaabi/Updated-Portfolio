@@ -183,18 +183,7 @@ const extractDateFromUrlOrText = (targetUrl = '', html = '', microDate = '') => 
 const API_BASE_URLS = ['', 'http://127.0.0.1:4173', 'http://localhost:4173'];
 
 async function apiFetch(path, options = {}) {
-  let lastError = null;
-  for (const base of API_BASE_URLS) {
-    try {
-      const url = base ? `${base}${path}` : path;
-      const res = await fetch(url, options);
-      if (res.ok) return res;
-    } catch (err) {
-      lastError = err;
-    }
-  }
-
-  // Fallback using Supabase directly if local/worker API route fails
+  // 1. Direct Supabase if configured (Fastest, direct cloud communication)
   if (window.ABIKRISHNA_SUPABASE && window.ABIKRISHNA_SUPABASE.url) {
     try {
       const { url: sbUrl, anonKey } = window.ABIKRISHNA_SUPABASE;
@@ -217,23 +206,62 @@ async function apiFetch(path, options = {}) {
             const raw = await sbRes.json();
             let data = raw;
             if (path === '/api/projects') {
-              data = (raw || []).map(row => ({
-                id: row.id,
-                title: row.title,
-                category: `${row.content_type}|${row.category || 'Product Design'}`,
-                description: row.description || '',
-                contentBody: row.content_body || '',
-                url: row.destination_url || '',
-                productUrl: row.destination_url || '',
-                image: row.image_url || '',
-                featured: Boolean(row.featured),
-                tags: row.tags || '',
-                readTime: row.read_time || '5 min read',
-                platform: row.platform || '',
-                journalType: row.journal_type || 'link',
-                createdAt: row.created_at,
-                date: row.created_at
-              }));
+              data = (raw || []).map(row => {
+                let productUrl = row.product_url || '';
+                let tools = row.tools || '';
+                let contentBody = row.content_body || '';
+
+                if (row.content_body && (row.content_type === 'work' || !row.content_type || row.content_type === 'main')) {
+                  try {
+                    let parsed = JSON.parse(row.content_body);
+                    while (parsed && typeof parsed === 'object' && parsed.body && typeof parsed.body === 'string' && parsed.body.startsWith('{')) {
+                      try {
+                        const nested = JSON.parse(parsed.body);
+                        if (nested && typeof nested === 'object') {
+                          if (!parsed.tools && nested.tools) parsed.tools = nested.tools;
+                          if (!parsed.productUrl && nested.productUrl) parsed.productUrl = nested.productUrl;
+                          parsed = { ...nested, ...parsed, body: nested.body || '' };
+                        } else {
+                          break;
+                        }
+                      } catch (e) { break; }
+                    }
+                    if (parsed && typeof parsed === 'object') {
+                      if (parsed.productUrl !== undefined) productUrl = parsed.productUrl;
+                      if (parsed.tools !== undefined) tools = parsed.tools;
+                      if (parsed.body !== undefined) contentBody = parsed.body;
+                    }
+                  } catch (e) {}
+                }
+
+                let sec = 'main';
+                let cat = row.category || 'Product Design';
+                if (row.category && row.category.includes('|')) {
+                  const parts = row.category.split('|');
+                  sec = parts[0] || 'main';
+                  cat = parts.slice(1).join('|') || 'Product Design';
+                }
+
+                return {
+                  id: row.id,
+                  title: row.title,
+                  category: `${row.content_type || 'work'}|${sec}|${cat}`,
+                  description: row.description || '',
+                  contentBody,
+                  url: row.destination_url || '',
+                  productUrl: productUrl || row.product_url || '',
+                  image: row.image_url || '',
+                  featured: Boolean(row.featured),
+                  tags: row.tags || '',
+                  tools: tools || row.tools || '',
+                  readTime: row.read_time || '5 min read',
+                  platform: row.platform || '',
+                  journalType: row.journal_type || 'link',
+                  displayOrder: row.display_order ?? 9999,
+                  createdAt: row.created_at,
+                  date: row.created_at
+                };
+              });
             } else if (path === '/api/tools') {
               data = (raw || []).map(row => ({
                 id: row.id,
@@ -241,6 +269,42 @@ async function apiFetch(path, options = {}) {
                 category: row.category || '',
                 icon_type: row.icon_type || 'figma',
                 custom_icon_url: row.custom_icon_url || '',
+                display_order: row.display_order || 0
+              }));
+            } else if (path === '/api/testimonials') {
+              data = (raw || []).map(row => ({
+                id: row.id,
+                name: row.name,
+                role: row.role || '',
+                quote: row.quote || '',
+                img: row.avatar_url || row.image || '',
+                avatar_url: row.avatar_url || ''
+              }));
+            } else if (path === '/api/brands') {
+              data = (raw || []).map(row => ({
+                id: row.id,
+                name: row.name,
+                logo: row.logo_url || row.logo || '',
+                logo_url: row.logo_url || row.logo || '',
+                url: row.url || '#'
+              }));
+            } else if (path === '/api/milestones') {
+              data = (raw || []).map(row => ({
+                id: row.id,
+                title: row.title,
+                category: row.category || '',
+                year: row.year || '',
+                eventLocation: row.event_location || '',
+                summary: row.summary || '',
+                spec1Label: row.spec1_label || '',
+                spec1Value: row.spec1_value || '',
+                spec2Label: row.spec2_label || '',
+                spec2Value: row.spec2_value || '',
+                spec3Label: row.spec3_label || '',
+                spec3Value: row.spec3_value || '',
+                buttonText: row.button_text || 'Watch Keynote Deck',
+                url: row.url || '#',
+                image: row.image || '',
                 display_order: row.display_order || 0
               }));
             } else if (path === '/api/settings') {
@@ -257,19 +321,40 @@ async function apiFetch(path, options = {}) {
       } else if (path === '/api/projects' && options.method === 'POST') {
         const bodyObj = JSON.parse(options.body || '{}');
         const parts = (bodyObj.category || 'work|main|Product Design').split('|');
+        const contentType = parts[0] || 'work';
+        const sec = parts[1] || 'main';
+        const cat = parts.slice(2).join('|') || parts[1] || 'Product Design';
+        
+        let contentBody = bodyObj.contentBody || '';
+        if (contentType === 'work') {
+          let innerBody = bodyObj.contentBody || '';
+          if (typeof innerBody === 'string' && innerBody.startsWith('{')) {
+            try {
+              const p = JSON.parse(innerBody);
+              innerBody = p.body || '';
+            } catch (e) {}
+          }
+          contentBody = JSON.stringify({
+            productUrl: (bodyObj.productUrl || '').trim(),
+            tools: (bodyObj.tools || '').trim(),
+            body: innerBody
+          });
+        }
+
         const payload = {
           title: bodyObj.title,
-          content_type: parts[0] || 'work',
-          category: `${parts[1] || 'main'}|${parts.slice(2).join('|') || parts[1] || 'Product Design'}`,
+          content_type: contentType,
+          category: `${sec}|${cat}`,
           description: bodyObj.description || '',
-          content_body: bodyObj.contentBody || '',
+          content_body: contentBody,
           destination_url: bodyObj.url || '',
           image_url: bodyObj.image || '',
           featured: Boolean(bodyObj.featured),
-          tags: bodyObj.tags || bodyObj.tools || '',
+          tags: bodyObj.tags || '',
           read_time: bodyObj.readTime || '5 min read',
           platform: bodyObj.platform || '',
-          journal_type: bodyObj.journalType || 'link',
+          journal_type: bodyObj.journalType || bodyObj.playgroundType || 'link',
+          display_order: bodyObj.displayOrder ?? 9999,
           created_at: bodyObj.date ? new Date(bodyObj.date).toISOString() : new Date().toISOString()
         };
         const sbRes = await fetch(`${sbUrl}/rest/v1/portfolio_content`, {
@@ -284,13 +369,14 @@ async function apiFetch(path, options = {}) {
         const payload = {};
         if (bodyObj.title !== undefined) payload.title = bodyObj.title;
         if (bodyObj.description !== undefined) payload.description = bodyObj.description;
-        if (bodyObj.contentBody !== undefined) payload.content_body = bodyObj.contentBody;
         if (bodyObj.url !== undefined) payload.destination_url = bodyObj.url;
         if (bodyObj.image !== undefined) payload.image_url = bodyObj.image;
         if (bodyObj.featured !== undefined) payload.featured = Boolean(bodyObj.featured);
         if (bodyObj.tags !== undefined) payload.tags = bodyObj.tags;
         if (bodyObj.readTime !== undefined) payload.read_time = bodyObj.readTime;
+        if (bodyObj.platform !== undefined) payload.platform = bodyObj.platform;
         if (bodyObj.journalType !== undefined) payload.journal_type = bodyObj.journalType;
+        if (bodyObj.displayOrder !== undefined) payload.display_order = bodyObj.displayOrder;
         if (bodyObj.date !== undefined && bodyObj.date) {
           try { payload.created_at = new Date(bodyObj.date).toISOString(); } catch {}
         }
@@ -298,6 +384,25 @@ async function apiFetch(path, options = {}) {
           const parts = bodyObj.category.split('|');
           payload.content_type = parts[0] || 'work';
           payload.category = `${parts[1] || 'main'}|${parts.slice(2).join('|') || parts[1] || 'Product Design'}`;
+        }
+        if (bodyObj.productUrl !== undefined || bodyObj.tools !== undefined || bodyObj.contentBody !== undefined) {
+          const isWork = !bodyObj.category || bodyObj.category.startsWith('work');
+          if (isWork) {
+            let innerBody = bodyObj.contentBody || '';
+            if (typeof innerBody === 'string' && innerBody.startsWith('{')) {
+              try {
+                const p = JSON.parse(innerBody);
+                innerBody = p.body || '';
+              } catch (e) {}
+            }
+            payload.content_body = JSON.stringify({
+              productUrl: (bodyObj.productUrl || '').trim(),
+              tools: (bodyObj.tools || '').trim(),
+              body: innerBody
+            });
+          } else {
+            payload.content_body = bodyObj.contentBody || '';
+          }
         }
         const sbRes = await fetch(`${sbUrl}/rest/v1/portfolio_content?id=eq.${encodeURIComponent(id)}`, {
           method: 'PATCH',
@@ -328,6 +433,138 @@ async function apiFetch(path, options = {}) {
           }
         }
         return { ok: true, status: 200, json: async () => ({ ok: true }) };
+      } else if (path === '/api/settings' && (options.method === 'PUT' || options.method === 'POST')) {
+        const bodyObj = JSON.parse(options.body || '{}');
+        const sbRes = await fetch(`${sbUrl}/rest/v1/portfolio_settings`, {
+          method: 'POST',
+          headers: {
+            apikey: anonKey,
+            Authorization: `Bearer ${anonKey}`,
+            'Content-Type': 'application/json',
+            Prefer: 'resolution=merge-duplicates,return=representation'
+          },
+          body: JSON.stringify({ id: 'global', settings: bodyObj, updated_at: new Date().toISOString() })
+        });
+        if (sbRes.ok) return sbRes;
+      } else if (path === '/api/testimonials' && options.method === 'POST') {
+        const bodyObj = JSON.parse(options.body || '{}');
+        const payload = {
+          name: bodyObj.name,
+          role: bodyObj.role || '',
+          quote: bodyObj.quote || '',
+          avatar_url: bodyObj.img || bodyObj.avatar_url || bodyObj.avatarUrl || ''
+        };
+        if (bodyObj.id) {
+          const sbRes = await fetch(`${sbUrl}/rest/v1/portfolio_testimonials?id=eq.${encodeURIComponent(bodyObj.id)}`, {
+            method: 'PATCH',
+            headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}`, 'Content-Type': 'application/json', Prefer: 'return=representation' },
+            body: JSON.stringify(payload)
+          });
+          if (sbRes.ok) return sbRes;
+        } else {
+          payload.created_at = new Date().toISOString();
+          const sbRes = await fetch(`${sbUrl}/rest/v1/portfolio_testimonials`, {
+            method: 'POST',
+            headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}`, 'Content-Type': 'application/json', Prefer: 'return=representation' },
+            body: JSON.stringify(payload)
+          });
+          if (sbRes.ok) return sbRes;
+        }
+      } else if (path.startsWith('/api/testimonials/') && options.method === 'DELETE') {
+        const id = path.split('/').pop();
+        const sbRes = await fetch(`${sbUrl}/rest/v1/portfolio_testimonials?id=eq.${encodeURIComponent(id)}`, {
+          method: 'DELETE',
+          headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}` }
+        });
+        if (sbRes.ok) return sbRes;
+      } else if (path === '/api/milestones' && options.method === 'POST') {
+        const bodyObj = JSON.parse(options.body || '{}');
+        const payload = {
+          title: bodyObj.title,
+          category: bodyObj.category || '',
+          year: bodyObj.year || '',
+          event_location: bodyObj.eventLocation || bodyObj.event_location || '',
+          summary: bodyObj.summary || '',
+          spec1_label: bodyObj.spec1Label || bodyObj.spec1_label || '🎤 AUDIENCE',
+          spec1_value: bodyObj.spec1Value || bodyObj.spec1_value || '',
+          spec2_label: bodyObj.spec2Label || bodyObj.spec2_label || '🚀 DEMO',
+          spec2_value: bodyObj.spec2Value || bodyObj.spec2_value || '',
+          spec3_label: bodyObj.spec3Label || bodyObj.spec3_label || '📱 PLATFORM',
+          spec3_value: bodyObj.spec3Value || bodyObj.spec3_value || '',
+          url: bodyObj.url || '#',
+          button_text: bodyObj.buttonText || bodyObj.button_text || 'Watch Keynote Deck',
+          image: bodyObj.image || '',
+          display_order: bodyObj.displayOrder || bodyObj.display_order || 9999
+        };
+        if (bodyObj.id) {
+          const sbRes = await fetch(`${sbUrl}/rest/v1/portfolio_milestones?id=eq.${encodeURIComponent(bodyObj.id)}`, {
+            method: 'PATCH',
+            headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}`, 'Content-Type': 'application/json', Prefer: 'return=representation' },
+            body: JSON.stringify(payload)
+          });
+          if (sbRes.ok) return sbRes;
+        } else {
+          payload.created_at = new Date().toISOString();
+          const sbRes = await fetch(`${sbUrl}/rest/v1/portfolio_milestones`, {
+            method: 'POST',
+            headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}`, 'Content-Type': 'application/json', Prefer: 'return=representation' },
+            body: JSON.stringify(payload)
+          });
+          if (sbRes.ok) return sbRes;
+        }
+      } else if (path.startsWith('/api/milestones/') && options.method === 'DELETE') {
+        const id = path.split('/').pop();
+        const sbRes = await fetch(`${sbUrl}/rest/v1/portfolio_milestones?id=eq.${encodeURIComponent(id)}`, {
+          method: 'DELETE',
+          headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}` }
+        });
+        if (sbRes.ok) return sbRes;
+      } else if (path === '/api/milestones/reorder' && options.method === 'POST') {
+        const items = JSON.parse(options.body || '[]');
+        if (Array.isArray(items)) {
+          for (let i = 0; i < items.length; i++) {
+            const item = items[i];
+            const id = typeof item === 'object' ? item.id : item;
+            if (id) {
+              await fetch(`${sbUrl}/rest/v1/portfolio_milestones?id=eq.${encodeURIComponent(id)}`, {
+                method: 'PATCH',
+                headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ display_order: i + 1 })
+              }).catch(() => {});
+            }
+          }
+        }
+        return { ok: true, status: 200, json: async () => ({ ok: true }) };
+      } else if (path === '/api/tools' && options.method === 'POST') {
+        const bodyObj = JSON.parse(options.body || '{}');
+        const payload = {
+          name: bodyObj.name,
+          category: bodyObj.category || '',
+          icon_type: bodyObj.icon_type || bodyObj.iconType || 'figma',
+          custom_icon_url: bodyObj.custom_icon_url || bodyObj.customIconUrl || '',
+          display_order: bodyObj.display_order || bodyObj.displayOrder || 0
+        };
+        if (bodyObj.id && !String(bodyObj.id).startsWith('tool-')) {
+          payload.id = bodyObj.id;
+        }
+        const sbRes = await fetch(`${sbUrl}/rest/v1/portfolio_tools`, {
+          method: 'POST',
+          headers: {
+            apikey: anonKey,
+            Authorization: `Bearer ${anonKey}`,
+            'Content-Type': 'application/json',
+            Prefer: 'resolution=merge-duplicates,return=representation'
+          },
+          body: JSON.stringify(payload)
+        });
+        if (sbRes.ok) return sbRes;
+      } else if (path.startsWith('/api/tools/') && options.method === 'DELETE') {
+        const id = path.split('/').pop();
+        const sbRes = await fetch(`${sbUrl}/rest/v1/portfolio_tools?id=eq.${encodeURIComponent(id)}`, {
+          method: 'DELETE',
+          headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}` }
+        });
+        if (sbRes.ok) return sbRes;
       } else if (path === '/api/brands' && options.method === 'POST') {
         const bodyObj = JSON.parse(options.body || '{}');
         if (bodyObj.id) {
@@ -335,7 +572,7 @@ async function apiFetch(path, options = {}) {
           const sbRes = await fetch(`${sbUrl}/rest/v1/portfolio_brands?id=eq.${encodeURIComponent(bodyObj.id)}`, {
             method: 'PATCH',
             headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}`, 'Content-Type': 'application/json', Prefer: 'return=representation' },
-            body: JSON.stringify({ name: bodyObj.name, logo: bodyObj.logo || '' })
+            body: JSON.stringify({ name: bodyObj.name, logo_url: bodyObj.logo || bodyObj.logo_url || '' })
           });
           if (sbRes.ok) return sbRes;
         } else {
@@ -343,7 +580,7 @@ async function apiFetch(path, options = {}) {
           const sbRes = await fetch(`${sbUrl}/rest/v1/portfolio_brands`, {
             method: 'POST',
             headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}`, 'Content-Type': 'application/json', Prefer: 'return=representation' },
-            body: JSON.stringify({ name: bodyObj.name, logo: bodyObj.logo || '', created_at: new Date().toISOString() })
+            body: JSON.stringify({ name: bodyObj.name, logo_url: bodyObj.logo || bodyObj.logo_url || '', created_at: new Date().toISOString() })
           });
           if (sbRes.ok) return sbRes;
         }
@@ -354,8 +591,29 @@ async function apiFetch(path, options = {}) {
           headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}` }
         });
         if (sbRes.ok) return sbRes;
+      } else if (path.startsWith('/api/messages/') && options.method === 'DELETE') {
+        const id = path.split('/').pop();
+        const sbRes = await fetch(`${sbUrl}/rest/v1/contact_messages?id=eq.${encodeURIComponent(id)}`, {
+          method: 'DELETE',
+          headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}` }
+        });
+        if (sbRes.ok) return sbRes;
       }
-    } catch (e) {}
+    } catch (sbErr) {
+      console.warn('Direct Supabase request error:', sbErr);
+    }
+  }
+
+  // 2. Try backend API routes as fallback
+  let lastError = null;
+  for (const base of API_BASE_URLS) {
+    try {
+      const url = base ? `${base}${path}` : path;
+      const res = await fetch(url, options);
+      if (res.ok) return res;
+    } catch (err) {
+      lastError = err;
+    }
   }
 
   // Fallback to static data.json if GET request
@@ -1154,8 +1412,10 @@ function renderProjectsList() {
           ${item.readTime ? `<span class="meta-item">⏱ ${escapeHtml(item.readTime)}</span>` : ''}
           ${item.platform ? `<span class="meta-item">🌐 ${escapeHtml(item.platform)}</span>` : ''}
           ${item.tags ? `<span class="meta-item meta-tags">🏷 ${escapeHtml(item.tags)}</span>` : ''}
+          ${item.tools ? `<span class="meta-item" style="color:#6366f1;font-weight:600;">🛠 ${escapeHtml(item.tools)}</span>` : ''}
         </div>
-        ${item.url ? `<p class="content-row-url"><a href="${escapeHtml(item.url)}" target="_blank" rel="noreferrer">🔗 ${escapeHtml(item.url)}</a></p>` : ''}
+        ${item.url ? `<p class="content-row-url"><a href="${escapeHtml(item.url)}" target="_blank" rel="noreferrer">🔗 Case Study: ${escapeHtml(item.url)}</a></p>` : ''}
+        ${item.productUrl ? `<p class="content-row-url" style="margin-top:4px;"><a href="${escapeHtml(item.productUrl)}" target="_blank" rel="noreferrer" style="color:#16a34a;font-weight:600;">⚡ Live Product: ${escapeHtml(item.productUrl)}</a></p>` : ''}
       </div>
       <div class="actions">
         ${canReorder ? `
@@ -1461,17 +1721,24 @@ contentForm.onsubmit = async event => {
     const isFeatured = Boolean($('#content-featured')?.checked);
     const finalCategory = data.category || (targetType === 'work' ? 'Product Design' : 'Design Thinking');
 
+    let contentBodyFinal = '';
+    if (isInternalBlogNow) {
+      contentBodyFinal = contentBodyVal;
+    } else if (targetType === 'work') {
+      contentBodyFinal = '';
+    }
+
     payload = {
       title: titleVal,
       description: descVal,
-      contentBody: isInternalBlogNow ? contentBodyVal : '',
+      contentBody: contentBodyFinal,
       url: isInternalBlogNow ? '' : (urlVal || ''),
-      productUrl: data.productUrl || '',
+      productUrl: (data.productUrl || '').trim(),
       image,
       category: `${targetType}|main|${finalCategory}`,
       featured: isFeatured,
-      tags: data.tags || '',
-      tools: data.tools || '',
+      tags: (data.tags || '').trim(),
+      tools: (data.tools || '').trim(),
       readTime: data.readTime || '5 min read',
       journalType: targetType === 'journal' ? journalModeNow : 'link',
       date: targetType === 'journal' ? (dateVal || data.date || getTodayDateString()) : (data.date || '')
@@ -3592,13 +3859,33 @@ function saveLiveWorksToStorage(list) {
   try {
     localStorage.setItem(STORAGE_KEY_LIVE_WORKS, JSON.stringify(list));
   } catch (e) {}
+  apiFetch('/api/settings').then(r => r.ok ? r.json() : {}).then(currentSettings => {
+    apiFetch('/api/settings', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...currentSettings, liveWorks: list })
+    }).catch(() => {});
+  }).catch(() => {});
 }
 
-function fetchLiveWorks() {
+async function fetchLiveWorks() {
   const localSaved = loadLiveWorksFromStorage();
-  if (localSaved !== null && Array.isArray(localSaved)) {
+  if (localSaved !== null && Array.isArray(localSaved) && localSaved.length > 0) {
     allLiveWorksData = localSaved;
   } else {
+    try {
+      const res = await apiFetch('/api/settings');
+      if (res.ok) {
+        const settings = await res.json();
+        if (Array.isArray(settings.liveWorks) && settings.liveWorks.length > 0) {
+          allLiveWorksData = settings.liveWorks;
+          saveLiveWorksToStorage(allLiveWorksData);
+          renderLiveWorksList();
+          updateLivePreviewNode();
+          return;
+        }
+      }
+    } catch (e) {}
     allLiveWorksData = [...defaultLiveWorksPresets];
     saveLiveWorksToStorage(allLiveWorksData);
   }

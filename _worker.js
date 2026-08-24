@@ -74,18 +74,46 @@ export default {
             sec = parts[0] || 'main';
             cat = parts.slice(1).join('|') || 'Product Design';
           }
+
+          let productUrl = row.product_url || '';
+          let tools = row.tools || '';
+          let contentBody = row.content_body || '';
+
+          if (row.content_body && (row.content_type === 'work' || !row.content_type || row.content_type === 'main')) {
+            try {
+              let parsed = JSON.parse(row.content_body);
+              while (parsed && typeof parsed === 'object' && parsed.body && typeof parsed.body === 'string' && parsed.body.startsWith('{')) {
+                try {
+                  const nested = JSON.parse(parsed.body);
+                  if (nested && typeof nested === 'object') {
+                    if (!parsed.tools && nested.tools) parsed.tools = nested.tools;
+                    if (!parsed.productUrl && nested.productUrl) parsed.productUrl = nested.productUrl;
+                    parsed = { ...nested, ...parsed, body: nested.body || '' };
+                  } else {
+                    break;
+                  }
+                } catch (e) { break; }
+              }
+              if (parsed && typeof parsed === 'object') {
+                if (parsed.productUrl !== undefined) productUrl = parsed.productUrl;
+                if (parsed.tools !== undefined) tools = parsed.tools;
+                if (parsed.body !== undefined) contentBody = parsed.body;
+              }
+            } catch (e) {}
+          }
+
           return {
             id: row.id,
             title: row.title,
             category: `${row.content_type || 'work'}|${sec}|${cat}`,
             description: row.description || '',
-            contentBody: row.content_body || '',
+            contentBody,
             url: row.destination_url || '',
-            productUrl: row.destination_url || '',
+            productUrl: productUrl || row.product_url || '',
             image: row.image_url || '',
             featured: Boolean(row.featured),
             tags: row.tags || '',
-            tools: row.tags || '',
+            tools: tools || row.tools || '',
             readTime: row.read_time || '5 min read',
             platform: row.platform || '',
             journalType: row.journal_type || 'link',
@@ -106,16 +134,32 @@ export default {
         const category = parts.slice(2).join('|') || parts[1] || 'Product Design';
         const combinedCategory = `${section}|${category}`;
 
+        let contentBody = incoming.contentBody || '';
+        if (contentType === 'work') {
+          let innerBody = incoming.contentBody || '';
+          if (typeof innerBody === 'string' && innerBody.startsWith('{')) {
+            try {
+              const p = JSON.parse(innerBody);
+              innerBody = p.body || '';
+            } catch (e) {}
+          }
+          contentBody = JSON.stringify({
+            productUrl: (incoming.productUrl || '').trim(),
+            tools: (incoming.tools || '').trim(),
+            body: innerBody
+          });
+        }
+
         const row = {
           title: incoming.title.trim(),
           content_type: contentType,
           category: combinedCategory,
           description: incoming.description || '',
-          content_body: incoming.contentBody || '',
+          content_body: contentBody,
           destination_url: incoming.url || incoming.destinationUrl || '',
           image_url: incoming.image || incoming.imageUrl || '',
           featured: Boolean(incoming.featured),
-          tags: incoming.tags || incoming.tools || '',
+          tags: incoming.tags || '',
           read_time: incoming.readTime || '5 min read',
           platform: incoming.platform || '',
           journal_type: incoming.playgroundType || incoming.journalType || 'link',
@@ -165,7 +209,6 @@ export default {
           updatePayload.category = `${sec}|${cat}`;
         }
         if (incoming.description !== undefined) updatePayload.description = incoming.description;
-        if (incoming.contentBody !== undefined) updatePayload.content_body = incoming.contentBody;
         if (incoming.url !== undefined) updatePayload.destination_url = incoming.url;
         if (incoming.image !== undefined) updatePayload.image_url = incoming.image;
         if (incoming.featured !== undefined) updatePayload.featured = Boolean(incoming.featured);
@@ -180,6 +223,25 @@ export default {
           try {
             updatePayload.created_at = new Date(incoming.date).toISOString();
           } catch {}
+        }
+        if (incoming.productUrl !== undefined || incoming.tools !== undefined || incoming.contentBody !== undefined) {
+          const isWork = !incoming.category || incoming.category.startsWith('work');
+          if (isWork) {
+            let innerBody = incoming.contentBody || '';
+            if (typeof innerBody === 'string' && innerBody.startsWith('{')) {
+              try {
+                const p = JSON.parse(innerBody);
+                innerBody = p.body || '';
+              } catch (e) {}
+            }
+            updatePayload.content_body = JSON.stringify({
+              productUrl: (incoming.productUrl || '').trim(),
+              tools: (incoming.tools || '').trim(),
+              body: innerBody
+            });
+          } else {
+            updatePayload.content_body = incoming.contentBody || '';
+          }
         }
 
         const res = await sbFetch(`portfolio_content?id=eq.${id}`, {

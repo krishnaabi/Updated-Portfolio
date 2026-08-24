@@ -10,6 +10,7 @@ create table if not exists public.portfolio_content (
   description text,
   content_body text,
   destination_url text,
+  product_url text,
   image_url text,
   featured boolean default false,
   tags text,

@@ -467,22 +467,53 @@ const fetchMetadata = async rawUrl => {
 };
 
 // Mapper: Supabase row -> Frontend Project
-const toProject = row => ({
-  id: row.id,
-  title: row.title,
-  category: `${row.content_type}|${row.category || 'Product Design'}`,
-  description: row.description || '',
-  contentBody: row.content_body || '',
-  url: row.destination_url || '',
-  image: row.image_url || '',
-  featured: Boolean(row.featured),
-  tags: row.tags || '',
-  readTime: row.read_time || '5 min read',
-  platform: row.platform || '',
-  journalType: row.journal_type || 'link',
-  createdAt: row.created_at,
-  displayOrder: row.display_order || 0
-});
+const toProject = row => {
+  let productUrl = row.product_url || '';
+  let tools = row.tools || '';
+  let contentBody = row.content_body || '';
+
+  if (row.content_body && (row.content_type === 'work' || !row.content_type || row.content_type === 'main')) {
+    try {
+      let parsed = JSON.parse(row.content_body);
+      while (parsed && typeof parsed === 'object' && parsed.body && typeof parsed.body === 'string' && parsed.body.startsWith('{')) {
+        try {
+          const nested = JSON.parse(parsed.body);
+          if (nested && typeof nested === 'object') {
+            if (!parsed.tools && nested.tools) parsed.tools = nested.tools;
+            if (!parsed.productUrl && nested.productUrl) parsed.productUrl = nested.productUrl;
+            parsed = { ...nested, ...parsed, body: nested.body || '' };
+          } else {
+            break;
+          }
+        } catch (e) { break; }
+      }
+      if (parsed && typeof parsed === 'object') {
+        if (parsed.productUrl !== undefined) productUrl = parsed.productUrl;
+        if (parsed.tools !== undefined) tools = parsed.tools;
+        if (parsed.body !== undefined) contentBody = parsed.body;
+      }
+    } catch (e) {}
+  }
+
+  return {
+    id: row.id,
+    title: row.title,
+    category: `${row.content_type || 'work'}|${row.category || 'Product Design'}`,
+    description: row.description || '',
+    contentBody,
+    url: row.destination_url || '',
+    productUrl: productUrl || row.product_url || '',
+    image: row.image_url || '',
+    featured: Boolean(row.featured),
+    tags: row.tags || '',
+    tools: tools || row.tools || '',
+    readTime: row.read_time || '5 min read',
+    platform: row.platform || '',
+    journalType: row.journal_type || 'link',
+    createdAt: row.created_at,
+    displayOrder: row.display_order || 0
+  };
+};
 
 // Projects API (Supabase ONLY)
 const getProjects = async () => {
@@ -502,8 +533,22 @@ const addProject = async incoming => {
   const tags = incoming.tags || '';
   const readTime = incoming.readTime || '5 min read';
   const platform = incoming.platform || '';
-  const journalType = incoming.journalType || 'link';
-  const contentBody = incoming.contentBody || '';
+  const journalType = incoming.journalType || incoming.playgroundType || 'link';
+  let contentBody = incoming.contentBody || '';
+  if (contentType === 'work' || !contentType) {
+    let innerBody = incoming.contentBody || '';
+    if (typeof innerBody === 'string' && innerBody.startsWith('{')) {
+      try {
+        const p = JSON.parse(innerBody);
+        innerBody = p.body || '';
+      } catch (e) {}
+    }
+    contentBody = JSON.stringify({
+      productUrl: (incoming.productUrl || '').trim(),
+      tools: (incoming.tools || '').trim(),
+      body: innerBody
+    });
+  }
   const createdAt = incoming.date ? new Date(incoming.date).toISOString() : new Date().toISOString();
 
   const payload = {
@@ -539,7 +584,6 @@ const updateProject = async (id, changes) => {
   const payload = {};
   if ('title' in changes) payload.title = changes.title;
   if ('description' in changes) payload.description = changes.description;
-  if ('contentBody' in changes) payload.content_body = changes.contentBody;
   if ('url' in changes) payload.destination_url = changes.url;
   if ('image' in changes) payload.image_url = changes.image;
   if ('featured' in changes) payload.featured = Boolean(changes.featured);
@@ -553,6 +597,26 @@ const updateProject = async (id, changes) => {
     const [contentType, ...categoryParts] = (changes.category || 'work|main|Product Design').split('|');
     payload.content_type = contentType;
     payload.category = categoryParts.join('|');
+  }
+
+  if ('productUrl' in changes || 'tools' in changes || 'contentBody' in changes) {
+    const isWork = !changes.category || changes.category.startsWith('work');
+    if (isWork) {
+      let innerBody = changes.contentBody || '';
+      if (typeof innerBody === 'string' && innerBody.startsWith('{')) {
+        try {
+          const p = JSON.parse(innerBody);
+          innerBody = p.body || '';
+        } catch (e) {}
+      }
+      payload.content_body = JSON.stringify({
+        productUrl: (changes.productUrl || '').trim(),
+        tools: (changes.tools || '').trim(),
+        body: innerBody
+      });
+    } else {
+      payload.content_body = changes.contentBody || '';
+    }
   }
 
   try {

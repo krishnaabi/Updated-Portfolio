@@ -348,25 +348,7 @@
   const API_BASE_URLS = ['', 'http://127.0.0.1:4173', 'http://localhost:4173'];
 
   async function apiFetch(path, options = {}) {
-    // 1. Try local/Cloudflare backend API endpoint
-    for (const base of API_BASE_URLS) {
-      try {
-        const url = base ? `${base}${path}` : path;
-        const res = await fetch(url, options);
-        if (res.ok) {
-          const contentType = res.headers.get('content-type') || '';
-          if (contentType.includes('application/json') || res.status === 200) {
-            const data = await res.json();
-            if (data && (Array.isArray(data) ? data.length > 0 : Object.keys(data).length > 0)) {
-              setCachedData(path, data);
-              return { ok: true, status: 200, json: async () => data, text: async () => JSON.stringify(data) };
-            }
-          }
-        }
-      } catch (e) {}
-    }
-
-    // 2. Direct Supabase fallback if configured in supabase-config.js
+    // 1. Direct Supabase if configured (Fastest, direct cloud communication)
     if ((!options.method || options.method === 'GET') && window.ABIKRISHNA_SUPABASE && window.ABIKRISHNA_SUPABASE.url) {
       try {
         const { url: sbUrl, anonKey } = window.ABIKRISHNA_SUPABASE;
@@ -387,23 +369,62 @@
             const raw = await sbRes.json();
             let payload = raw;
             if (path === '/api/projects') {
-              payload = (raw || []).map(row => ({
-                id: row.id,
-                title: row.title,
-                category: `${row.content_type || 'work'}|${row.section || 'main'}|${row.category || 'Product Design'}`,
-                description: row.description || '',
-                contentBody: row.content_body || '',
-                url: row.destination_url || '',
-                productUrl: row.product_url || '',
-                image: row.image_url || '',
-                featured: Boolean(row.featured),
-                tags: row.tags || '',
-                tools: row.tools || '',
-                readTime: row.read_time || '5 min read',
-                platform: row.platform || '',
-                journalType: row.journal_type || 'link',
-                createdAt: row.created_at
-              }));
+              payload = (raw || []).map(row => {
+                let productUrl = row.product_url || '';
+                let tools = row.tools || '';
+                let contentBody = row.content_body || '';
+
+                if (row.content_body && (row.content_type === 'work' || !row.content_type || row.content_type === 'main')) {
+                  try {
+                    let parsed = JSON.parse(row.content_body);
+                    while (parsed && typeof parsed === 'object' && parsed.body && typeof parsed.body === 'string' && parsed.body.startsWith('{')) {
+                      try {
+                        const nested = JSON.parse(parsed.body);
+                        if (nested && typeof nested === 'object') {
+                          if (!parsed.tools && nested.tools) parsed.tools = nested.tools;
+                          if (!parsed.productUrl && nested.productUrl) parsed.productUrl = nested.productUrl;
+                          parsed = { ...nested, ...parsed, body: nested.body || '' };
+                        } else {
+                          break;
+                        }
+                      } catch (e) { break; }
+                    }
+                    if (parsed && typeof parsed === 'object') {
+                      if (parsed.productUrl !== undefined) productUrl = parsed.productUrl;
+                      if (parsed.tools !== undefined) tools = parsed.tools;
+                      if (parsed.body !== undefined) contentBody = parsed.body;
+                    }
+                  } catch (e) {}
+                }
+
+                let sec = 'main';
+                let cat = row.category || 'Product Design';
+                if (row.category && row.category.includes('|')) {
+                  const parts = row.category.split('|');
+                  sec = parts[0] || 'main';
+                  cat = parts.slice(1).join('|') || 'Product Design';
+                }
+
+                return {
+                  id: row.id,
+                  title: row.title,
+                  category: `${row.content_type || 'work'}|${sec}|${cat}`,
+                  description: row.description || '',
+                  contentBody,
+                  url: row.destination_url || '',
+                  productUrl: productUrl || row.product_url || '',
+                  image: row.image_url || '',
+                  featured: Boolean(row.featured),
+                  tags: row.tags || '',
+                  tools: tools || row.tools || '',
+                  readTime: row.read_time || '5 min read',
+                  platform: row.platform || '',
+                  journalType: row.journal_type || 'link',
+                  displayOrder: row.display_order ?? 9999,
+                  createdAt: row.created_at,
+                  date: row.created_at
+                };
+              });
             } else if (path === '/api/tools') {
               payload = (raw || []).map(row => ({
                 id: row.id,
@@ -419,6 +440,24 @@
             if (payload && (Array.isArray(payload) ? payload.length > 0 : Object.keys(payload).length > 0)) {
               setCachedData(path, payload);
               return { ok: true, status: 200, json: async () => payload, text: async () => JSON.stringify(payload) };
+            }
+          }
+        }
+      } catch (e) {}
+    }
+
+    // 2. Try local/Cloudflare backend API endpoint as fallback
+    for (const base of API_BASE_URLS) {
+      try {
+        const url = base ? `${base}${path}` : path;
+        const res = await fetch(url, options);
+        if (res.ok) {
+          const contentType = res.headers.get('content-type') || '';
+          if (contentType.includes('application/json') || res.status === 200) {
+            const data = await res.json();
+            if (data && (Array.isArray(data) ? data.length > 0 : Object.keys(data).length > 0)) {
+              setCachedData(path, data);
+              return { ok: true, status: 200, json: async () => data, text: async () => JSON.stringify(data) };
             }
           }
         }
@@ -1123,8 +1162,8 @@
         featuredTrack.innerHTML = featuredItems.map((item, index) => {
           const num = String(index + 1).padStart(2, '0');
           const categoryLabel = categoryOf(item) || 'Product Design';
-          const tagsList = (item.tags || categoryLabel).split('|').map(t => t.trim()).filter(Boolean);
-          const toolsList = (item.tools || '').split('|').map(t => t.trim()).filter(Boolean);
+          const tagsList = (item.tags || categoryLabel).split(/[|·•,]+/).map(t => t.trim()).filter(Boolean);
+          const toolsList = (item.tools || '').split(/[|·•,]+/).map(t => t.trim()).filter(Boolean);
           const tagsHtml = tagsList.length ? `<div class="fc-tags">${tagsList.map(t => `<span class="fc-tag">${escape(t)}</span>`).join('')}</div>` : '';
           const toolsHtml = toolsList.length ? `<div class="fc-tools">${toolsList.map(t => `<span class="fc-tool"><i>⚡</i> ${escape(t)}</span>`).join('')}</div>` : '';
 
@@ -1837,7 +1876,7 @@
             const cleanTitle = (item.title || 'Flubn').split('—')[0].trim().replace(/\.+$/, '');
             const subtitle = item.subtitle || (item.title.includes('—') ? item.title.split('—')[1].trim() : (isFlubn ? 'An influencer Platform' : 'Product Design & Strategy'));
 
-            const tagsList = (item.tags || 'Product | 2025 - 2026 | APP').split('|').map(t => t.trim()).filter(Boolean);
+            const tagsList = (item.tags || 'Product | 2025 - 2026 | APP').split(/[|·•]+/).map(t => t.trim()).filter(Boolean);
             const metaPillsHtml = tagsList.map(tag => {
               let iconSvg = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#ff4e1b" stroke-width="2"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>`;
               if (tag.toLowerCase().includes('product') || tag.toLowerCase().includes('design')) {
