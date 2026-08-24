@@ -277,8 +277,8 @@ async function apiFetch(path, options = {}) {
                 name: row.name,
                 role: row.role || '',
                 quote: row.quote || '',
-                img: row.avatar_url || row.image || '',
-                avatar_url: row.avatar_url || ''
+                img: row.img || row.avatar_url || row.image || '',
+                avatar_url: row.img || row.avatar_url || row.image || ''
               }));
             } else if (path === '/api/brands') {
               data = (raw || []).map(row => ({
@@ -452,7 +452,7 @@ async function apiFetch(path, options = {}) {
           name: bodyObj.name,
           role: bodyObj.role || '',
           quote: bodyObj.quote || '',
-          avatar_url: bodyObj.img || bodyObj.avatar_url || bodyObj.avatarUrl || ''
+          img: bodyObj.img || bodyObj.avatar_url || bodyObj.avatarUrl || ''
         };
         if (bodyObj.id) {
           const sbRes = await fetch(`${sbUrl}/rest/v1/portfolio_testimonials?id=eq.${encodeURIComponent(bodyObj.id)}`, {
@@ -2492,9 +2492,9 @@ const renderTestimonialsList = () => {
       e.preventDefault();
       if (!confirm('Are you sure you want to remove this testimonial?')) return;
       try {
-        const res = await fetch(`/api/testimonials/${btn.dataset.removeTestimonial}`, { method: 'DELETE' });
+        const res = await apiFetch(`/api/testimonials/${btn.dataset.removeTestimonial}`, { method: 'DELETE' });
         if (res.ok) {
-          fetchTestimonials();
+          await fetchTestimonials();
         }
       } catch (err) {
         alert('Could not remove testimonial.');
@@ -2510,7 +2510,8 @@ const startEditingTestimonial = (id) => {
   $('#testimonial-name').value = item.name || '';
   $('#testimonial-role').value = item.role || '';
   $('#testimonial-quote').value = item.quote || '';
-  $('#testimonial-img-url').value = item.img || '';
+  $('#testimonial-img-url').value = item.img || item.avatar_url || '';
+  if ($('#testimonial-img-file')) $('#testimonial-img-file').value = '';
 
   $('#testimonial-form-title').textContent = 'Edit Testimonial';
   $('#testimonial-form-subtitle').textContent = 'Modify client feedback and save changes live.';
@@ -2525,6 +2526,7 @@ const resetTestimonialForm = () => {
   $('#testimonial-form-subtitle').textContent = 'Add client reviews & recommendations to showcase on your homepage.';
   $('#testimonial-submit-btn').innerHTML = 'Publish Testimonial <b>↗</b>';
   if ($('#testimonial-cancel-btn')) $('#testimonial-cancel-btn').style.display = 'none';
+  if ($('#testimonial-img-file')) $('#testimonial-img-file').value = '';
   $('#testimonial-form').reset();
 };
 
@@ -2539,11 +2541,12 @@ if (testimonialForm) {
     const status = $('#testimonial-status');
     status.textContent = 'Saving testimonial...';
 
-    const editId = $('#testimonial-editing-id').value;
-    let imgUrl = $('#testimonial-img-url').value || '';
+    const editId = ($('#testimonial-editing-id')?.value || '').trim();
+    let imgUrl = ($('#testimonial-img-url')?.value || '').trim();
     const fileElem = $('#testimonial-img-file');
     if (fileElem && fileElem.files && fileElem.files[0]) {
       try {
+        status.textContent = 'Uploading photo... ⏳';
         imgUrl = await fileToUrl(fileElem.files[0]);
       } catch (err) {
         status.textContent = 'Failed to upload photo.';
@@ -2553,14 +2556,15 @@ if (testimonialForm) {
 
     const payload = {
       id: editId || undefined,
-      name: $('#testimonial-name').value.trim(),
-      role: $('#testimonial-role').value.trim(),
-      quote: $('#testimonial-quote').value.trim(),
-      img: imgUrl
+      name: ($('#testimonial-name')?.value || '').trim(),
+      role: ($('#testimonial-role')?.value || '').trim(),
+      quote: ($('#testimonial-quote')?.value || '').trim(),
+      img: imgUrl,
+      avatar_url: imgUrl
     };
 
     try {
-      const res = await fetch('/api/testimonials', {
+      const res = await apiFetch('/api/testimonials', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
@@ -2568,7 +2572,7 @@ if (testimonialForm) {
       if (!res.ok) throw new Error();
       status.textContent = '✦ Testimonial saved successfully!';
       resetTestimonialForm();
-      fetchTestimonials();
+      await fetchTestimonials();
       setTimeout(() => status.textContent = '', 3500);
     } catch (err) {
       status.textContent = 'Failed to save testimonial.';

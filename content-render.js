@@ -425,6 +425,15 @@
                   date: row.created_at
                 };
               });
+            } else if (path === '/api/testimonials') {
+              payload = (raw || []).map(row => ({
+                id: row.id,
+                name: row.name,
+                role: row.role || '',
+                quote: row.quote || '',
+                img: row.img || row.avatar_url || row.image || '',
+                avatar_url: row.img || row.avatar_url || row.image || ''
+              }));
             } else if (path === '/api/tools') {
               payload = (raw || []).map(row => ({
                 id: row.id,

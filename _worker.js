@@ -502,19 +502,30 @@ export default {
           name: incoming.name.trim(),
           role: incoming.role || '',
           quote: incoming.quote || '',
-          img: incoming.img || '',
-          created_at: new Date().toISOString()
+          img: incoming.img || incoming.avatar_url || incoming.avatarUrl || ''
         };
 
-        const res = await sbFetch('portfolio_testimonials', {
-          method: 'POST',
-          headers: { Prefer: 'return=representation' },
-          body: JSON.stringify(row)
-        }, env);
+        if (incoming.id) {
+          const res = await sbFetch(`portfolio_testimonials?id=eq.${encodeURIComponent(incoming.id)}`, {
+            method: 'PATCH',
+            headers: { Prefer: 'return=representation' },
+            body: JSON.stringify(row)
+          }, env);
+          if (!res.ok) return json({ error: await res.text() }, 500);
+          const data = await res.json();
+          return json(Array.isArray(data) ? data[0] : (data || { ok: true }));
+        } else {
+          row.created_at = new Date().toISOString();
+          const res = await sbFetch('portfolio_testimonials', {
+            method: 'POST',
+            headers: { Prefer: 'return=representation' },
+            body: JSON.stringify(row)
+          }, env);
 
-        if (!res.ok) return json({ error: await res.text() }, 500);
-        const data = await res.json();
-        return json(Array.isArray(data) ? data[0] : data, 201);
+          if (!res.ok) return json({ error: await res.text() }, 500);
+          const data = await res.json();
+          return json(Array.isArray(data) ? data[0] : data, 201);
+        }
       }
 
       if (path.startsWith('/api/testimonials/') && method === 'DELETE') {
