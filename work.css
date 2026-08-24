@@ -644,6 +644,15 @@ body.work-page {
   pointer-events: none;
 }
 
+.studio-connectors {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 2;
+}
+
 /* Left Inset Feature Highlights */
 .studio-feature-list {
   position: absolute;
