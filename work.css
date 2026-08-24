@@ -927,29 +927,45 @@ body.work-page {
   align-items: center;
 }
 
-.creators-avatar-stack img {
+.creators-avatar-stack .mini-av {
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  object-fit: cover;
   border: 2px solid #ffffff;
-  margin-right: -8px;
+  margin-right: -7px;
+  background-size: cover;
+  background-position: center;
+  display: inline-block;
 }
 
-.avatar-plus-pill {
+.mini-av-1 {
+  background-image: url('https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80');
+  background-color: #fca5a5;
+}
+
+.mini-av-2 {
+  background-image: url('https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80');
+  background-color: #fdba74;
+}
+
+.mini-av-3 {
+  background-image: url('https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&auto=format&fit=crop&q=80');
+  background-color: #c4b5fd;
+}
+
+.creators-avatar-stack .mini-av-more {
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  background: #8b5cf6;
+  background: #a855f7;
   color: #ffffff;
   font-size: 13px;
   font-weight: 800;
   display: grid;
   place-items: center;
   border: 2px solid #ffffff;
-  margin-right: -8px;
-  position: relative;
-  z-index: 4;
+  margin-right: 0;
+  box-shadow: 0 2px 6px rgba(168, 85, 247, 0.4);
 }
 
 /* ─── Floating 3D Glossy Squircles ─── */

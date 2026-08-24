@@ -1905,108 +1905,105 @@
                 <a href="${escape(item.url || '#')}" ${item.url && item.url.startsWith('http') ? 'target="_blank" rel="noreferrer"' : ''} class="work-card-right studio-stage-right" aria-label="View ${escape(cleanTitle)} case study">
                   <div class="studio-ambient-bg"></div>
 
-                  <div class="floating-squircle squircle-purple-top" aria-hidden="true">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                  </div>
-
-                  <div class="floating-squircle squircle-orange-mid" aria-hidden="true">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-                  </div>
-
-                  <div class="floating-squircle squircle-purple-bot" aria-hidden="true">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M16 12l-4-4v8z"/></svg>
-                  </div>
-
-                  <div class="floating-squircle squircle-dark-bot" aria-hidden="true">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-                  </div>
-
-                  <div class="studio-sparkle sparkle-top-right" aria-hidden="true">✦</div>
-                  <div class="studio-sparkle sparkle-bot-mid" aria-hidden="true">✦</div>
-
+                  <!-- Inset Left Features -->
                   <div class="studio-feature-list">
-                    <div class="studio-feature-card feat-creators">
-                      <span class="feat-icon">🔥</span>
-                      <div>
-                        <strong>10K+ Top Creators</strong>
-                        <small>Verified across YouTube & IG</small>
+                    <h3 class="feature-headline">All-in-one <br><span class="headline-gradient">influencer marketing</span> <br>platform</h3>
+                    <div class="feature-items">
+                      <div class="feature-item">
+                        <span class="feature-icon-box">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                        </span>
+                        <span>Discover creators</span>
                       </div>
-                    </div>
-
-                    <div class="studio-feature-card feat-campaigns">
-                      <span class="feat-icon">⚡</span>
-                      <div>
-                        <strong>Instant Match Engine</strong>
-                        <small>Data-driven brand discovery</small>
+                      <div class="feature-item">
+                        <span class="feature-icon-box">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></svg>
+                        </span>
+                        <span>Manage campaigns</span>
                       </div>
-                    </div>
-
-                    <div class="studio-feature-card feat-roi">
-                      <span class="feat-icon">📈</span>
-                      <div>
-                        <strong>4.8x Campaign ROI</strong>
-                        <small>Automated escrow & metrics</small>
+                      <div class="feature-item">
+                        <span class="feature-icon-box">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" x2="18" y1="20" y2="10"/><line x1="12" x2="12" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="14"/></svg>
+                        </span>
+                        <span>Measure impact</span>
                       </div>
                     </div>
                   </div>
 
+                  <!-- 3D Perspective Device Mockup -->
                   <div class="studio-phone-mockup">
-                    <div class="phone-rim-glow"></div>
-                    <div class="phone-chassis">
-                      <div class="phone-island"></div>
-                      <div class="phone-screen">
-                        <div class="flubn-app-screen">
-                          <div class="flubn-top-bar">
-                            <span class="flubn-logo-text">FLUBN</span>
-                            <span class="flubn-avatar"></span>
+                    <div class="phone-titanium-shell">
+                      <div class="phone-screen-glass">
+                        <div class="phone-status-bar">
+                          <span class="status-time">9:41</span>
+                          <span class="dynamic-island"></span>
+                          <span class="status-icons">
+                            <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M1 18h3V6H1v12zm5 0h3V2H6v16zm5 0h3v-8h-3v8zm5 0h3v-4h-3v4z"/></svg>
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><rect x="2" y="7" width="16" height="10" rx="2" ry="2"/><path d="M20 11v2"/></svg>
+                          </span>
+                        </div>
+
+                        <div class="app-screen-content">
+                          <div class="app-brand-lockup">
+                            <h4 class="app-logo-text">flubn<span class="dot-accent">.</span></h4>
+                            <p class="app-tagline">Connect. Collaborate.<br>Create impact.</p>
                           </div>
 
-                          <div class="flubn-stat-card">
-                            <div class="flubn-stat-title">Active Collaborations</div>
-                            <div class="flubn-stat-val">28 Brands <span class="flubn-stat-badge">+34%</span></div>
-                            <div class="flubn-mini-graph">
-                              <span></span><span></span><span></span><span></span><span></span><span></span>
-                            </div>
-                          </div>
-
-                          <div class="flubn-creator-pill-row">
-                            <div class="flubn-pill active">Tech</div>
-                            <div class="flubn-pill">Lifestyle</div>
-                            <div class="flubn-pill">Finance</div>
-                          </div>
-
-                          <div class="flubn-campaign-row">
-                            <div class="flubn-camp-icon">✦</div>
-                            <div class="flubn-camp-info">
-                              <div class="flubn-camp-name">Nike Summer Launch</div>
-                              <div class="flubn-camp-budget">$12,400 · 6 Creators</div>
-                            </div>
-                          </div>
-
-                          <div class="flubn-bottom-dock">
-                            <div class="flubn-dock-btn active"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></div>
-                            <div class="flubn-dock-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div>
-                            <div class="flubn-dock-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></div>
-                            <div class="flubn-dock-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+                          <div class="app-actions-wrap">
+                            <button class="app-get-started-btn" type="button">Get Started</button>
+                            <button class="app-explore-btn" type="button">Explore</button>
                           </div>
                         </div>
                       </div>
                     </div>
                   </div>
 
-                  <div class="studio-floating-badge badge-top-reach">
-                    <span class="reach-dot"></span>
-                    <span>1.2M+ Reach</span>
+                  <!-- Top-Right Reach Card -->
+                  <div class="studio-badge badge-top-reach">
+                    <div class="badge-header">
+                      <span class="badge-label">Campaign Reach</span>
+                      <span class="badge-percent">+24%</span>
+                    </div>
+                    <span class="badge-metric">72.5K</span>
+                    <div class="badge-sparkline">
+                      <svg viewBox="0 0 100 24" fill="none">
+                        <path d="M 0 18 Q 20 22 35 12 T 70 8 T 100 2" stroke="#ff4e1b" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                        <circle cx="100" cy="2" r="3" fill="#ff4e1b"/>
+                      </svg>
+                    </div>
                   </div>
 
-                  <div class="studio-floating-badge badge-bot-creators">
-                    <span class="creators-avatar-stack">
-                      <span class="mini-av av-1"></span>
-                      <span class="mini-av av-2"></span>
-                      <span class="mini-av av-3"></span>
-                    </span>
-                    <span>Live Campaigns</span>
+                  <!-- Bottom-Left Creators Card -->
+                  <div class="studio-badge badge-bot-creators">
+                    <span class="badge-label">Active Creators</span>
+                    <span class="badge-metric">4.8K</span>
+                    <div class="creators-avatar-stack">
+                      <span class="mini-av mini-av-1"></span>
+                      <span class="mini-av mini-av-2"></span>
+                      <span class="mini-av mini-av-3"></span>
+                      <span class="mini-av-more">+</span>
+                    </div>
                   </div>
+
+                  <!-- Floating Squircles & Sparkles -->
+                  <div class="floating-squircle squircle-purple-top" aria-hidden="true">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                  </div>
+
+                  <div class="floating-squircle squircle-orange-mid" aria-hidden="true">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+                  </div>
+
+                  <div class="floating-squircle squircle-purple-bot" aria-hidden="true">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" x2="18" y1="20" y2="10"/><line x1="12" x2="12" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="14"/></svg>
+                  </div>
+
+                  <div class="floating-squircle squircle-dark-bot" aria-hidden="true">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                  </div>
+
+                  <div class="studio-sparkle sparkle-top-right" aria-hidden="true">✦</div>
+                  <div class="studio-sparkle sparkle-bot-mid" aria-hidden="true">✦</div>
                 </a>
               `;
             } else {
@@ -2022,7 +2019,7 @@
             }
 
             const article = document.createElement('article');
-            article.className = `work-showcase-card ${isFlubn ? 'theme-dark' : ''}`;
+            article.className = 'work-showcase-card';
             article.style.setProperty('--card-index', index);
             article.id = `work-card-${item.id || index}`;
 
@@ -2036,8 +2033,8 @@
                       <path d="M 420 0 C 410 80, 390 160, 380 210 C 365 240, 455 245, 455 300 C 455 355, 365 360, 380 390 C 390 440, 410 520, 420 600 L 1000 600 L 1000 0 Z"/>
                     </clipPath>
                     <linearGradient id="stageGrad-${index}" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" stop-color="${isFlubn ? '#1a1918' : '#faf7f3'}" />
-                      <stop offset="100%" stop-color="${isFlubn ? '#0d0c0b' : '#f0eae1'}" />
+                      <stop offset="0%" stop-color="#faf7f3" />
+                      <stop offset="100%" stop-color="#f0eae1" />
                     </linearGradient>
                   </defs>
 
