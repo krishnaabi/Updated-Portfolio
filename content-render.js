@@ -1881,9 +1881,9 @@
             const tagsList = (item.tags || 'Product | 2025 - 2026 | APP').split(/[|·•]+/).map(t => t.trim()).filter(Boolean);
             const metaPillsHtml = tagsList.map(tag => {
               let iconSvg = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ff4e1b" stroke-width="2"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>`;
-              if (tag.toLowerCase().includes('product') || tag.toLowerCase().includes('design')) {
+              if (tag.toLowerCase().includes('product') || tag.toLowerCase().includes('design') || tag.toLowerCase().includes('system')) {
                 iconSvg = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ff4e1b" stroke-width="2"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>`;
-              } else if (tag.toLowerCase().includes('app') || tag.toLowerCase().includes('mobile')) {
+              } else if (tag.toLowerCase().includes('app') || tag.toLowerCase().includes('mobile') || tag.toLowerCase().includes('web') || tag.toLowerCase().includes('ui')) {
                 iconSvg = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ff4e1b" stroke-width="2"><rect width="14" height="20" x="5" y="2" rx="2" ry="2"/><line x1="12" x2="12.01" y1="18" y2="18"/></svg>`;
               }
               return `<span class="work-pill">${iconSvg} ${escape(tag)}</span>`;
@@ -1895,7 +1895,7 @@
             if (cleanImage.length > 0) {
               rightStageHtml = `
                 <a href="${escape(item.url || '#')}" ${item.url && item.url.startsWith('http') ? 'target="_blank" rel="noreferrer"' : ''} class="work-card-right custom-card-right" aria-label="View ${escape(cleanTitle)} case study">
-                  <div class="work-stage-frame">
+                  <div class="work-art-img-wrap">
                     <img src="${escape(cleanImgUrl(cleanImage))}" alt="${escape(item.title)}" class="work-showcase-img" />
                   </div>
                 </a>
@@ -2027,6 +2027,40 @@
             article.id = `work-card-${item.id || index}`;
 
             article.innerHTML = `
+              <!-- Left Studio Contour Vector Curve Boundary -->
+              <div class="work-curve-divider-wrap" aria-hidden="true">
+                <svg class="work-curve-svg" viewBox="0 0 1000 600" preserveAspectRatio="none">
+                  <defs>
+                    <clipPath id="stageClip-${index}">
+                      <!-- Precise S-curve matching reference with center notch apex -->
+                      <path d="M 430 0 C 420 80, 400 160, 390 230 C 370 255, 420 270, 420 300 C 420 330, 370 345, 390 370 C 400 440, 425 520, 440 600 L 1000 600 L 1000 0 Z"/>
+                    </clipPath>
+                    <linearGradient id="stageGrad-${index}" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stop-color="${isFlubn ? '#1a1918' : '#faf7f3'}" />
+                      <stop offset="100%" stop-color="${isFlubn ? '#0d0c0b' : '#f0eae1'}" />
+                    </linearGradient>
+                  </defs>
+
+                  <!-- Filled Right Canvas Area with Smooth Curved Boundary -->
+                  <g clip-path="url(#stageClip-${index})">
+                    <rect x="0" y="0" width="1000" height="600" fill="url(#stageGrad-${index})" />
+                  </g>
+
+                  <!-- Trailing decorative dot pattern behind the curve -->
+                  <g class="curve-dot-matrix" fill="#ff4e1b" opacity="0.12">
+                    <circle cx="410" cy="380" r="1.8"/><circle cx="430" cy="380" r="1.8"/><circle cx="450" cy="380" r="1.8"/>
+                    <circle cx="400" cy="405" r="1.8"/><circle cx="420" cy="405" r="1.8"/><circle cx="440" cy="405" r="1.8"/><circle cx="460" cy="405" r="1.8"/>
+                    <circle cx="410" cy="430" r="1.8"/><circle cx="430" cy="430" r="1.8"/><circle cx="450" cy="430" r="1.8"/><circle cx="470" cy="430" r="1.8"/>
+                    <circle cx="420" cy="455" r="1.8"/><circle cx="440" cy="455" r="1.8"/><circle cx="460" cy="455" r="1.8"/><circle cx="480" cy="455" r="1.8"/>
+                    <circle cx="430" cy="480" r="1.8"/><circle cx="450" cy="480" r="1.8"/><circle cx="470" cy="480" r="1.8"/><circle cx="490" cy="480" r="1.8"/>
+                    <circle cx="440" cy="505" r="1.8"/><circle cx="460" cy="505" r="1.8"/><circle cx="480" cy="505" r="1.8"/><circle cx="500" cy="505" r="1.8"/>
+                  </g>
+
+                  <!-- Dividing Crisp Contour Line -->
+                  <path class="curve-stroke-line" d="M 430 0 C 420 80, 400 160, 390 230 C 370 255, 420 270, 420 300 C 420 330, 370 345, 390 370 C 400 440, 425 520, 440 600" fill="none" stroke="rgba(255, 78, 27, 0.25)" stroke-width="1.6" stroke-linecap="round"/>
+                </svg>
+              </div>
+
               <!-- Left Editorial Content Column -->
               <div class="work-card-left">
                 <div class="work-card-left-top">
@@ -2057,13 +2091,19 @@
                     </a>
                     ${item.productUrl ? `<a href="${escape(item.productUrl)}" target="_blank" rel="noreferrer" class="work-secondary-btn">Live Product <b>↗</b></a>` : ''}
                   </div>
+
+                  <div class="work-dot-matrix" aria-hidden="true">
+                    <span></span><span></span><span></span><span></span><span></span><span></span>
+                    <span></span><span></span><span></span><span></span><span></span><span></span>
+                    <span></span><span></span><span></span><span></span><span></span><span></span>
+                  </div>
                 </div>
               </div>
 
-              <!-- Refined Floating Notch Arrow Badge on Boundary -->
-              <div class="work-card-divider" aria-hidden="true">
+              <!-- Center Notch Circular Arrow Button Nestled Inside Curve -->
+              <div class="work-card-notch">
                 <a href="${escape(item.url || '#')}" ${item.url && item.url.startsWith('http') ? 'target="_blank" rel="noreferrer"' : ''} class="notch-arrow-badge" aria-label="View ${escape(cleanTitle)}">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M5 12h14"/>
                     <path d="m13 6 6 6-6 6"/>
                   </svg>
