@@ -2047,8 +2047,8 @@
 
             article.innerHTML = `
               <!-- Left Studio Contour Vector Curve Boundary -->
-              <div class="work-card-contour-bg" aria-hidden="true">
-                <svg class="contour-vector-canvas" viewBox="0 0 1000 600" preserveAspectRatio="none">
+              <div class="work-curve-divider-wrap" aria-hidden="true">
+                <svg class="work-curve-svg" viewBox="0 0 1000 600" preserveAspectRatio="none">
                   <defs>
                     <clipPath id="stageClip-${index}">
                       <!-- Precise S-curve matching reference with center notch apex -->
