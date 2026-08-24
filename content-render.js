@@ -2042,7 +2042,7 @@
                       `}
                     </linearGradient>
                     <clipPath id="stageClip-${index}" clipPathUnits="userSpaceOnUse">
-                      <path d="M 440 0 C 430 80, 415 160, 404 220 C 392 245, 428 260, 428 300 C 428 340, 392 355, 404 380 C 415 440, 430 520, 440 600 L 1000 600 L 1000 0 Z" />
+                      <path d="M 420 0 C 410 80, 390 150, 375 200 C 365 245, 412 255, 412 300 C 412 345, 365 355, 375 400 C 390 450, 410 520, 420 600 L 1000 600 L 1000 0 Z" />
                     </clipPath>
                   </defs>
 
@@ -2052,18 +2052,17 @@
                   </g>
 
                   <!-- Trailing decorative dot pattern behind the curve -->
-                  <g class="curve-dot-matrix" fill="#ff4e1b" opacity="0.2">
-                    <circle cx="410" cy="370" r="1.5"/><circle cx="430" cy="370" r="1.5"/><circle cx="450" cy="370" r="1.5"/>
-                    <circle cx="400" cy="395" r="1.5"/><circle cx="420" cy="395" r="1.5"/><circle cx="440" cy="395" r="1.5"/><circle cx="460" cy="395" r="1.5"/>
-                    <circle cx="410" cy="420" r="1.5"/><circle cx="430" cy="420" r="1.5"/><circle cx="450" cy="420" r="1.5"/><circle cx="470" cy="420" r="1.5"/>
-                    <circle cx="420" cy="445" r="1.5"/><circle cx="440" cy="445" r="1.5"/><circle cx="460" cy="445" r="1.5"/><circle cx="480" cy="445" r="1.5"/>
-                    <circle cx="430" cy="470" r="1.5"/><circle cx="450" cy="470" r="1.5"/><circle cx="470" cy="470" r="1.5"/><circle cx="490" cy="470" r="1.5"/>
-                    <circle cx="440" cy="495" r="1.5"/><circle cx="460" cy="495" r="1.5"/><circle cx="480" cy="495" r="1.5"/><circle cx="500" cy="495" r="1.5"/>
-                    <circle cx="450" cy="520" r="1.5"/><circle cx="470" cy="520" r="1.5"/><circle cx="490" cy="520" r="1.5"/><circle cx="510" cy="520" r="1.5"/>
+                  <g class="curve-dot-matrix" fill="#ff4e1b" opacity="0.18">
+                    <circle cx="380" cy="380" r="1.5"/><circle cx="400" cy="380" r="1.5"/><circle cx="420" cy="380" r="1.5"/>
+                    <circle cx="370" cy="405" r="1.5"/><circle cx="390" cy="405" r="1.5"/><circle cx="410" cy="405" r="1.5"/><circle cx="430" cy="405" r="1.5"/>
+                    <circle cx="380" cy="430" r="1.5"/><circle cx="400" cy="430" r="1.5"/><circle cx="420" cy="430" r="1.5"/><circle cx="440" cy="430" r="1.5"/>
+                    <circle cx="390" cy="455" r="1.5"/><circle cx="410" cy="455" r="1.5"/><circle cx="430" cy="455" r="1.5"/><circle cx="450" cy="455" r="1.5"/>
+                    <circle cx="400" cy="480" r="1.5"/><circle cx="420" cy="480" r="1.5"/><circle cx="440" cy="480" r="1.5"/><circle cx="460" cy="480" r="1.5"/>
+                    <circle cx="410" cy="505" r="1.5"/><circle cx="430" cy="505" r="1.5"/><circle cx="450" cy="505" r="1.5"/><circle cx="470" cy="505" r="1.5"/>
                   </g>
 
                   <!-- Dividing Crisp Contour Line with peach stroke -->
-                  <path class="curve-stroke-line" d="M 440 0 C 430 80, 415 160, 404 220 C 392 245, 428 260, 428 300 C 428 340, 392 355, 404 380 C 415 440, 430 520, 440 600" fill="none" stroke="#fcd5c5" stroke-width="1.8" stroke-linecap="round"/>
+                  <path class="curve-stroke-line" d="M 420 0 C 410 80, 390 150, 375 200 C 365 245, 412 255, 412 300 C 412 345, 365 355, 375 400 C 390 450, 410 520, 420 600" fill="none" stroke="#fcd5c5" stroke-width="1.8" stroke-linecap="round"/>
                 </svg>
               </div>
 
