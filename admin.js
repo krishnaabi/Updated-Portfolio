@@ -2506,23 +2506,27 @@ const renderTestimonialsList = () => {
   listEl.innerHTML = allTestimonialsData.map((item, idx) => {
     const isFirst = idx === 0;
     const isLast = idx === allTestimonialsData.length - 1;
-    const avatar = item.img ? `<img src="${escapeHtml(item.img)}" alt="${escapeHtml(item.name)}" style="width:48px;height:48px;border-radius:50%;object-fit:cover;border:1px solid #ddd;flex-shrink:0;">` : `<div style="width:48px;height:48px;border-radius:50%;background:var(--accent,#ff4e1b);color:#fff;display:grid;place-items:center;font-weight:800;font-size:16px;flex-shrink:0;">${escapeHtml((item.name || 'AK').slice(0, 2).toUpperCase())}</div>`;
-    return `<article class="content-row">
-      <div style="display:flex;gap:14px;align-items:center;overflow:hidden;">
-        ${avatar}
-        <div style="min-width:0;">
-          <h3>${escapeHtml(item.name)}</h3>
-          <p style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
-            <strong>${escapeHtml(item.role)}</strong><br>
-            <span style="opacity:0.85;">"${escapeHtml(item.quote)}"</span>
-          </p>
+    const avatar = item.img ? `<img src="${escapeHtml(item.img)}" alt="${escapeHtml(item.name)}" style="width:44px;height:44px;border-radius:50%;object-fit:cover;border:1.5px solid #dfddda;flex-shrink:0;">` : `<div style="width:44px;height:44px;border-radius:50%;background:var(--accent,#ff4e1b);color:#fff;display:grid;place-items:center;font-weight:800;font-size:15px;flex-shrink:0;">${escapeHtml((item.name || 'AK').slice(0, 2).toUpperCase())}</div>`;
+    return `<article style="padding:18px 20px;background:#ffffff;border:1px solid #e8e3dc;border-radius:16px;box-shadow:0 2px 8px rgba(0,0,0,0.02);display:flex;flex-direction:column;gap:12px;min-width:0;width:100%;box-sizing:border-box;">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+        <div style="display:flex;gap:12px;align-items:center;min-width:0;flex:1 1 180px;">
+          ${avatar}
+          <div style="min-width:0;overflow:hidden;">
+            <h3 style="margin:0 0 2px 0;font-size:15px;font-weight:700;color:#121211;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHtml(item.name)}</h3>
+            <p style="margin:0;font-size:12.5px;color:#74716e;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHtml(item.role)}</p>
+          </div>
+        </div>
+        <div class="actions" style="display:flex;gap:6px;align-items:center;flex-shrink:0;margin-left:auto;">
+          <button type="button" class="btn-move-up" data-move-test-up="${item.id}" ${isFirst ? 'disabled' : ''} title="Move position up">↑ Up</button>
+          <button type="button" class="btn-move-down" data-move-test-down="${item.id}" ${isLast ? 'disabled' : ''} title="Move position down">↓ Down</button>
+          <button type="button" class="btn-edit" data-edit-testimonial="${item.id}">✏️ Edit</button>
+          <button type="button" class="btn-remove" data-remove-testimonial="${item.id}">Remove</button>
         </div>
       </div>
-      <div class="actions" style="flex-shrink:0;">
-        <button type="button" class="btn-move-up" data-move-test-up="${item.id}" ${isFirst ? 'disabled' : ''} title="Move position up">↑ Up</button>
-        <button type="button" class="btn-move-down" data-move-test-down="${item.id}" ${isLast ? 'disabled' : ''} title="Move position down">↓ Down</button>
-        <button class="btn-edit" data-edit-testimonial="${item.id}">✏️ Edit</button>
-        <button class="btn-remove" data-remove-testimonial="${item.id}">Remove</button>
+      <div style="padding:10px 14px;background:#faf8f5;border-radius:10px;border:1px solid #f0ebe4;">
+        <p style="margin:0;font-size:13px;color:#444;line-height:1.5;font-style:italic;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;">
+          "${escapeHtml(item.quote)}"
+        </p>
       </div>
     </article>`;
   }).join('');
