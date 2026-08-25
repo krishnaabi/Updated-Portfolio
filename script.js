@@ -399,25 +399,36 @@ window.initFeaturedCarousel();
 
   const loadTestimonials = async () => {
     try {
-      let res = await fetch('/api/testimonials');
+      let data = null;
+      const res = await fetch('/api/testimonials');
       if (res.ok) {
-        const data = await res.json();
-        if (Array.isArray(data) && data.length) {
-          testimonials = data;
-          tIndex = 0;
-          updateDisplay(testimonials[0]);
-          return;
+        data = await res.json();
+      }
+      if (!data || !data.length) {
+        // Static fallback
+        const dataRes = await fetch('data.json');
+        if (dataRes.ok) {
+          const staticData = await dataRes.json();
+          if (Array.isArray(staticData.testimonials) && staticData.testimonials.length) {
+            data = staticData.testimonials;
+          }
         }
       }
-      // Static fallback
-      res = await fetch('data.json');
-      if (res.ok) {
-        const staticData = await res.json();
-        if (Array.isArray(staticData.testimonials) && staticData.testimonials.length) {
-          testimonials = staticData.testimonials;
-          tIndex = 0;
-          updateDisplay(testimonials[0]);
-        }
+      if (Array.isArray(data) && data.length) {
+        try {
+          const savedOrder = JSON.parse(localStorage.getItem('custom_testimonials_order'));
+          if (savedOrder && Array.isArray(savedOrder) && savedOrder.length) {
+            const orderMap = new Map(savedOrder.map((item, idx) => [String(item.id || item), idx]));
+            data.sort((a, b) => {
+              const idxA = orderMap.has(String(a.id)) ? orderMap.get(String(a.id)) : (a.display_order ?? 999);
+              const idxB = orderMap.has(String(b.id)) ? orderMap.get(String(b.id)) : (b.display_order ?? 999);
+              return idxA - idxB;
+            });
+          }
+        } catch (e) {}
+        testimonials = data;
+        tIndex = 0;
+        updateDisplay(testimonials[0]);
       }
     } catch (e) {}
   };

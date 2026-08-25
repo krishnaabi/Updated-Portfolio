@@ -18,9 +18,14 @@ export async function onRequest(context) {
   // GET: List testimonials
   if (request.method === 'GET') {
     try {
-      const sbRes = await fetch(`${sbUrl}/rest/v1/portfolio_testimonials?select=*&order=created_at.desc`, {
+      let sbRes = await fetch(`${sbUrl}/rest/v1/portfolio_testimonials?select=*&order=display_order.asc,created_at.desc`, {
         headers: { apikey: sbKey, Authorization: `Bearer ${sbKey}` }
       });
+      if (!sbRes.ok) {
+        sbRes = await fetch(`${sbUrl}/rest/v1/portfolio_testimonials?select=*&order=created_at.desc`, {
+          headers: { apikey: sbKey, Authorization: `Bearer ${sbKey}` }
+        });
+      }
       if (sbRes.ok) {
         const raw = await sbRes.json();
         return new Response(JSON.stringify(raw || []), { headers });

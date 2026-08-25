@@ -192,16 +192,21 @@ async function apiFetch(path, options = {}) {
         let table = '';
         if (path === '/api/projects') table = 'portfolio_content?select=*&order=display_order.asc,created_at.desc';
         else if (path === '/api/messages') table = 'contact_messages?select=*&order=created_at.desc';
-        else if (path === '/api/testimonials') table = 'portfolio_testimonials?select=*&order=created_at.desc';
+        else if (path === '/api/testimonials') table = 'portfolio_testimonials?select=*&order=display_order.asc,created_at.desc';
         else if (path === '/api/brands') table = 'portfolio_brands?select=*&order=created_at.desc';
         else if (path === '/api/milestones') table = 'portfolio_milestones?select=*&order=display_order.asc,created_at.desc';
         else if (path === '/api/tools') table = 'portfolio_tools?select=*&order=display_order.asc,created_at.asc';
         else if (path === '/api/settings') table = 'portfolio_settings?id=eq.global&select=*';
 
         if (table) {
-          const sbRes = await fetch(`${sbUrl}/rest/v1/${table}`, {
+          let sbRes = await fetch(`${sbUrl}/rest/v1/${table}`, {
             headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}` }
           });
+          if (!sbRes.ok && path === '/api/testimonials') {
+            sbRes = await fetch(`${sbUrl}/rest/v1/portfolio_testimonials?select=*&order=created_at.desc`, {
+              headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}` }
+            });
+          }
           if (sbRes.ok) {
             const raw = await sbRes.json();
             let data = raw;
@@ -278,7 +283,8 @@ async function apiFetch(path, options = {}) {
                 role: row.role || '',
                 quote: row.quote || '',
                 img: row.img || row.avatar_url || row.image || '',
-                avatar_url: row.img || row.avatar_url || row.image || ''
+                avatar_url: row.img || row.avatar_url || row.image || '',
+                display_order: row.display_order
               }));
             } else if (path === '/api/brands') {
               data = (raw || []).map(row => ({
@@ -477,6 +483,22 @@ async function apiFetch(path, options = {}) {
           headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}` }
         });
         if (sbRes.ok) return sbRes;
+      } else if (path === '/api/testimonials/reorder' && options.method === 'POST') {
+        const items = JSON.parse(options.body || '[]');
+        if (Array.isArray(items)) {
+          for (let i = 0; i < items.length; i++) {
+            const item = items[i];
+            const id = typeof item === 'object' ? item.id : item;
+            if (id) {
+              await fetch(`${sbUrl}/rest/v1/portfolio_testimonials?id=eq.${encodeURIComponent(id)}`, {
+                method: 'PATCH',
+                headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ display_order: i + 1 })
+              }).catch(() => {});
+            }
+          }
+        }
+        return { ok: true, status: 200, json: async () => ({ ok: true }) };
       } else if (path === '/api/milestones' && options.method === 'POST') {
         const bodyObj = JSON.parse(options.body || '{}');
         const payload = {
@@ -2440,11 +2462,33 @@ fetchMessages();
 // =====================================================
 let allTestimonialsData = [];
 
+const getSavedTestimonialsOrder = () => {
+  try { return JSON.parse(localStorage.getItem('custom_testimonials_order')) || null; } catch { return null; }
+};
+const setSavedTestimonialsOrder = data => {
+  try { localStorage.setItem('custom_testimonials_order', JSON.stringify(data)); } catch { }
+};
+
+const sortTestimonialsBySavedOrder = (items) => {
+  if (!Array.isArray(items)) return items;
+  const saved = getSavedTestimonialsOrder();
+  if (saved && Array.isArray(saved) && saved.length) {
+    const orderMap = new Map(saved.map((item, idx) => [String(item.id || item), idx]));
+    return [...items].sort((a, b) => {
+      const idxA = orderMap.has(String(a.id)) ? orderMap.get(String(a.id)) : (a.display_order ?? 999);
+      const idxB = orderMap.has(String(b.id)) ? orderMap.get(String(b.id)) : (b.display_order ?? 999);
+      return idxA - idxB;
+    });
+  }
+  return items;
+};
+
 const fetchTestimonials = async () => {
   try {
     const res = await apiFetch('/api/testimonials');
     if (res.ok) {
-      allTestimonialsData = await res.json();
+      const data = await res.json();
+      allTestimonialsData = sortTestimonialsBySavedOrder(data || []);
       renderTestimonialsList();
     }
   } catch (err) {
@@ -2459,7 +2503,9 @@ const renderTestimonialsList = () => {
     listEl.innerHTML = '<p class="help">No testimonials published yet.</p>';
     return;
   }
-  listEl.innerHTML = allTestimonialsData.map(item => {
+  listEl.innerHTML = allTestimonialsData.map((item, idx) => {
+    const isFirst = idx === 0;
+    const isLast = idx === allTestimonialsData.length - 1;
     const avatar = item.img ? `<img src="${escapeHtml(item.img)}" alt="${escapeHtml(item.name)}" style="width:48px;height:48px;border-radius:50%;object-fit:cover;border:1px solid #ddd;flex-shrink:0;">` : `<div style="width:48px;height:48px;border-radius:50%;background:var(--accent,#ff4e1b);color:#fff;display:grid;place-items:center;font-weight:800;font-size:16px;flex-shrink:0;">${escapeHtml((item.name || 'AK').slice(0, 2).toUpperCase())}</div>`;
     return `<article class="content-row">
       <div style="display:flex;gap:14px;align-items:center;overflow:hidden;">
@@ -2473,11 +2519,62 @@ const renderTestimonialsList = () => {
         </div>
       </div>
       <div class="actions" style="flex-shrink:0;">
+        <button type="button" class="btn-move-up" data-move-test-up="${item.id}" ${isFirst ? 'disabled' : ''} title="Move position up">↑ Up</button>
+        <button type="button" class="btn-move-down" data-move-test-down="${item.id}" ${isLast ? 'disabled' : ''} title="Move position down">↓ Down</button>
         <button class="btn-edit" data-edit-testimonial="${item.id}">✏️ Edit</button>
         <button class="btn-remove" data-remove-testimonial="${item.id}">Remove</button>
       </div>
     </article>`;
   }).join('');
+
+  const moveTestimonial = async (id, direction) => {
+    const idx = allTestimonialsData.findIndex(t => String(t.id) === String(id));
+    if (idx === -1) return;
+
+    const targetIdx = direction === 'up' ? idx - 1 : idx + 1;
+    if (targetIdx < 0 || targetIdx >= allTestimonialsData.length) return;
+
+    const itemA = allTestimonialsData[idx];
+    const itemB = allTestimonialsData[targetIdx];
+
+    allTestimonialsData[idx] = itemB;
+    allTestimonialsData[targetIdx] = itemA;
+
+    setSavedTestimonialsOrder(allTestimonialsData);
+    renderTestimonialsList();
+
+    try {
+      const res = await apiFetch('/api/testimonials/reorder', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(allTestimonialsData)
+      });
+      if (res && res.ok) {
+        const updated = await res.json();
+        if (Array.isArray(updated) && updated.length) {
+          allTestimonialsData = updated;
+          setSavedTestimonialsOrder(allTestimonialsData);
+          renderTestimonialsList();
+        }
+      }
+    } catch (e) {
+      console.error('Failed to reorder testimonials:', e);
+    }
+  };
+
+  listEl.querySelectorAll('[data-move-test-up]').forEach(btn => {
+    btn.onclick = (e) => {
+      e.preventDefault();
+      moveTestimonial(btn.dataset.moveTestUp, 'up');
+    };
+  });
+
+  listEl.querySelectorAll('[data-move-test-down]').forEach(btn => {
+    btn.onclick = (e) => {
+      e.preventDefault();
+      moveTestimonial(btn.dataset.moveTestDown, 'down');
+    };
+  });
 
   // Attach event handlers
   listEl.querySelectorAll('[data-edit-testimonial]').forEach(btn => {

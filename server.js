@@ -764,15 +764,19 @@ const saveSettings = async incoming => {
 // Testimonials API (Supabase ONLY)
 const getTestimonials = async () => {
   try {
-    const rows = await supabase('portfolio_testimonials?select=*&order=created_at.desc');
+    let rows = await supabase('portfolio_testimonials?select=*&order=display_order.asc,created_at.desc');
+    if (!Array.isArray(rows)) {
+      rows = await supabase('portfolio_testimonials?select=*&order=created_at.desc');
+    }
     if (Array.isArray(rows) && rows.length > 0) {
-      return rows.map(r => ({ id: r.id, name: r.name, role: r.role, quote: r.quote, img: r.img }));
+      return rows.map(r => ({ id: r.id, name: r.name, role: r.role, quote: r.quote, img: r.img, display_order: r.display_order }));
     }
     // Seed default testimonials into Supabase if table is empty
-    for (const item of defaultTestimonials) {
+    for (let i = 0; i < defaultTestimonials.length; i++) {
+      const item = defaultTestimonials[i];
       await supabase('portfolio_testimonials', {
         method: 'POST',
-        body: JSON.stringify({ id: item.id, name: item.name, role: item.role, quote: item.quote, img: item.img })
+        body: JSON.stringify({ id: item.id, name: item.name, role: item.role, quote: item.quote, img: item.img, display_order: i + 1 })
       }).catch(() => { });
     }
     return defaultTestimonials;
@@ -780,6 +784,24 @@ const getTestimonials = async () => {
     console.error('Supabase getTestimonials error:', e.message);
     return defaultTestimonials;
   }
+};
+
+const reorderTestimonials = async (orderedItems) => {
+  if (Array.isArray(orderedItems)) {
+    for (let index = 0; index < orderedItems.length; index++) {
+      const item = orderedItems[index];
+      const id = typeof item === 'object' ? item.id : item;
+      if (id) {
+        try {
+          await supabase(`portfolio_testimonials?id=eq.${encodeURIComponent(id)}`, {
+            method: 'PATCH',
+            body: JSON.stringify({ display_order: index + 1 })
+          });
+        } catch (e) { }
+      }
+    }
+  }
+  return getTestimonials();
 };
 
 const saveTestimonial = async incoming => {
@@ -1107,6 +1129,10 @@ http.createServer(async (req, res) => {
     if (url.pathname.startsWith('/api/projects/') && req.method === 'PATCH') { const id = url.pathname.split('/').pop(); const updated = await updateProject(id, await body(req)); return json(res, 200, updated || { ok: true }); }
     if (url.pathname.startsWith('/api/projects/') && req.method === 'DELETE') { await removeProject(url.pathname.split('/').pop()); return json(res, 200, { ok: true }); }
     if (url.pathname === '/api/testimonials' && req.method === 'GET') return json(res, 200, await getTestimonials());
+    if (url.pathname === '/api/testimonials/reorder' && req.method === 'POST') {
+      const incoming = await body(req);
+      return json(res, 200, await reorderTestimonials(incoming));
+    }
     if (url.pathname === '/api/testimonials' && req.method === 'POST') {
       const incoming = await body(req);
       if (!incoming.name || !incoming.name.trim()) return json(res, 400, { error: 'Client Name is required.' });

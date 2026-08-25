@@ -355,16 +355,21 @@
         let table = '';
         if (path === '/api/projects') table = 'portfolio_content?select=*&order=display_order.asc,created_at.desc';
         else if (path === '/api/messages') table = 'contact_messages?select=*&order=created_at.desc';
-        else if (path === '/api/testimonials') table = 'portfolio_testimonials?select=*&order=created_at.desc';
+        else if (path === '/api/testimonials') table = 'portfolio_testimonials?select=*&order=display_order.asc,created_at.desc';
         else if (path === '/api/brands') table = 'portfolio_brands?select=*&order=created_at.desc';
         else if (path === '/api/milestones') table = 'portfolio_milestones?select=*&order=display_order.asc,created_at.desc';
         else if (path === '/api/tools') table = 'portfolio_tools?select=*&order=display_order.asc,created_at.asc';
         else if (path === '/api/settings') table = 'portfolio_settings?id=eq.global&select=*';
 
         if (table) {
-          const sbRes = await fetch(`${sbUrl}/rest/v1/${table}`, {
+          let sbRes = await fetch(`${sbUrl}/rest/v1/${table}`, {
             headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}` }
           });
+          if (!sbRes.ok && path === '/api/testimonials') {
+            sbRes = await fetch(`${sbUrl}/rest/v1/portfolio_testimonials?select=*&order=created_at.desc`, {
+              headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}` }
+            });
+          }
           if (sbRes.ok) {
             const raw = await sbRes.json();
             let payload = raw;
@@ -432,8 +437,20 @@
                 role: row.role || '',
                 quote: row.quote || '',
                 img: row.img || row.avatar_url || row.image || '',
-                avatar_url: row.img || row.avatar_url || row.image || ''
+                avatar_url: row.img || row.avatar_url || row.image || '',
+                display_order: row.display_order
               }));
+              try {
+                const savedOrder = JSON.parse(localStorage.getItem('custom_testimonials_order'));
+                if (savedOrder && Array.isArray(savedOrder) && savedOrder.length) {
+                  const orderMap = new Map(savedOrder.map((item, idx) => [String(item.id || item), idx]));
+                  payload.sort((a, b) => {
+                    const idxA = orderMap.has(String(a.id)) ? orderMap.get(String(a.id)) : (a.display_order ?? 999);
+                    const idxB = orderMap.has(String(b.id)) ? orderMap.get(String(b.id)) : (b.display_order ?? 999);
+                    return idxA - idxB;
+                  });
+                }
+              } catch (e) {}
             } else if (path === '/api/tools') {
               payload = (raw || []).map(row => ({
                 id: row.id,

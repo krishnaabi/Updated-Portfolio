@@ -489,9 +489,29 @@ export default {
       // 6. TESTIMONIALS API
       // ═══════════════════════════════════════════
       if (path === '/api/testimonials' && method === 'GET') {
-        const res = await sbFetch('portfolio_testimonials?select=*&order=created_at.desc', {}, env);
+        let res = await sbFetch('portfolio_testimonials?select=*&order=display_order.asc,created_at.desc', {}, env);
+        if (!res.ok) {
+          res = await sbFetch('portfolio_testimonials?select=*&order=created_at.desc', {}, env);
+        }
         if (!res.ok) return json([]);
         return json(await res.json());
+      }
+
+      if (path === '/api/testimonials/reorder' && method === 'POST') {
+        const items = await request.json();
+        if (Array.isArray(items)) {
+          for (let i = 0; i < items.length; i++) {
+            const item = items[i];
+            const id = typeof item === 'object' ? item.id : item;
+            if (id) {
+              await sbFetch(`portfolio_testimonials?id=eq.${encodeURIComponent(id)}`, {
+                method: 'PATCH',
+                body: JSON.stringify({ display_order: i + 1 })
+              }, env);
+            }
+          }
+        }
+        return json({ ok: true });
       }
 
       if (path === '/api/testimonials' && method === 'POST') {
