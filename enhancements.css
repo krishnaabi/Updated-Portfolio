@@ -951,35 +951,63 @@
   }
 }
 
-/* Testimonial card transition & enhanced typography */
+/* ── Locked Stable Height & Layout for Homepage About / Testimonial Card ── */
+.about {
+  display: grid !important;
+  grid-template-columns: 36% 28% 36% !important;
+  align-items: stretch !important;
+  min-height: 440px !important;
+  border: 1px solid #e6e2df !important;
+  border-radius: 16px !important;
+  background: #ffffff !important;
+  overflow: hidden !important;
+}
+
 .quote-card {
-  transition: opacity 0.4s ease, transform 0.4s ease;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  height: 100% !important;
+  min-height: 100% !important;
+  padding: 42px 32px !important;
+  box-sizing: border-box !important;
+  transition: opacity 0.35s ease, transform 0.35s ease !important;
 }
 
 .quote-card.fade-out {
-  opacity: 0;
-  transform: translateY(-8px);
+  opacity: 0 !important;
+  transform: translateY(-6px) !important;
 }
 
 .quote-card > p {
-  font-size: 18px !important;
+  font-size: clamp(14px, 1.1vw, 15.5px) !important;
   line-height: 1.55 !important;
-  letter-spacing: -0.4px !important;
+  letter-spacing: -0.3px !important;
   font-weight: 500 !important;
   color: #1a1918 !important;
-  margin: 16px 0 24px !important;
+  margin: 12px 0 20px !important;
+  flex: 1 1 auto !important;
+  display: -webkit-box !important;
+  -webkit-line-clamp: 7 !important;
+  -webkit-box-orient: vertical !important;
+  overflow: hidden !important;
 }
 
 .person {
+  display: flex !important;
   gap: 12px !important;
   align-items: center !important;
+  margin-top: auto !important;
+  flex-shrink: 0 !important;
 }
 
 .person img {
-  width: 42px !important;
-  height: 42px !important;
+  width: 44px !important;
+  height: 44px !important;
   border-radius: 50% !important;
   object-fit: cover !important;
+  border: 1px solid #e6e2df !important;
+  flex-shrink: 0 !important;
 }
 
 .person b {
@@ -996,6 +1024,74 @@
   color: #74716e !important;
   line-height: 1.3 !important;
   display: block !important;
+}
+
+.about-image {
+  height: 100% !important;
+  min-height: 100% !important;
+  width: 100% !important;
+  overflow: hidden !important;
+  background: #f0ebe5 !important;
+  position: relative !important;
+  display: flex !important;
+}
+
+.about-image img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  object-position: center 25% !important;
+  display: block !important;
+  transition: transform 0.7s var(--ease) !important;
+}
+
+.about-copy {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  height: 100% !important;
+  min-height: 100% !important;
+  padding: 42px 32px !important;
+  box-sizing: border-box !important;
+}
+
+.about-copy .text-cta {
+  margin-top: auto !important;
+  align-self: flex-start !important;
+}
+
+@media (max-width: 1050px) {
+  .about {
+    grid-template-columns: 1fr 1fr !important;
+    min-height: auto !important;
+  }
+  .about-copy {
+    grid-column: 1 / -1 !important;
+  }
+  .quote-card {
+    min-height: 380px !important;
+  }
+  .about-image {
+    min-height: 380px !important;
+  }
+}
+
+@media (max-width: 560px) {
+  .about {
+    grid-template-columns: 1fr !important;
+    min-height: auto !important;
+  }
+  .quote-card {
+    min-height: 320px !important;
+    padding: 28px 20px !important;
+  }
+  .about-image {
+    min-height: 240px !important;
+    order: -1 !important;
+  }
+  .about-copy {
+    padding: 28px 20px !important;
+  }
 }
 
 /* Footer Arrow Hover Animation to Point Straight Top/Up */
