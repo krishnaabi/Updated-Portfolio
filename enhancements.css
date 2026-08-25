@@ -956,22 +956,55 @@
   display: grid !important;
   grid-template-columns: 36% 28% 36% !important;
   align-items: stretch !important;
-  min-height: 440px !important;
+  min-height: 480px !important;
   border: 1px solid #e6e2df !important;
   border-radius: 16px !important;
   background: #ffffff !important;
   overflow: hidden !important;
+  padding: 0 !important;
+}
+
+.about-image {
+  height: 100% !important;
+  min-height: 100% !important;
+  width: 100% !important;
+  align-self: stretch !important;
+  overflow: hidden !important;
+  background: #f0ebe5 !important;
+  position: relative !important;
+  display: flex !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.about-image img {
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 100% !important;
+  object-fit: cover !important;
+  object-position: center 25% !important;
+  display: block !important;
+  transition: transform 0.7s var(--ease) !important;
 }
 
 .quote-card {
   display: flex !important;
   flex-direction: column !important;
-  justify-content: space-between !important;
+  justify-content: center !important;
+  align-items: flex-start !important;
   height: 100% !important;
   min-height: 100% !important;
-  padding: 42px 32px !important;
+  padding: 44px 36px !important;
   box-sizing: border-box !important;
+  gap: 16px !important;
   transition: opacity 0.35s ease, transform 0.35s ease !important;
+}
+
+.quote-mark {
+  margin: 0 !important;
+  line-height: 0.8 !important;
+  font-size: 38px !important;
+  color: var(--accent, #ff4e1b) !important;
 }
 
 .quote-card.fade-out {
@@ -985,10 +1018,10 @@
   letter-spacing: -0.3px !important;
   font-weight: 500 !important;
   color: #1a1918 !important;
-  margin: 12px 0 20px !important;
-  flex: 1 1 auto !important;
+  margin: 0 !important;
+  flex: 0 1 auto !important;
   display: -webkit-box !important;
-  -webkit-line-clamp: 7 !important;
+  -webkit-line-clamp: 8 !important;
   -webkit-box-orient: vertical !important;
   overflow: hidden !important;
 }
@@ -997,7 +1030,7 @@
   display: flex !important;
   gap: 12px !important;
   align-items: center !important;
-  margin-top: auto !important;
+  margin-top: 4px !important;
   flex-shrink: 0 !important;
 }
 
@@ -1026,37 +1059,38 @@
   display: block !important;
 }
 
-.about-image {
-  height: 100% !important;
-  min-height: 100% !important;
-  width: 100% !important;
-  overflow: hidden !important;
-  background: #f0ebe5 !important;
-  position: relative !important;
-  display: flex !important;
-}
-
-.about-image img {
-  width: 100% !important;
-  height: 100% !important;
-  object-fit: cover !important;
-  object-position: center 25% !important;
-  display: block !important;
-  transition: transform 0.7s var(--ease) !important;
-}
-
 .about-copy {
   display: flex !important;
   flex-direction: column !important;
-  justify-content: space-between !important;
+  justify-content: center !important;
+  align-items: flex-start !important;
   height: 100% !important;
   min-height: 100% !important;
-  padding: 42px 32px !important;
+  padding: 44px 36px !important;
   box-sizing: border-box !important;
+  gap: 14px !important;
+}
+
+.about-copy .label {
+  margin: 0 !important;
+}
+
+.about-copy h2 {
+  margin: 0 !important;
+  font-size: clamp(22px, 2vw, 27px) !important;
+  line-height: 1.25 !important;
+  letter-spacing: -1px !important;
+}
+
+.about-copy > p:not(.label) {
+  margin: 0 !important;
+  font-size: 14px !important;
+  line-height: 1.6 !important;
+  color: #555 !important;
 }
 
 .about-copy .text-cta {
-  margin-top: auto !important;
+  margin: 6px 0 0 0 !important;
   align-self: flex-start !important;
 }
 
@@ -1067,9 +1101,11 @@
   }
   .about-copy {
     grid-column: 1 / -1 !important;
+    padding: 36px 28px !important;
   }
   .quote-card {
     min-height: 380px !important;
+    padding: 36px 28px !important;
   }
   .about-image {
     min-height: 380px !important;
@@ -1082,15 +1118,15 @@
     min-height: auto !important;
   }
   .quote-card {
-    min-height: 320px !important;
-    padding: 28px 20px !important;
+    min-height: auto !important;
+    padding: 30px 20px !important;
   }
   .about-image {
-    min-height: 240px !important;
+    min-height: 280px !important;
     order: -1 !important;
   }
   .about-copy {
-    padding: 28px 20px !important;
+    padding: 30px 20px !important;
   }
 }
 
