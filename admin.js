@@ -52,6 +52,8 @@ const pgExtTitle = $('#pg-ext-title');
 const pgExtDescription = $('#pg-ext-description');
 const pgExtCategory = $('#pg-ext-category');
 const pgExtLink = $('#pg-ext-link');
+const pgExtImageUrl = $('#pg-ext-image-url');
+const pgExtImageFile = $('#pg-ext-image-file');
 const autoFetchPgExtBtn = $('#auto-fetch-pg-ext-btn');
 const fetchStatusPgExtMsg = $('#fetch-status-pg-ext-msg');
 
@@ -878,6 +880,7 @@ function updateLivePreview() {
       descVal = $('#pg-ext-description')?.value.trim() || 'Brief description of the external prototype...';
       catVal = $('#pg-ext-category')?.value || 'Interaction';
       timeVal = '↗ EXTERNAL LINK';
+      imgUrl = $('#pg-ext-image-url')?.value.trim() || '';
     }
   } else {
     titleVal = $('#content-title')?.value.trim() || 'Project or Article Title';
@@ -901,11 +904,30 @@ function updateLivePreview() {
 
 ['#content-title', '#content-description', '#content-category', '#journal-readtime', '#content-image-url',
  '#pg-experiment-question', '#pg-short-explanation', '#pg-internal-category', '#pg-hero-image-url',
- '#pg-ext-title', '#pg-ext-description', '#pg-ext-category'].forEach(sel => {
+ '#pg-ext-title', '#pg-ext-description', '#pg-ext-category', '#pg-ext-image-url'].forEach(sel => {
   const el = $(sel);
   if (el) {
     el.oninput = updateLivePreview;
     el.onchange = updateLivePreview;
+  }
+});
+
+['#content-image-file', '#pg-hero-image-file', '#pg-ext-image-file'].forEach(sel => {
+  const fileInput = $(sel);
+  if (fileInput) {
+    fileInput.onchange = () => {
+      if (fileInput.files && fileInput.files[0]) {
+        const reader = new FileReader();
+        reader.onload = e => {
+          if (prevMedia && e.target.result) {
+            prevMedia.innerHTML = `<img src="${escapeHtml(e.target.result)}" alt="Preview">`;
+          }
+        };
+        reader.readAsDataURL(fileInput.files[0]);
+      } else {
+        updateLivePreview();
+      }
+    };
   }
 });
 
@@ -1036,7 +1058,7 @@ if (autoFetchPgExtBtn) {
   autoFetchPgExtBtn.onclick = async () => {
     let targetUrl = pgExtLink?.value.trim();
     if (!targetUrl) {
-      alert('Please enter a prototype link first (e.g. Figma, Dribbble, CodePen, Live demo).');
+      alert('Please enter a link first (e.g. Super.site, Figma, Dribbble, CodePen, Live demo).');
       return;
     }
     if (!/^https?:\/\//i.test(targetUrl)) {
@@ -1044,22 +1066,52 @@ if (autoFetchPgExtBtn) {
       if (pgExtLink) pgExtLink.value = targetUrl;
     }
 
-    if (fetchStatusPgExtMsg) fetchStatusPgExtMsg.textContent = 'Extracting prototype title & details... ⏳';
+    if (fetchStatusPgExtMsg) fetchStatusPgExtMsg.textContent = 'Extracting prototype details & cover image... ⏳';
     autoFetchPgExtBtn.disabled = true;
 
+    let fetchedData = null;
+
+    // 1. Try backend API endpoint (/api/fetch-metadata)
     try {
-      const microRes = await fetch(`https://api.microlink.io?url=${encodeURIComponent(targetUrl)}&screenshot=false&meta=true`);
-      if (microRes.ok) {
-        const microJson = await microRes.json();
-        if (microJson.status === 'success' && microJson.data) {
-          const md = microJson.data;
-          if (md.title && pgExtTitle) pgExtTitle.value = md.title;
-          if (md.description && pgExtDescription) pgExtDescription.value = md.description;
-        }
+      const response = await apiFetch('/api/fetch-metadata', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: targetUrl })
+      });
+      if (response.ok) {
+        fetchedData = await response.json();
       }
     } catch (e) {}
 
-    if (fetchStatusPgExtMsg) fetchStatusPgExtMsg.textContent = '✦ Details auto-fetched!';
+    // 2. Secondary browser-direct fallback via Microlink API if server failed or returned missing data
+    if (!fetchedData || !fetchedData.title || !fetchedData.image) {
+      try {
+        const microRes = await fetch(`https://api.microlink.io?url=${encodeURIComponent(targetUrl)}&screenshot=false&meta=true`);
+        if (microRes.ok) {
+          const microJson = await microRes.json();
+          if (microJson.status === 'success' && microJson.data) {
+            const md = microJson.data;
+            fetchedData = {
+              title: fetchedData?.title || md.title || '',
+              description: fetchedData?.description || md.description || '',
+              image: fetchedData?.image || ((md.image && md.image.url) ? md.image.url : ((md.logo && md.logo.url) ? md.logo.url : ''))
+            };
+          }
+        }
+      } catch (e) {}
+    }
+
+    if (fetchedData) {
+      if (fetchedData.title && pgExtTitle) pgExtTitle.value = fetchedData.title;
+      if (fetchedData.description && pgExtDescription) pgExtDescription.value = fetchedData.description;
+      if (fetchedData.image && pgExtImageUrl) pgExtImageUrl.value = fetchedData.image;
+    }
+
+    updateLivePreview();
+
+    if (fetchStatusPgExtMsg) {
+      fetchStatusPgExtMsg.textContent = fetchedData?.image ? '✦ Details & cover image auto-fetched!' : '✦ Details auto-fetched!';
+    }
     setTimeout(() => {
       if (fetchStatusPgExtMsg) fetchStatusPgExtMsg.textContent = '';
       autoFetchPgExtBtn.disabled = false;
@@ -1294,6 +1346,8 @@ function startEditing(id) {
         pgExtCategory.value = (itemCategoryName && !['experiments', 'sketches', 'fun'].includes(itemCategoryName)) ? itemCategoryName : (itemCategoryName || '');
       }
       if (pgExtLink) pgExtLink.value = item.url || '';
+      if (pgExtImageUrl) pgExtImageUrl.value = item.image || '';
+      if (pgExtImageFile) pgExtImageFile.value = '';
     }
   } else {
     if (itemCategoryName && category) {
@@ -1346,6 +1400,8 @@ if (cancelEditBtn) {
     submitBtn.innerHTML = 'Publish Item <b>↗</b>';
     cancelEditBtn.style.display = 'none';
     contentForm.reset();
+    if (pgExtImageUrl) pgExtImageUrl.value = '';
+    if (pgExtImageFile) pgExtImageFile.value = '';
     if ($('#journal-date')) $('#journal-date').value = getTodayDateString();
     if (pgGalleryPreviewContainer) pgGalleryPreviewContainer.innerHTML = '';
     refreshFields();
@@ -1692,13 +1748,22 @@ contentForm.onsubmit = async event => {
       const defaultExtCat = pgSectionNow === 'sketches' ? 'Wireframes & Sketches' : (pgSectionNow === 'fun' ? 'Visual Tests' : 'Interaction');
       const finalExtCatVal = extCat || defaultExtCat;
 
+      let extImg = (pgExtImageUrl ? pgExtImageUrl.value : '').trim();
+      if (pgExtImageFile && pgExtImageFile.files && pgExtImageFile.files[0]) {
+        try {
+          extImg = await fileToUrl(pgExtImageFile.files[0]);
+        } catch (uploadErr) {
+          return showError('Cover image upload failed: ' + uploadErr.message);
+        }
+      }
+
       payload = {
         title: extTitle,
         description: extDesc,
         contentBody: '',
         category: `playground|${pgSectionNow}|${finalExtCatVal}`,
         url: extLink,
-        image: '',
+        image: extImg,
         platform: detectedPlatform,
         featured: false,
         playgroundType: 'external'

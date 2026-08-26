@@ -297,7 +297,11 @@ const fetchMetadata = async rawUrl => {
           .replace(/&quot;/g, '"')
           .replace(/&#039;/g, "'")
           .replace(/&#39;/g, "'")
+          .replace(/&#x27;/g, "'")
+          .replace(/&#x2F;/g, '/')
           .replace(/&nbsp;/g, ' ')
+          .replace(/[\r\n\t]+/g, ' ')
+          .replace(/\s{2,}/g, ' ')
           .trim();
       };
 

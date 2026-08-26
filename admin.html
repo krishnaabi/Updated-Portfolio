@@ -14,7 +14,7 @@
   <link
     href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500;600&family=Manrope:wght@400;500;600;700;800&display=swap"
     rel="stylesheet" />
-  <link rel="stylesheet" href="admin.css?v=60" />
+  <link rel="stylesheet" href="admin.css?v=61" />
   <link rel="preload" as="image" href="assets/ak-logo-exact.png" />
 </head>
 
@@ -228,7 +228,7 @@
           </div>
 
           <!-- ══════════════════════════════════════════════════════════ -->
-          <!-- 2. EXTERNAL PLAYGROUND (EXACT 4 REQUIRED FIELDS ONLY) -->
+          <!-- 2. EXTERNAL PLAYGROUND -->
           <!-- ══════════════════════════════════════════════════════════ -->
           <div id="playground-external-fields-group" style="display:none;">
             <!-- 1. Title -->
@@ -260,6 +260,16 @@
                 </button>
               </div>
               <small class="fetch-status-msg" id="fetch-status-pg-ext-msg"></small>
+            </div>
+
+            <!-- 5. Cover / Thumbnail Image -->
+            <div class="form-group">
+              <label class="group-label">Cover / Thumbnail Image</label>
+              <input name="pgExtImageUrl" id="pg-ext-image-url" placeholder="Paste image URL (https://...) or upload below...">
+              <div style="margin-top:8px;">
+                <input name="pgExtImageFile" type="file" accept="image/*" id="pg-ext-image-file">
+                <small class="recommended-size">💡 Recommended size: <b>1200 × 800 px</b> (3:2 landscape ratio, max 5 MB). Will auto-fill if detected via Auto-Fetch.</small>
+              </div>
             </div>
           </div>
 
@@ -1342,7 +1352,7 @@
   </main>
 
   <script src="supabase-config.js"></script>
-  <script src="admin.js?v=152"></script>
+  <script src="admin.js?v=160"></script>
 </body>
 
 </html>
