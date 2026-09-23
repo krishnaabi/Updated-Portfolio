@@ -119,9 +119,9 @@
       }
     ];
 
-    const getItems = (overrideList) => {
+    const getItems = () => {
       try {
-        const local = overrideList || JSON.parse(localStorage.getItem('ak_portfolio_live_works') || 'null');
+        const local = JSON.parse(localStorage.getItem('ak_portfolio_live_works') || 'null');
         if (Array.isArray(local) && local.length > 0) {
           return local.map(item => {
             const rad = item.size_tier === 'lg' ? 52 : (item.size_tier === 'sm' ? 38 : 44);
@@ -132,149 +132,188 @@
       return defaultItems;
     };
 
-    let items = getItems();
-    const orbs = [];
-    let width = 1200;
-    let height = 440;
-
+    const items = getItems();
     const countBadge = document.querySelector('#galaxy-count-badge');
+    if (countBadge) {
+      countBadge.textContent = `${String(items.length).padStart(2, '0')} Live Portals`;
+    }
 
+    // ══════════════════════════════════════════════════════════
+    // 1. RENDER PHYSICS GALAXY VIEW (3D Orbs + Soft Shadows)
+    // ══════════════════════════════════════════════════════════
+    physicsView.innerHTML = '';
+    const stageRect = physicsView.getBoundingClientRect();
+    let width = stageRect.width || 1200;
+    let height = stageRect.height || 440;
+
+    const orbs = [];
+    const numOrbs = items.length;
+
+    items.forEach((item, index) => {
+      const el = document.createElement('div');
+      el.className = 'galaxy-orb-node';
+      el.style.setProperty('--node-accent', item.accent_color || '#ff4e1b');
+      el.style.width = `${item.radius * 2}px`;
+      el.style.height = `${item.radius * 2}px`;
+
+      let domain = '';
+      try {
+        if (item.url && item.url.startsWith('http')) {
+          domain = new URL(item.url).hostname.replace(/^www\./, '');
+        } else {
+          domain = item.url || 'Live Demo';
+        }
+      } catch {
+        domain = item.url || 'Live Demo';
+      }
+
+      const customImg = item.image || item.custom_icon_url || item.iconUrl || '';
+      const orbContent = customImg
+        ? `<img src="${customImg}" alt="${item.title}" class="galaxy-logo-img" />`
+        : `<span class="galaxy-monogram">${item.icon_text || (item.title ? item.title.slice(0,2).toUpperCase() : '⚡')}</span>`;
+
+      el.innerHTML = `
+        <div class="galaxy-orb-shadow"></div>
+        <div class="galaxy-tooltip">
+          <span class="galaxy-tooltip-dot"></span>
+          <div class="galaxy-tooltip-info">
+            <span class="galaxy-tooltip-title">${item.title}</span>
+            <span class="galaxy-tooltip-sub">${domain} · ${item.category || 'Live Site'}</span>
+          </div>
+          <span class="galaxy-tooltip-arrow">↗</span>
+        </div>
+        <div class="galaxy-orb-shell">
+          <span class="galaxy-live-beacon"></span>
+          ${orbContent}
+        </div>
+      `;
+
+      physicsView.appendChild(el);
+
+      const cols = Math.ceil(Math.sqrt(numOrbs * (width / height)));
+      const rows = Math.ceil(numOrbs / cols);
+      const col = index % cols;
+      const row = Math.floor(index / cols);
+
+      const cellW = (width - 160) / cols;
+      const cellH = (height - 110) / rows;
+
+      const initX = 80 + col * cellW + cellW / 2 + (Math.random() - 0.5) * 30;
+      const initY = 55 + row * cellH + cellH / 2 + (Math.random() - 0.5) * 25;
+
+      orbs.push({
+        el,
+        item,
+        x: Math.max(item.radius + 20, Math.min(width - item.radius - 20, initX)),
+        y: Math.max(item.radius + 20, Math.min(height - item.radius - 20, initY)),
+        vx: (Math.random() - 0.5) * 0.8,
+        vy: (Math.random() - 0.5) * 0.8,
+        radius: item.radius,
+        mass: item.radius * 0.1,
+        isDragging: false,
+        dragStartX: 0,
+        dragStartY: 0,
+        movedDistance: 0,
+        phase: Math.random() * Math.PI * 2
+      });
+    });
+
+    // ══════════════════════════════════════════════════════════
+    // 2. RENDER ULTRA-MINIMAL LAUNCHPAD TABLE VIEW
+    // ══════════════════════════════════════════════════════════
     const tableHeadHtml = `
-      <div class="launchpad-list-header">
+      <div class="launchpad-table-head">
         <span>#</span>
-        <span>PROJECT & PORTAL</span>
-        <span>CATEGORY</span>
-        <span>STATUS</span>
-        <span>LAUNCH PORTAL</span>
+        <span>Project & Platform</span>
+        <span>Category</span>
+        <span>Live Status</span>
+        <span style="text-align:right;">Link ↗</span>
       </div>
     `;
 
-    function buildNodes(currentItems) {
-      if (countBadge) {
-        countBadge.textContent = `${String(currentItems.length).padStart(2, '0')} Live Portals`;
+    const rowsHtml = items.map((item, idx) => {
+      const accent = item.accent_color || '#ff4e1b';
+      const iconText = item.icon_text || (item.title ? item.title.slice(0, 2).toUpperCase() : '⚡');
+      const customImg = item.image || item.custom_icon_url || item.iconUrl || '';
+      const indexStr = String(idx + 1).padStart(2, '0');
+
+      let domain = '';
+      try {
+        if (item.url && item.url.startsWith('http')) {
+          domain = new URL(item.url).hostname.replace(/^www\./, '');
+        } else {
+          domain = item.url || 'Live Demo';
+        }
+      } catch {
+        domain = item.url || 'Live Demo';
       }
 
-      // 1. Render Physics Galaxy View Nodes
-      physicsView.innerHTML = '';
-      orbs.length = 0;
+      const orbContent = customImg
+        ? `<img src="${customImg}" alt="${item.title}" style="width:100%;height:100%;object-fit:contain;border-radius:50%;" />`
+        : iconText;
 
-      const stageRect = physicsView.getBoundingClientRect();
-      width = stageRect.width || 1200;
-      height = stageRect.height || 440;
-
-      currentItems.forEach((item, index) => {
-        const el = document.createElement('div');
-        el.className = 'galaxy-orb-node';
-        el.style.setProperty('--node-accent', item.accent_color || '#ff4e1b');
-        el.style.width = `${item.radius * 2}px`;
-        el.style.height = `${item.radius * 2}px`;
-
-        let domain = '';
-        try {
-          if (item.url && item.url.startsWith('http')) {
-            domain = new URL(item.url).hostname.replace(/^www\./, '');
-          } else {
-            domain = item.url || 'Live Demo';
-          }
-        } catch {
-          domain = item.url || 'Live Demo';
-        }
-
-        const iconText = item.icon_text || (item.title ? item.title.slice(0, 2).toUpperCase() : '⚡');
-        const customImg = item.image || item.custom_icon_url || item.iconUrl || '';
-
-        const nodeInner = customImg
-          ? `<img src="${customImg}" alt="${item.title}" class="galaxy-orb-img" />`
-          : `<span class="galaxy-orb-monogram">${iconText}</span>`;
-
-        el.innerHTML = `
-          <a href="${item.url || '#'}" ${item.url && item.url.startsWith('http') ? 'target="_blank" rel="noopener noreferrer"' : ''} class="galaxy-orb-link" aria-label="Open ${item.title}">
-            <div class="galaxy-orb-glass">
-              <span class="galaxy-live-indicator"></span>
-              ${nodeInner}
+      return `
+        <a href="${item.url || '#'}" ${item.url && item.url.startsWith('http') ? 'target="_blank" rel="noopener noreferrer"' : ''} class="launchpad-list-row" style="--row-accent:${accent};" aria-label="Visit ${item.title}">
+          <span class="launchpad-row-index">${indexStr}</span>
+          <div class="launchpad-row-project">
+            <div class="launchpad-row-orb">
+              ${orbContent}
             </div>
-            <div class="galaxy-orb-tooltip">
-              <span class="tooltip-badge">${item.badge_status || '● Live'}</span>
-              <strong class="tooltip-title">${item.title}</strong>
-              <span class="tooltip-domain">${domain} ↗</span>
-            </div>
-          </a>
-        `;
+            <h4 class="launchpad-row-title">${item.title}</h4>
+          </div>
+          <span class="launchpad-row-cat">${item.category || 'Websites & Apps'}</span>
+          <div class="launchpad-row-status">
+            <span class="launchpad-row-status-dot"></span>
+            <span>${item.badge_status ? item.badge_status.replace(/^●\s*/, '') : 'Live Site'}</span>
+          </div>
+          <span class="launchpad-row-action">${domain} ↗</span>
+        </a>
+      `;
+    }).join('');
 
-        physicsView.appendChild(el);
+    listView.innerHTML = tableHeadHtml + rowsHtml;
 
-        const colIndex = index % 4;
-        const rowIndex = Math.floor(index / 4);
-        const cellW = width / 4;
-        const cellH = height / Math.max(1, Math.ceil(currentItems.length / 4));
+    // ══════════════════════════════════════════════════════════
+    // 3. DUAL VIEW TOGGLE SWITCHER ENGINE
+    // ══════════════════════════════════════════════════════════
+    const btnGalaxy = document.querySelector('#btn-view-galaxy');
+    const btnList = document.querySelector('#btn-view-list');
+    const hintText = document.querySelector('#galaxy-hint-text');
 
-        const initialX = cellW * colIndex + cellW / 2 + (Math.random() * 40 - 20);
-        const initialY = cellH * rowIndex + cellH / 2 + (Math.random() * 40 - 20);
+    let currentMode = 'galaxy'; // Always default to Galaxy View on page load and refresh
 
-        const orbObj = {
-          el,
-          item,
-          radius: item.radius,
-          x: Math.max(item.radius, Math.min(width - item.radius, initialX)),
-          y: Math.max(item.radius, Math.min(height - item.radius, initialY)),
-          vx: (Math.random() - 0.5) * 1.5,
-          vy: (Math.random() - 0.5) * 1.5,
-          phase: Math.random() * Math.PI * 2,
-          isDragging: false,
-          dragStartX: 0,
-          dragStartY: 0,
-          movedDistance: 0
-        };
+    function setViewMode(mode) {
+      currentMode = mode;
 
-        orbs.push(orbObj);
-        attachOrbEvents(orbObj);
-      });
+      if (mode === 'galaxy') {
+        btnGalaxy?.classList.add('active');
+        btnGalaxy?.setAttribute('aria-selected', 'true');
+        btnList?.classList.remove('active');
+        btnList?.setAttribute('aria-selected', 'false');
 
-      // 2. Render Launchpad List View
-      const rowsHtml = currentItems.map((item, index) => {
-        const indexStr = String(index + 1).padStart(2, '0');
-        const accent = item.accent_color || '#ff4e1b';
-        const iconText = item.icon_text || (item.title ? item.title.slice(0, 2).toUpperCase() : '⚡');
-        const customImg = item.image || item.custom_icon_url || item.iconUrl || '';
+        physicsView.classList.remove('hidden');
+        listView.classList.add('hidden');
+        if (hintText) hintText.textContent = '✦ Drag or fling orbs · Click to launch';
+      } else {
+        btnList?.classList.add('active');
+        btnList?.setAttribute('aria-selected', 'true');
+        btnGalaxy?.classList.remove('active');
+        btnGalaxy?.setAttribute('aria-selected', 'false');
 
-        let domain = '';
-        try {
-          if (item.url && item.url.startsWith('http')) {
-            domain = new URL(item.url).hostname.replace(/^www\./, '');
-          } else {
-            domain = item.url || 'Live Demo';
-          }
-        } catch {
-          domain = item.url || 'Live Demo';
-        }
-
-        const orbContent = customImg
-          ? `<img src="${customImg}" alt="${item.title}" style="width:100%;height:100%;object-fit:contain;border-radius:50%;" />`
-          : iconText;
-
-        return `
-          <a href="${item.url || '#'}" ${item.url && item.url.startsWith('http') ? 'target="_blank" rel="noopener noreferrer"' : ''} class="launchpad-list-row" style="--row-accent:${accent};" aria-label="Visit ${item.title}">
-            <span class="launchpad-row-index">${indexStr}</span>
-            <div class="launchpad-row-project">
-              <div class="launchpad-row-orb">
-                ${orbContent}
-              </div>
-              <h4 class="launchpad-row-title">${item.title}</h4>
-            </div>
-            <span class="launchpad-row-cat">${item.category || 'Websites & Apps'}</span>
-            <div class="launchpad-row-status">
-              <span class="launchpad-row-status-dot"></span>
-              <span>${item.badge_status ? item.badge_status.replace(/^●\s*/, '') : 'Live Site'}</span>
-            </div>
-            <span class="launchpad-row-action">${domain} ↗</span>
-          </a>
-        `;
-      }).join('');
-
-      listView.innerHTML = tableHeadHtml + rowsHtml;
+        listView.classList.remove('hidden');
+        physicsView.classList.add('hidden');
+        if (hintText) hintText.textContent = '✦ Click any row to launch live site';
+      }
     }
 
-    // Interactive Drag / Touch Handler
+    if (btnGalaxy) btnGalaxy.onclick = () => setViewMode('galaxy');
+    if (btnList) btnList.onclick = () => setViewMode('list');
+
+    setViewMode('galaxy');
+
+    // ══════════════════════════════════════════════════════════
+    // 4. SILKY-SMOOTH GALAXY PHYSICS & FLUID DRAG/FLING ENGINE
+    // ══════════════════════════════════════════════════════════
     let draggedOrb = null;
     let pointerX = 0;
     let pointerY = 0;
@@ -284,19 +323,6 @@
     let pointerVy = 0;
     let hoverMouseX = -9999;
     let hoverMouseY = -9999;
-
-    function attachOrbEvents(orb) {
-      orb.el.addEventListener('mousedown', e => {
-        e.preventDefault();
-        onPointerDown(orb, e.clientX, e.clientY);
-      });
-
-      orb.el.addEventListener('touchstart', e => {
-        if (e.touches.length > 0) {
-          onPointerDown(orb, e.touches[0].clientX, e.touches[0].clientY);
-        }
-      }, { passive: true });
-    }
 
     const onPointerDown = (orb, clientX, clientY) => {
       const rect = physicsView.getBoundingClientRect();
@@ -325,6 +351,7 @@
       pointerX = hoverMouseX;
       pointerY = hoverMouseY;
 
+      // Exponential moving average for buttery fling velocity
       const rawVx = (pointerX - lastPointerX);
       const rawVy = (pointerY - lastPointerY);
       pointerVx = pointerVx * 0.6 + rawVx * 0.4;
@@ -333,6 +360,7 @@
       lastPointerX = pointerX;
       lastPointerY = pointerY;
 
+      // Smooth lerp toward mouse pointer while dragging
       draggedOrb.x += (pointerX - draggedOrb.x) * 0.85;
       draggedOrb.y += (pointerY - draggedOrb.y) * 0.85;
 
@@ -345,6 +373,7 @@
       if (!draggedOrb) return;
 
       if (draggedOrb.movedDistance < 7) {
+        // Instant Click (Shockwave & Open URL)
         const shell = draggedOrb.el.querySelector('.galaxy-orb-shell');
         if (shell) {
           const ripple = document.createElement('span');
@@ -362,6 +391,7 @@
           }
         }
       } else {
+        // Silky Fling Release with smooth momentum transfer
         draggedOrb.vx = Math.max(-14, Math.min(14, pointerVx * 1.15));
         draggedOrb.vy = Math.max(-14, Math.min(14, pointerVy * 1.15));
       }
@@ -369,6 +399,19 @@
       draggedOrb.isDragging = false;
       draggedOrb = null;
     };
+
+    orbs.forEach(orb => {
+      orb.el.addEventListener('mousedown', e => {
+        e.preventDefault();
+        onPointerDown(orb, e.clientX, e.clientY);
+      });
+
+      orb.el.addEventListener('touchstart', e => {
+        if (e.touches.length > 0) {
+          onPointerDown(orb, e.touches[0].clientX, e.touches[0].clientY);
+        }
+      }, { passive: true });
+    });
 
     physicsView.addEventListener('mousemove', e => onPointerMove(e.clientX, e.clientY));
     physicsView.addEventListener('mouseleave', () => {
@@ -389,68 +432,6 @@
     window.addEventListener('mouseup', onPointerUp);
     window.addEventListener('touchend', onPointerUp);
 
-    // Initial Node Build
-    buildNodes(items);
-
-    // Dynamic Refresher for External API Callers & Remote Sync
-    window.refreshKineticGalaxy = function(newList) {
-      if (Array.isArray(newList) && newList.length > 0) {
-        try {
-          localStorage.setItem('ak_portfolio_live_works', JSON.stringify(newList));
-        } catch (e) {}
-        items = getItems(newList);
-        buildNodes(items);
-      }
-    };
-
-    // Async Fetch Remote Settings
-    const fetchRemoteLiveWorks = async () => {
-      try {
-        const fetchFn = typeof window.apiFetch === 'function' ? window.apiFetch : window.fetch;
-        const res = await fetchFn('/api/settings');
-        if (res && res.ok) {
-          const data = await res.json();
-          if (data && Array.isArray(data.liveWorks) && data.liveWorks.length > 0) {
-            window.refreshKineticGalaxy(data.liveWorks);
-          }
-        }
-      } catch (e) {}
-    };
-
-    // ══════════════════════════════════════════════════════════
-    // DUAL VIEW TOGGLE SWITCHER ENGINE
-    // ══════════════════════════════════════════════════════════
-    const btnGalaxy = document.querySelector('#btn-view-galaxy');
-    const btnList = document.querySelector('#btn-view-list');
-    const hintBox = document.querySelector('#galaxy-hint-box');
-    const hintText = document.querySelector('#galaxy-hint-text');
-
-    let currentMode = 'galaxy';
-
-    const switchView = (mode) => {
-      currentMode = mode;
-      if (mode === 'galaxy') {
-        physicsView.classList.remove('hidden');
-        listView.classList.add('hidden');
-        btnGalaxy.classList.add('active');
-        btnGalaxy.setAttribute('aria-selected', 'true');
-        btnList.classList.remove('active');
-        btnList.setAttribute('aria-selected', 'false');
-        if (hintText) hintText.textContent = '✦ Drag or fling orbs · Click to launch';
-      } else {
-        physicsView.classList.add('hidden');
-        listView.classList.remove('hidden');
-        btnList.classList.add('active');
-        btnList.setAttribute('aria-selected', 'true');
-        btnGalaxy.classList.remove('active');
-        btnGalaxy.setAttribute('aria-selected', 'false');
-        if (hintText) hintText.textContent = '✦ Click any row to launch live site';
-      }
-    };
-
-    if (btnGalaxy) btnGalaxy.addEventListener('click', () => switchView('galaxy'));
-    if (btnList) btnList.addEventListener('click', () => switchView('list'));
-
     // ══════════════════════════════════════════════════════════
     // HIGH-PRECISION 60–120FPS FLUID SIMULATION LOOP
     // ══════════════════════════════════════════════════════════
@@ -461,22 +442,24 @@
       const delta = Math.min((now - lastTime) / 16.667, 2.0) || 1.0;
       lastTime = now;
 
-      if (currentMode === 'galaxy' && orbs.length > 0) {
+      if (currentMode === 'galaxy') {
         animTime += 0.012 * delta;
         const rect = physicsView.getBoundingClientRect();
-        width = rect.width || width;
-        height = rect.height || height;
+        width = rect.width;
+        height = rect.height;
 
         // 1. Organic Harmonic Buoyancy Drift & Proximity Magnetic Glide
         orbs.forEach(orb => {
           if (orb.isDragging) return;
 
+          // Double harmonic sine levitation
           const floatFx = (Math.cos(animTime + orb.phase) * 0.05 + Math.sin(animTime * 0.7 + orb.phase) * 0.03) * delta;
           const floatFy = (Math.sin(animTime + orb.phase) * 0.05 + Math.cos(animTime * 0.6 + orb.phase) * 0.03) * delta;
 
           orb.vx += floatFx;
           orb.vy += floatFy;
 
+          // Silky Magnetic Proximity Pull with cubic falloff
           if (hoverMouseX > 0 && hoverMouseY > 0) {
             const mdx = hoverMouseX - orb.x;
             const mdy = hoverMouseY - orb.y;
@@ -489,6 +472,7 @@
             }
           }
 
+          // Natural air damping
           const damping = Math.pow(0.984, delta);
           orb.vx *= damping;
           orb.vy *= damping;
@@ -496,6 +480,7 @@
           orb.x += orb.vx * delta;
           orb.y += orb.vy * delta;
 
+          // Silky Cushion Stage Boundary Bounce
           const pad = orb.radius + 6;
           if (orb.x < pad) {
             orb.x = pad;
@@ -530,6 +515,7 @@
               const nx = dx / dist;
               const ny = dy / dist;
 
+              // Smooth spring repulsion force
               const springForce = overlap * 0.18 * delta;
 
               if (!a.isDragging) {
@@ -568,8 +554,6 @@
       width = r.width;
       height = r.height;
     });
-
-    fetchRemoteLiveWorks();
   }
 
   if (document.readyState === 'loading') {
