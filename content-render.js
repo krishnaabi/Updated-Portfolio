@@ -866,6 +866,14 @@
       try {
         localStorage.setItem('ak_portfolio_settings', JSON.stringify(data));
       } catch (e) {}
+      if (Array.isArray(data.liveWorks) && data.liveWorks.length > 0) {
+        try {
+          localStorage.setItem('ak_portfolio_live_works', JSON.stringify(data.liveWorks));
+        } catch (e) {}
+        if (typeof window.refreshKineticGalaxy === 'function') {
+          window.refreshKineticGalaxy(data.liveWorks);
+        }
+      }
     }
   });
   document.querySelectorAll('.contact-links a').forEach(link => { if (/book a call/i.test(link.textContent)) link.remove(); });

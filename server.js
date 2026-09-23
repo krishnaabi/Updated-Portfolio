@@ -969,24 +969,19 @@ const saveMilestone = async incoming => {
     image: incoming.image || 'https://images.unsplash.com/photo-1475721027785-f74eccf877e2?auto=format&fit=crop&w=1200&q=95'
   };
 
+  if (incoming.id) payload.id = incoming.id;
+  else payload.created_at = new Date().toISOString();
+
   try {
-    if (incoming.id) {
-      await supabase(`portfolio_milestones?id=eq.${encodeURIComponent(incoming.id)}`, {
-        method: 'PATCH',
-        body: JSON.stringify(payload)
-      });
-      return { id: incoming.id, ...incoming };
-    } else {
-      const res = await supabase('portfolio_milestones', {
-        method: 'POST',
-        headers: { Prefer: 'return=representation' },
-        body: JSON.stringify(payload)
-      });
-      return Array.isArray(res) && res[0] ? toMilestone(res[0]) : { id: Date.now().toString(), ...incoming };
-    }
+    const res = await supabase('portfolio_milestones', {
+      method: 'POST',
+      headers: { Prefer: 'resolution=merge-duplicates,return=representation' },
+      body: JSON.stringify(payload)
+    });
+    return Array.isArray(res) && res[0] ? toMilestone(res[0]) : { id: incoming.id || Date.now().toString(), ...incoming };
   } catch (e) {
     console.error('Supabase saveMilestone error:', e.message);
-    return { id: Date.now().toString(), ...incoming };
+    return { id: incoming.id || Date.now().toString(), ...incoming };
   }
 };
 
@@ -1167,7 +1162,8 @@ http.createServer(async (req, res) => {
     if (url.pathname === '/api/milestones' && req.method === 'POST') {
       const incoming = await body(req);
       if (!incoming.title || !incoming.title.trim()) return json(res, 400, { error: 'Milestone Title is required.' });
-      return json(res, 201, await saveMilestone(incoming));
+      const saved = await saveMilestone(incoming);
+      return json(res, incoming.id ? 200 : 201, saved);
     }
     if (url.pathname.startsWith('/api/milestones/') && req.method === 'DELETE') {
       const id = url.pathname.split('/').pop();

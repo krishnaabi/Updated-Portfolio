@@ -59,28 +59,48 @@ export async function onRequest(context) {
         display_order: incoming.display_order || incoming.displayOrder || 0
       };
 
-      if (incoming.id && !String(incoming.id).startsWith('tool-')) {
-        payload.id = incoming.id;
+      if (incoming.id) {
+        // UPDATE existing tool
+        const sbRes = await fetch(`${sbUrl}/rest/v1/portfolio_tools?id=eq.${encodeURIComponent(incoming.id)}`, {
+          method: 'PATCH',
+          headers: {
+            apikey: sbKey,
+            Authorization: `Bearer ${sbKey}`,
+            'Content-Type': 'application/json',
+            Prefer: 'return=representation'
+          },
+          body: JSON.stringify(payload)
+        });
+        if (sbRes.ok) {
+          const resData = await sbRes.json();
+          const row = Array.isArray(resData) ? resData[0] : resData;
+          return new Response(JSON.stringify(row || { id: incoming.id, ...incoming }), { status: 200, headers });
+        }
+        const errText = await sbRes.text();
+        return new Response(JSON.stringify({ error: errText }), { status: 500, headers });
+      } else {
+        // INSERT new tool
+        payload.created_at = new Date().toISOString();
+        const sbRes = await fetch(`${sbUrl}/rest/v1/portfolio_tools`, {
+          method: 'POST',
+          headers: {
+            apikey: sbKey,
+            Authorization: `Bearer ${sbKey}`,
+            'Content-Type': 'application/json',
+            Prefer: 'return=representation'
+          },
+          body: JSON.stringify(payload)
+        });
+
+        if (sbRes.ok) {
+          const resData = await sbRes.json();
+          const row = Array.isArray(resData) ? resData[0] : resData;
+          return new Response(JSON.stringify(row || { id: Date.now().toString(), ...incoming }), { status: 201, headers });
+        }
+
+        const errText = await sbRes.text();
+        return new Response(JSON.stringify({ error: errText }), { status: 500, headers });
       }
-
-      const sbRes = await fetch(`${sbUrl}/rest/v1/portfolio_tools`, {
-        method: 'POST',
-        headers: {
-          apikey: sbKey,
-          Authorization: `Bearer ${sbKey}`,
-          'Content-Type': 'application/json',
-          Prefer: 'return=representation,resolution=merge-duplicates'
-        },
-        body: JSON.stringify(payload)
-      });
-
-      if (sbRes.ok) {
-        const resData = await sbRes.json();
-        const row = Array.isArray(resData) ? resData[0] : resData;
-        return new Response(JSON.stringify(row || { id: incoming.id || Date.now().toString(), ...payload }), { status: 201, headers });
-      }
-
-      return new Response(JSON.stringify({ id: incoming.id || Date.now().toString(), ...payload }), { status: 201, headers });
     } catch (err) {
       return new Response(JSON.stringify({ error: err.message }), { status: 500, headers });
     }

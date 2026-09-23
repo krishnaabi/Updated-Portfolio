@@ -119,11 +119,11 @@
       }
     ];
 
-    const getItems = () => {
+    const getItems = (customList) => {
       try {
-        const local = JSON.parse(localStorage.getItem('ak_portfolio_live_works') || 'null');
-        if (Array.isArray(local) && local.length > 0) {
-          return local.map(item => {
+        const listToUse = customList || JSON.parse(localStorage.getItem('ak_portfolio_live_works') || 'null');
+        if (Array.isArray(listToUse) && listToUse.length > 0) {
+          return listToUse.map(item => {
             const rad = item.size_tier === 'lg' ? 52 : (item.size_tier === 'sm' ? 38 : 44);
             return { ...item, radius: rad };
           });
@@ -132,7 +132,165 @@
       return defaultItems;
     };
 
-    const items = getItems();
+    let items = getItems();
+
+    function renderGalaxy(itemsToRender) {
+      if (itemsToRender) items = getItems(itemsToRender);
+      const countBadge = document.querySelector('#galaxy-count-badge');
+      if (countBadge) {
+        countBadge.textContent = `${String(items.length).padStart(2, '0')} Live Portals`;
+      }
+
+      // Re-render physics nodes
+      physicsView.innerHTML = '';
+      const stageRect = physicsView.getBoundingClientRect();
+      let width = stageRect.width || 1200;
+      let height = stageRect.height || 440;
+      orbs.length = 0;
+
+      items.forEach((item, index) => {
+        const el = document.createElement('div');
+        el.className = 'galaxy-orb-node';
+        el.style.setProperty('--node-accent', item.accent_color || '#ff4e1b');
+        el.style.width = `${item.radius * 2}px`;
+        el.style.height = `${item.radius * 2}px`;
+
+        let domain = '';
+        try {
+          if (item.url && item.url.startsWith('http')) {
+            domain = new URL(item.url).hostname.replace(/^www\./, '');
+          } else {
+            domain = item.url || 'Live Demo';
+          }
+        } catch {
+          domain = item.url || 'Live Demo';
+        }
+
+        const iconText = item.icon_text || (item.title ? item.title.slice(0, 2).toUpperCase() : '⚡');
+        const customImg = item.image || item.custom_icon_url || item.iconUrl || '';
+
+        const nodeInner = customImg
+          ? `<img src="${customImg}" alt="${item.title}" class="galaxy-orb-img" />`
+          : `<span class="galaxy-orb-monogram">${iconText}</span>`;
+
+        el.innerHTML = `
+          <a href="${item.url || '#'}" ${item.url && item.url.startsWith('http') ? 'target="_blank" rel="noopener noreferrer"' : ''} class="galaxy-orb-link" aria-label="Open ${item.title}">
+            <div class="galaxy-orb-glass">
+              <span class="galaxy-live-indicator"></span>
+              ${nodeInner}
+            </div>
+            <div class="galaxy-orb-tooltip">
+              <span class="tooltip-badge">${item.badge_status || '● Live'}</span>
+              <strong class="tooltip-title">${item.title}</strong>
+              <span class="tooltip-domain">${domain} ↗</span>
+            </div>
+          </a>
+        `;
+
+        physicsView.appendChild(el);
+
+        const colIndex = index % 4;
+        const rowIndex = Math.floor(index / 4);
+        const cellW = width / 4;
+        const cellH = height / Math.ceil(items.length / 4);
+
+        const initialX = cellW * colIndex + cellW / 2 + (Math.random() * 40 - 20);
+        const initialY = cellH * rowIndex + cellH / 2 + (Math.random() * 40 - 20);
+
+        orbs.push({
+          el,
+          radius: item.radius,
+          x: Math.max(item.radius, Math.min(width - item.radius, initialX)),
+          y: Math.max(item.radius, Math.min(height - item.radius, initialY)),
+          vx: (Math.random() - 0.5) * 1.5,
+          vy: (Math.random() - 0.5) * 1.5,
+          isDragging: false,
+          dragOffsetX: 0,
+          dragOffsetY: 0,
+          lastX: 0,
+          lastY: 0,
+          lastTime: 0
+        });
+
+        setupOrbInteraction(orbs[orbs.length - 1], physicsView);
+      });
+
+      // Render List View
+      const rowsHtml = items.map((item, index) => {
+        const indexStr = String(index + 1).padStart(2, '0');
+        const accent = item.accent_color || '#ff4e1b';
+        const iconText = item.icon_text || (item.title ? item.title.slice(0, 2).toUpperCase() : '⚡');
+        const customImg = item.image || item.custom_icon_url || item.iconUrl || '';
+
+        let domain = '';
+        try {
+          if (item.url && item.url.startsWith('http')) {
+            domain = new URL(item.url).hostname.replace(/^www\./, '');
+          } else {
+            domain = item.url || 'Live Demo';
+          }
+        } catch {
+          domain = item.url || 'Live Demo';
+        }
+
+        const orbContent = customImg
+          ? `<img src="${customImg}" alt="${item.title}" style="width:100%;height:100%;object-fit:contain;border-radius:50%;" />`
+          : iconText;
+
+        return `
+          <a href="${item.url || '#'}" ${item.url && item.url.startsWith('http') ? 'target="_blank" rel="noopener noreferrer"' : ''} class="launchpad-list-row" style="--row-accent:${accent};" aria-label="Visit ${item.title}">
+            <span class="launchpad-row-index">${indexStr}</span>
+            <div class="launchpad-row-project">
+              <div class="launchpad-row-orb">
+                ${orbContent}
+              </div>
+              <h4 class="launchpad-row-title">${item.title}</h4>
+            </div>
+            <span class="launchpad-row-cat">${item.category || 'Websites & Apps'}</span>
+            <div class="launchpad-row-status">
+              <span class="launchpad-row-status-dot"></span>
+              <span>${item.badge_status ? item.badge_status.replace(/^●\s*/, '') : 'Live Site'}</span>
+            </div>
+            <span class="launchpad-row-action">${domain} ↗</span>
+          </a>
+        `;
+      }).join('');
+
+      listView.innerHTML = tableHeadHtml + rowsHtml;
+    }
+
+    const tableHeadHtml = `
+      <div class="launchpad-list-header">
+        <span>#</span>
+        <span>PROJECT & PORTAL</span>
+        <span>CATEGORY</span>
+        <span>STATUS</span>
+        <span>LAUNCH PORTAL</span>
+      </div>
+    `;
+
+    window.refreshKineticGalaxy = function(newList) {
+      if (Array.isArray(newList) && newList.length > 0) {
+        try {
+          localStorage.setItem('ak_portfolio_live_works', JSON.stringify(newList));
+        } catch (e) {}
+        renderGalaxy(newList);
+      }
+    };
+
+    // Async Fetch Remote Settings to Sync Across Browsers / Incognito
+    const fetchRemoteLiveWorks = async () => {
+      try {
+        const fetchFn = typeof window.apiFetch === 'function' ? window.apiFetch : window.fetch;
+        const res = await fetchFn('/api/settings');
+        if (res && res.ok) {
+          const data = await res.json();
+          if (data && Array.isArray(data.liveWorks) && data.liveWorks.length > 0) {
+            window.refreshKineticGalaxy(data.liveWorks);
+          }
+        }
+      } catch (e) {}
+    };
     const countBadge = document.querySelector('#galaxy-count-badge');
     if (countBadge) {
       countBadge.textContent = `${String(items.length).padStart(2, '0')} Live Portals`;
@@ -554,6 +712,9 @@
       width = r.width;
       height = r.height;
     });
+
+    // Automatically trigger remote API fetch to ensure Incognito and all browsers get latest liveWorks
+    fetchRemoteLiveWorks();
   }
 
   if (document.readyState === 'loading') {

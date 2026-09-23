@@ -40,30 +40,52 @@ export async function onRequest(context) {
 
       const payload = {
         name: incoming.name.trim(),
-        logo_url: incoming.logoUrl || incoming.logo_url || '',
-        url: incoming.url || '#',
-        created_at: new Date().toISOString()
+        logo_url: incoming.logoUrl || incoming.logo_url || incoming.logo || '',
+        url: incoming.url || '#'
       };
 
-      const sbRes = await fetch(`${sbUrl}/rest/v1/portfolio_brands`, {
-        method: 'POST',
-        headers: {
-          apikey: sbKey,
-          Authorization: `Bearer ${sbKey}`,
-          'Content-Type': 'application/json',
-          Prefer: 'return=representation'
-        },
-        body: JSON.stringify(payload)
-      });
+      if (incoming.id) {
+        // UPDATE existing brand
+        const sbRes = await fetch(`${sbUrl}/rest/v1/portfolio_brands?id=eq.${encodeURIComponent(incoming.id)}`, {
+          method: 'PATCH',
+          headers: {
+            apikey: sbKey,
+            Authorization: `Bearer ${sbKey}`,
+            'Content-Type': 'application/json',
+            Prefer: 'return=representation'
+          },
+          body: JSON.stringify(payload)
+        });
+        if (sbRes.ok) {
+          const resData = await sbRes.json();
+          const row = Array.isArray(resData) ? resData[0] : resData;
+          return new Response(JSON.stringify(row || { id: incoming.id, ...incoming }), { status: 200, headers });
+        }
+        const errText = await sbRes.text();
+        return new Response(JSON.stringify({ error: errText }), { status: 500, headers });
+      } else {
+        // INSERT new brand
+        payload.created_at = new Date().toISOString();
+        const sbRes = await fetch(`${sbUrl}/rest/v1/portfolio_brands`, {
+          method: 'POST',
+          headers: {
+            apikey: sbKey,
+            Authorization: `Bearer ${sbKey}`,
+            'Content-Type': 'application/json',
+            Prefer: 'return=representation'
+          },
+          body: JSON.stringify(payload)
+        });
 
-      if (sbRes.ok) {
-        const resData = await sbRes.json();
-        const row = Array.isArray(resData) ? resData[0] : resData;
-        return new Response(JSON.stringify(row || { id: Date.now().toString(), ...incoming }), { status: 201, headers });
+        if (sbRes.ok) {
+          const resData = await sbRes.json();
+          const row = Array.isArray(resData) ? resData[0] : resData;
+          return new Response(JSON.stringify(row || { id: Date.now().toString(), ...incoming }), { status: 201, headers });
+        }
+
+        const errText = await sbRes.text();
+        return new Response(JSON.stringify({ error: errText }), { status: 500, headers });
       }
-
-      const errText = await sbRes.text();
-      return new Response(JSON.stringify({ error: errText }), { status: 500, headers });
     } catch (err) {
       return new Response(JSON.stringify({ error: err.message }), { status: 500, headers });
     }

@@ -53,41 +53,32 @@ export async function onRequest(context) {
         url: incoming.url || '#',
         button_text: incoming.buttonText || incoming.button_text || 'View Highlight',
         image: incoming.image || 'https://images.unsplash.com/photo-1475721027785-f74eccf877e2?auto=format&fit=crop&w=1200&q=95',
-        display_order: incoming.displayOrder || incoming.display_order || 9999,
-        created_at: new Date().toISOString()
+        display_order: incoming.displayOrder || incoming.display_order || 9999
       };
 
-      if (incoming.id) {
-        await fetch(`${sbUrl}/rest/v1/portfolio_milestones?id=eq.${encodeURIComponent(incoming.id)}`, {
-          method: 'PATCH',
-          headers: {
-            apikey: sbKey,
-            Authorization: `Bearer ${sbKey}`,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(payload)
-        });
-        return new Response(JSON.stringify({ id: incoming.id, ...incoming }), { headers });
-      } else {
-        const sbRes = await fetch(`${sbUrl}/rest/v1/portfolio_milestones`, {
-          method: 'POST',
-          headers: {
-            apikey: sbKey,
-            Authorization: `Bearer ${sbKey}`,
-            'Content-Type': 'application/json',
-            Prefer: 'return=representation'
-          },
-          body: JSON.stringify(payload)
-        });
+      if (incoming.id) payload.id = incoming.id;
+      else payload.created_at = new Date().toISOString();
 
-        if (sbRes.ok) {
-          const resData = await sbRes.json();
-          const row = Array.isArray(resData) ? resData[0] : resData;
-          return new Response(JSON.stringify(row || { id: Date.now().toString(), ...incoming }), { status: 201, headers });
-        }
+      const sbRes = await fetch(`${sbUrl}/rest/v1/portfolio_milestones`, {
+        method: 'POST',
+        headers: {
+          apikey: sbKey,
+          Authorization: `Bearer ${sbKey}`,
+          'Content-Type': 'application/json',
+          Prefer: 'resolution=merge-duplicates,return=representation'
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (sbRes.ok) {
+        const resData = await sbRes.json();
+        const row = Array.isArray(resData) ? resData[0] : resData;
+        return new Response(JSON.stringify(row || { id: incoming.id || Date.now().toString(), ...incoming }), { status: incoming.id ? 200 : 201, headers });
       }
 
-      return new Response(JSON.stringify({ id: Date.now().toString(), ...incoming }), { status: 201, headers });
+      const errText = await sbRes.text();
+      return new Response(JSON.stringify({ error: errText || 'Failed to save milestone' }), { status: 500, headers });
+
     } catch (err) {
       return new Response(JSON.stringify({ error: err.message }), { status: 500, headers });
     }

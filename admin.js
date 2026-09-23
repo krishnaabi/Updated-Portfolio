@@ -462,22 +462,15 @@ async function apiFetch(path, options = {}) {
           quote: bodyObj.quote || '',
           img: bodyObj.img || bodyObj.avatar_url || bodyObj.avatarUrl || ''
         };
-        if (bodyObj.id) {
-          const sbRes = await fetch(`${sbUrl}/rest/v1/portfolio_testimonials?id=eq.${encodeURIComponent(bodyObj.id)}`, {
-            method: 'PATCH',
-            headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}`, 'Content-Type': 'application/json', Prefer: 'return=representation' },
-            body: JSON.stringify(payload)
-          });
-          if (sbRes.ok) return sbRes;
-        } else {
-          payload.created_at = new Date().toISOString();
-          const sbRes = await fetch(`${sbUrl}/rest/v1/portfolio_testimonials`, {
-            method: 'POST',
-            headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}`, 'Content-Type': 'application/json', Prefer: 'return=representation' },
-            body: JSON.stringify(payload)
-          });
-          if (sbRes.ok) return sbRes;
-        }
+        if (bodyObj.id) payload.id = bodyObj.id;
+        else payload.created_at = new Date().toISOString();
+
+        const sbRes = await fetch(`${sbUrl}/rest/v1/portfolio_testimonials`, {
+          method: 'POST',
+          headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}`, 'Content-Type': 'application/json', Prefer: 'resolution=merge-duplicates,return=representation' },
+          body: JSON.stringify(payload)
+        });
+        if (sbRes.ok) return sbRes;
       } else if (path.startsWith('/api/testimonials/') && options.method === 'DELETE') {
         const id = path.split('/').pop();
         const sbRes = await fetch(`${sbUrl}/rest/v1/portfolio_testimonials?id=eq.${encodeURIComponent(id)}`, {
@@ -520,22 +513,15 @@ async function apiFetch(path, options = {}) {
           image: bodyObj.image || '',
           display_order: bodyObj.displayOrder || bodyObj.display_order || 9999
         };
-        if (bodyObj.id) {
-          const sbRes = await fetch(`${sbUrl}/rest/v1/portfolio_milestones?id=eq.${encodeURIComponent(bodyObj.id)}`, {
-            method: 'PATCH',
-            headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}`, 'Content-Type': 'application/json', Prefer: 'return=representation' },
-            body: JSON.stringify(payload)
-          });
-          if (sbRes.ok) return sbRes;
-        } else {
-          payload.created_at = new Date().toISOString();
-          const sbRes = await fetch(`${sbUrl}/rest/v1/portfolio_milestones`, {
-            method: 'POST',
-            headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}`, 'Content-Type': 'application/json', Prefer: 'return=representation' },
-            body: JSON.stringify(payload)
-          });
-          if (sbRes.ok) return sbRes;
-        }
+        if (bodyObj.id) payload.id = bodyObj.id;
+        else payload.created_at = new Date().toISOString();
+
+        const sbRes = await fetch(`${sbUrl}/rest/v1/portfolio_milestones`, {
+          method: 'POST',
+          headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}`, 'Content-Type': 'application/json', Prefer: 'resolution=merge-duplicates,return=representation' },
+          body: JSON.stringify(payload)
+        });
+        if (sbRes.ok) return sbRes;
       } else if (path.startsWith('/api/milestones/') && options.method === 'DELETE') {
         const id = path.split('/').pop();
         const sbRes = await fetch(`${sbUrl}/rest/v1/portfolio_milestones?id=eq.${encodeURIComponent(id)}`, {
@@ -568,17 +554,12 @@ async function apiFetch(path, options = {}) {
           custom_icon_url: bodyObj.custom_icon_url || bodyObj.customIconUrl || '',
           display_order: bodyObj.display_order || bodyObj.displayOrder || 0
         };
-        if (bodyObj.id && !String(bodyObj.id).startsWith('tool-')) {
-          payload.id = bodyObj.id;
-        }
+        if (bodyObj.id && !String(bodyObj.id).startsWith('tool-')) payload.id = bodyObj.id;
+        else payload.created_at = new Date().toISOString();
+
         const sbRes = await fetch(`${sbUrl}/rest/v1/portfolio_tools`, {
           method: 'POST',
-          headers: {
-            apikey: anonKey,
-            Authorization: `Bearer ${anonKey}`,
-            'Content-Type': 'application/json',
-            Prefer: 'resolution=merge-duplicates,return=representation'
-          },
+          headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}`, 'Content-Type': 'application/json', Prefer: 'resolution=merge-duplicates,return=representation' },
           body: JSON.stringify(payload)
         });
         if (sbRes.ok) return sbRes;
@@ -591,23 +572,20 @@ async function apiFetch(path, options = {}) {
         if (sbRes.ok) return sbRes;
       } else if (path === '/api/brands' && options.method === 'POST') {
         const bodyObj = JSON.parse(options.body || '{}');
-        if (bodyObj.id) {
-          // UPDATE existing brand
-          const sbRes = await fetch(`${sbUrl}/rest/v1/portfolio_brands?id=eq.${encodeURIComponent(bodyObj.id)}`, {
-            method: 'PATCH',
-            headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}`, 'Content-Type': 'application/json', Prefer: 'return=representation' },
-            body: JSON.stringify({ name: bodyObj.name, logo_url: bodyObj.logo || bodyObj.logo_url || '' })
-          });
-          if (sbRes.ok) return sbRes;
-        } else {
-          // INSERT new brand
-          const sbRes = await fetch(`${sbUrl}/rest/v1/portfolio_brands`, {
-            method: 'POST',
-            headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}`, 'Content-Type': 'application/json', Prefer: 'return=representation' },
-            body: JSON.stringify({ name: bodyObj.name, logo_url: bodyObj.logo || bodyObj.logo_url || '', created_at: new Date().toISOString() })
-          });
-          if (sbRes.ok) return sbRes;
-        }
+        const payload = {
+          name: bodyObj.name,
+          logo_url: bodyObj.logo || bodyObj.logo_url || '',
+          url: bodyObj.url || '#'
+        };
+        if (bodyObj.id) payload.id = bodyObj.id;
+        else payload.created_at = new Date().toISOString();
+
+        const sbRes = await fetch(`${sbUrl}/rest/v1/portfolio_brands`, {
+          method: 'POST',
+          headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}`, 'Content-Type': 'application/json', Prefer: 'resolution=merge-duplicates,return=representation' },
+          body: JSON.stringify(payload)
+        });
+        if (sbRes.ok) return sbRes;
       } else if (path.startsWith('/api/brands/') && options.method === 'DELETE') {
         const id = path.split('/').pop();
         const sbRes = await fetch(`${sbUrl}/rest/v1/portfolio_brands?id=eq.${encodeURIComponent(id)}`, {
@@ -2988,7 +2966,7 @@ const renderMilestonesList = () => {
     renderMilestonesList();
 
     try {
-      const res = await fetch('/api/milestones/reorder', {
+      const res = await apiFetch('/api/milestones/reorder', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(allMilestonesData)
@@ -3046,7 +3024,7 @@ const renderMilestonesList = () => {
     btn.onclick = async () => {
       if (!confirm('Are you sure you want to delete this stage milestone?')) return;
       try {
-        const res = await fetch(`/api/milestones/${btn.dataset.removeMs}`, { method: 'DELETE' });
+        const res = await apiFetch(`/api/milestones/${btn.dataset.removeMs}`, { method: 'DELETE' });
         if (res.ok) fetchMilestones();
       } catch (err) {
         alert('Could not delete milestone.');
@@ -3077,7 +3055,7 @@ if (saveMilestoneBtn) {
     }
 
     const payload = {
-      id: $('#ms-id-input').value || undefined,
+      id: ($('#ms-id-input') && $('#ms-id-input').value) || undefined,
       title: titleVal,
       category: $('#ms-category-input').value.trim() || '🎤 STAGE KEYNOTE PRESENTATION',
       year: $('#ms-year-input').value.trim() || '2025',
@@ -3094,7 +3072,7 @@ if (saveMilestoneBtn) {
     };
 
     try {
-      const res = await fetch('/api/milestones', {
+      const res = await apiFetch('/api/milestones', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
