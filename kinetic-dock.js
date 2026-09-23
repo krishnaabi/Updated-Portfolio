@@ -554,6 +554,21 @@
       width = r.width;
       height = r.height;
     });
+
+    // Asynchronously fetch remote settings and sync to localStorage
+    const fetchRemoteLiveWorks = async () => {
+      try {
+        const fetchFn = typeof window.apiFetch === 'function' ? window.apiFetch : window.fetch;
+        const res = await fetchFn('/api/settings');
+        if (res && res.ok) {
+          const data = await res.json();
+          if (data && Array.isArray(data.liveWorks) && data.liveWorks.length > 0) {
+            try { localStorage.setItem('ak_portfolio_live_works', JSON.stringify(data.liveWorks)); } catch (e) {}
+          }
+        }
+      } catch (e) {}
+    };
+    fetchRemoteLiveWorks();
   }
 
   if (document.readyState === 'loading') {

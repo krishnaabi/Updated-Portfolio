@@ -4020,25 +4020,32 @@ async function fetchLiveWorks() {
   const localSaved = loadLiveWorksFromStorage();
   if (localSaved !== null && Array.isArray(localSaved) && localSaved.length > 0) {
     allLiveWorksData = localSaved;
-  } else {
-    try {
-      const res = await apiFetch('/api/settings');
-      if (res.ok) {
-        const settings = await res.json();
-        if (Array.isArray(settings.liveWorks) && settings.liveWorks.length > 0) {
-          allLiveWorksData = settings.liveWorks;
-          saveLiveWorksToStorage(allLiveWorksData);
-          renderLiveWorksList();
-          updateLivePreviewNode();
-          return;
-        }
+    renderLiveWorksList();
+    updateLivePreviewNode();
+  }
+
+  try {
+    const res = await apiFetch('/api/settings');
+    if (res && res.ok) {
+      const settings = await res.json();
+      if (Array.isArray(settings.liveWorks) && settings.liveWorks.length > 0) {
+        allLiveWorksData = settings.liveWorks;
+        try {
+          localStorage.setItem(STORAGE_KEY_LIVE_WORKS, JSON.stringify(allLiveWorksData));
+        } catch (e) {}
+        renderLiveWorksList();
+        updateLivePreviewNode();
+        return;
       }
-    } catch (e) {}
+    }
+  } catch (e) {}
+
+  if (!allLiveWorksData || allLiveWorksData.length === 0) {
     allLiveWorksData = [...defaultLiveWorksPresets];
     saveLiveWorksToStorage(allLiveWorksData);
+    renderLiveWorksList();
+    updateLivePreviewNode();
   }
-  renderLiveWorksList();
-  updateLivePreviewNode();
 }
 
 function updateLivePreviewNode() {

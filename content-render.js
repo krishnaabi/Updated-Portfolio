@@ -1795,6 +1795,40 @@
           }
         ];
 
+        const renderLiquidDockItems = (rawList) => {
+          if (!liquidDock) return;
+          if (liquidDockCount) {
+            liquidDockCount.textContent = `${String(rawList.length).padStart(2, '0')} Live Production & Graphic Works`;
+          }
+
+          liquidDock.innerHTML = rawList.map(item => {
+            const accent = item.accent_color || '#ff4e1b';
+            const iconText = item.icon_text || (item.title ? item.title.slice(0, 2).toUpperCase() : '⚡');
+            const customImg = item.image || item.custom_icon_url || item.iconUrl || item.logo || item.logo_url || '';
+
+            const orbInner = customImg
+              ? `<img src="${escape(customImg)}" alt="${escape(item.title)}" class="spatial-logo-img" />`
+              : `<span class="spatial-monogram">${escape(iconText)}</span>`;
+
+            return `
+              <a href="${escape(item.url || '#')}" ${item.url && item.url.startsWith('http') ? 'target="_blank" rel="noopener noreferrer"' : ''} class="spatial-dock-item" style="--orb-accent:${escape(accent)};" aria-label="Visit ${escape(item.title)}">
+                <!-- Floating Minimal Tooltip -->
+                <div class="spatial-tooltip">
+                  <span class="spatial-tooltip-dot"></span>
+                  <span class="spatial-tooltip-text">${escape(item.title)}</span>
+                  <span class="spatial-tooltip-arrow">↗</span>
+                </div>
+
+                <!-- 3D Glass Sphere -->
+                <div class="spatial-orb">
+                  <span class="spatial-live-beacon"></span>
+                  ${orbInner}
+                </div>
+              </a>
+            `;
+          }).join('');
+        };
+
         const getLiveWorks = () => {
           try {
             const local = JSON.parse(localStorage.getItem('ak_portfolio_live_works') || 'null');
@@ -1803,37 +1837,17 @@
           return defaultLiveWorks;
         };
 
-        const rawList = getLiveWorks();
-        if (liquidDockCount) {
-          liquidDockCount.textContent = `${String(rawList.length).padStart(2, '0')} Live Production & Graphic Works`;
+        renderLiquidDockItems(getLiveWorks());
+
+        // Asynchronously sync with server/Supabase settings
+        if (typeof apiFetch === 'function') {
+          apiFetch('/api/settings').then(res => res && res.ok ? res.json() : null).then(settings => {
+            if (settings && Array.isArray(settings.liveWorks) && settings.liveWorks.length > 0) {
+              try { localStorage.setItem('ak_portfolio_live_works', JSON.stringify(settings.liveWorks)); } catch (e) {}
+              renderLiquidDockItems(settings.liveWorks);
+            }
+          }).catch(() => {});
         }
-
-        liquidDock.innerHTML = rawList.map(item => {
-          const accent = item.accent_color || '#ff4e1b';
-          const iconText = item.icon_text || (item.title ? item.title.slice(0, 2).toUpperCase() : '⚡');
-          const customImg = item.image || item.custom_icon_url || item.iconUrl || '';
-
-          const orbInner = customImg
-            ? `<img src="${escape(customImg)}" alt="${escape(item.title)}" class="spatial-logo-img" />`
-            : `<span class="spatial-monogram">${escape(iconText)}</span>`;
-
-          return `
-            <a href="${escape(item.url || '#')}" ${item.url && item.url.startsWith('http') ? 'target="_blank" rel="noopener noreferrer"' : ''} class="spatial-dock-item" style="--orb-accent:${escape(accent)};" aria-label="Visit ${escape(item.title)}">
-              <!-- Floating Minimal Tooltip -->
-              <div class="spatial-tooltip">
-                <span class="spatial-tooltip-dot"></span>
-                <span class="spatial-tooltip-text">${escape(item.title)}</span>
-                <span class="spatial-tooltip-arrow">↗</span>
-              </div>
-
-              <!-- 3D Glass Sphere -->
-              <div class="spatial-orb">
-                <span class="spatial-live-beacon"></span>
-                ${orbInner}
-              </div>
-            </a>
-          `;
-        }).join('');
 
         // ══════════════════════════════════════════════════════════
         // PARABOLIC WAVE MAGNIFICATION ENGINE (macOS / VisionOS)
