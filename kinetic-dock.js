@@ -132,146 +132,192 @@
       return defaultItems;
     };
 
-    const items = getItems();
-    const countBadge = document.querySelector('#galaxy-count-badge');
-    if (countBadge) {
-      countBadge.textContent = `${String(items.length).padStart(2, '0')} Live Portals`;
+    const orbs = [];
+    let items = [];
+
+    function attachOrbEvents(orb) {
+      orb.el.addEventListener('mousedown', e => {
+        e.preventDefault();
+        onPointerDown(orb, e.clientX, e.clientY);
+      });
+
+      orb.el.addEventListener('touchstart', e => {
+        if (e.touches.length > 0) {
+          onPointerDown(orb, e.touches[0].clientX, e.touches[0].clientY);
+        }
+      }, { passive: true });
     }
 
-    // ══════════════════════════════════════════════════════════
-    // 1. RENDER PHYSICS GALAXY VIEW (3D Orbs + Soft Shadows)
-    // ══════════════════════════════════════════════════════════
-    physicsView.innerHTML = '';
-    const stageRect = physicsView.getBoundingClientRect();
-    let width = stageRect.width || 1200;
-    let height = stageRect.height || 440;
-
-    const orbs = [];
-    const numOrbs = items.length;
-
-    items.forEach((item, index) => {
-      const el = document.createElement('div');
-      el.className = 'galaxy-orb-node';
-      el.style.setProperty('--node-accent', item.accent_color || '#ff4e1b');
-      el.style.width = `${item.radius * 2}px`;
-      el.style.height = `${item.radius * 2}px`;
-
-      let domain = '';
-      try {
-        if (item.url && item.url.startsWith('http')) {
-          domain = new URL(item.url).hostname.replace(/^www\./, '');
-        } else {
-          domain = item.url || 'Live Demo';
-        }
-      } catch {
-        domain = item.url || 'Live Demo';
-      }
-
-      const customImg = item.image || item.custom_icon_url || item.iconUrl || '';
-      const orbContent = customImg
-        ? `<img src="${customImg}" alt="${item.title}" class="galaxy-logo-img" />`
-        : `<span class="galaxy-monogram">${item.icon_text || (item.title ? item.title.slice(0,2).toUpperCase() : '⚡')}</span>`;
-
-      el.innerHTML = `
-        <div class="galaxy-orb-shadow"></div>
-        <div class="galaxy-tooltip">
-          <span class="galaxy-tooltip-dot"></span>
-          <div class="galaxy-tooltip-info">
-            <span class="galaxy-tooltip-title">${item.title}</span>
-            <span class="galaxy-tooltip-sub">${domain} · ${item.category || 'Live Site'}</span>
-          </div>
-          <span class="galaxy-tooltip-arrow">↗</span>
-        </div>
-        <div class="galaxy-orb-shell">
-          <span class="galaxy-live-beacon"></span>
-          ${orbContent}
-        </div>
-      `;
-
-      physicsView.appendChild(el);
-
-      const cols = Math.ceil(Math.sqrt(numOrbs * (width / height)));
-      const rows = Math.ceil(numOrbs / cols);
-      const col = index % cols;
-      const row = Math.floor(index / cols);
-
-      const cellW = (width - 160) / cols;
-      const cellH = (height - 110) / rows;
-
-      const initX = 80 + col * cellW + cellW / 2 + (Math.random() - 0.5) * 30;
-      const initY = 55 + row * cellH + cellH / 2 + (Math.random() - 0.5) * 25;
-
-      orbs.push({
-        el,
-        item,
-        x: Math.max(item.radius + 20, Math.min(width - item.radius - 20, initX)),
-        y: Math.max(item.radius + 20, Math.min(height - item.radius - 20, initY)),
-        vx: (Math.random() - 0.5) * 0.8,
-        vy: (Math.random() - 0.5) * 0.8,
-        radius: item.radius,
-        mass: item.radius * 0.1,
-        isDragging: false,
-        dragStartX: 0,
-        dragStartY: 0,
-        movedDistance: 0,
-        phase: Math.random() * Math.PI * 2
+    const buildNodes = (rawList) => {
+      items = (rawList || []).map(item => {
+        const rad = item.size_tier === 'lg' ? 52 : (item.size_tier === 'sm' ? 38 : 44);
+        return { ...item, radius: item.radius || rad };
       });
-    });
 
-    // ══════════════════════════════════════════════════════════
-    // 2. RENDER ULTRA-MINIMAL LAUNCHPAD TABLE VIEW
-    // ══════════════════════════════════════════════════════════
-    const tableHeadHtml = `
-      <div class="launchpad-table-head">
-        <span>#</span>
-        <span>Project & Platform</span>
-        <span>Category</span>
-        <span>Live Status</span>
-        <span style="text-align:right;">Link ↗</span>
-      </div>
-    `;
-
-    const rowsHtml = items.map((item, idx) => {
-      const accent = item.accent_color || '#ff4e1b';
-      const iconText = item.icon_text || (item.title ? item.title.slice(0, 2).toUpperCase() : '⚡');
-      const customImg = item.image || item.custom_icon_url || item.iconUrl || '';
-      const indexStr = String(idx + 1).padStart(2, '0');
-
-      let domain = '';
-      try {
-        if (item.url && item.url.startsWith('http')) {
-          domain = new URL(item.url).hostname.replace(/^www\./, '');
-        } else {
-          domain = item.url || 'Live Demo';
-        }
-      } catch {
-        domain = item.url || 'Live Demo';
+      const countBadge = document.querySelector('#galaxy-count-badge');
+      if (countBadge) {
+        countBadge.textContent = `${String(items.length).padStart(2, '0')} Live Portals`;
       }
 
-      const orbContent = customImg
-        ? `<img src="${customImg}" alt="${item.title}" style="width:100%;height:100%;object-fit:contain;border-radius:50%;" />`
-        : iconText;
+      physicsView.innerHTML = '';
+      orbs.length = 0;
+      const numOrbs = items.length;
+      const stageRect = physicsView.getBoundingClientRect();
+      const w = stageRect.width || 1200;
+      const h = stageRect.height || 440;
 
-      return `
-        <a href="${item.url || '#'}" ${item.url && item.url.startsWith('http') ? 'target="_blank" rel="noopener noreferrer"' : ''} class="launchpad-list-row" style="--row-accent:${accent};" aria-label="Visit ${item.title}">
-          <span class="launchpad-row-index">${indexStr}</span>
-          <div class="launchpad-row-project">
-            <div class="launchpad-row-orb">
-              ${orbContent}
+      items.forEach((item, index) => {
+        const el = document.createElement('div');
+        el.className = 'galaxy-orb-node';
+        el.style.setProperty('--node-accent', item.accent_color || '#ff4e1b');
+        el.style.width = `${item.radius * 2}px`;
+        el.style.height = `${item.radius * 2}px`;
+
+        let domain = '';
+        try {
+          if (item.url && item.url.startsWith('http')) {
+            domain = new URL(item.url).hostname.replace(/^www\./, '');
+          } else {
+            domain = item.url || 'Live Demo';
+          }
+        } catch {
+          domain = item.url || 'Live Demo';
+        }
+
+        let customImg = item.image || item.custom_icon_url || item.iconUrl || item.logo || item.logo_url || '';
+        if (!customImg && item.url && item.url.startsWith('http')) {
+          try {
+            const host = new URL(item.url).hostname;
+            if (host && !host.includes('github.com') && !host.includes('behance.net') && !host.includes('dribbble.com')) {
+              customImg = `https://www.google.com/s2/favicons?domain=${host}&sz=128`;
+            }
+          } catch (e) {}
+        }
+
+        const orbContent = customImg
+          ? `<img src="${customImg}" alt="${item.title}" class="galaxy-logo-img" />`
+          : `<span class="galaxy-monogram">${item.icon_text || (item.title ? item.title.slice(0,2).toUpperCase() : '⚡')}</span>`;
+
+        el.innerHTML = `
+          <div class="galaxy-orb-shadow"></div>
+          <div class="galaxy-tooltip">
+            <span class="galaxy-tooltip-dot"></span>
+            <div class="galaxy-tooltip-info">
+              <span class="galaxy-tooltip-title">${item.title}</span>
+              <span class="galaxy-tooltip-sub">${domain} · ${item.category || 'Live Site'}</span>
             </div>
-            <h4 class="launchpad-row-title">${item.title}</h4>
+            <span class="galaxy-tooltip-arrow">↗</span>
           </div>
-          <span class="launchpad-row-cat">${item.category || 'Websites & Apps'}</span>
-          <div class="launchpad-row-status">
-            <span class="launchpad-row-status-dot"></span>
-            <span>${item.badge_status ? item.badge_status.replace(/^●\s*/, '') : 'Live Site'}</span>
+          <div class="galaxy-orb-shell">
+            <span class="galaxy-live-beacon"></span>
+            ${orbContent}
           </div>
-          <span class="launchpad-row-action">${domain} ↗</span>
-        </a>
-      `;
-    }).join('');
+        `;
 
-    listView.innerHTML = tableHeadHtml + rowsHtml;
+        physicsView.appendChild(el);
+
+        const cols = Math.ceil(Math.sqrt(numOrbs * (w / h)));
+        const rows = Math.ceil(numOrbs / cols);
+        const col = index % cols;
+        const row = Math.floor(index / cols);
+
+        const cellW = (w - 160) / cols;
+        const cellH = (h - 110) / rows;
+
+        const initX = 80 + col * cellW + cellW / 2 + (Math.random() - 0.5) * 30;
+        const initY = 55 + row * cellH + cellH / 2 + (Math.random() - 0.5) * 25;
+
+        const createdOrb = {
+          el,
+          item,
+          x: Math.max(item.radius + 20, Math.min(w - item.radius - 20, initX)),
+          y: Math.max(item.radius + 20, Math.min(h - item.radius - 20, initY)),
+          vx: (Math.random() - 0.5) * 0.8,
+          vy: (Math.random() - 0.5) * 0.8,
+          radius: item.radius,
+          mass: item.radius * 0.1,
+          isDragging: false,
+          dragStartX: 0,
+          dragStartY: 0,
+          movedDistance: 0,
+          phase: Math.random() * Math.PI * 2
+        };
+
+        orbs.push(createdOrb);
+        attachOrbEvents(createdOrb);
+      });
+
+      // 2. RENDER ULTRA-MINIMAL LAUNCHPAD TABLE VIEW
+      const tableHeadHtml = `
+        <div class="launchpad-table-head">
+          <span>#</span>
+          <span>Project & Platform</span>
+          <span>Category</span>
+          <span>Live Status</span>
+          <span style="text-align:right;">Link ↗</span>
+        </div>
+      `;
+
+      const rowsHtml = items.map((item, idx) => {
+        const accent = item.accent_color || '#ff4e1b';
+        const iconText = item.icon_text || (item.title ? item.title.slice(0, 2).toUpperCase() : '⚡');
+        let customImg = item.image || item.custom_icon_url || item.iconUrl || item.logo || item.logo_url || '';
+        if (!customImg && item.url && item.url.startsWith('http')) {
+          try {
+            const host = new URL(item.url).hostname;
+            if (host && !host.includes('github.com') && !host.includes('behance.net') && !host.includes('dribbble.com')) {
+              customImg = `https://www.google.com/s2/favicons?domain=${host}&sz=128`;
+            }
+          } catch (e) {}
+        }
+        const indexStr = String(idx + 1).padStart(2, '0');
+
+        let domain = '';
+        try {
+          if (item.url && item.url.startsWith('http')) {
+            domain = new URL(item.url).hostname.replace(/^www\./, '');
+          } else {
+            domain = item.url || 'Live Demo';
+          }
+        } catch {
+          domain = item.url || 'Live Demo';
+        }
+
+        const orbContent = customImg
+          ? `<img src="${customImg}" alt="${item.title}" style="width:100%;height:100%;object-fit:contain;border-radius:50%;" />`
+          : iconText;
+
+        return `
+          <a href="${item.url || '#'}" ${item.url && item.url.startsWith('http') ? 'target="_blank" rel="noopener noreferrer"' : ''} class="launchpad-list-row" style="--row-accent:${accent};" aria-label="Visit ${item.title}">
+            <span class="launchpad-row-index">${indexStr}</span>
+            <div class="launchpad-row-project">
+              <div class="launchpad-row-orb">
+                ${orbContent}
+              </div>
+              <h4 class="launchpad-row-title">${item.title}</h4>
+            </div>
+            <span class="launchpad-row-cat">${item.category || 'Websites & Apps'}</span>
+            <div class="launchpad-row-status">
+              <span class="launchpad-row-status-dot"></span>
+              <span>${item.badge_status ? item.badge_status.replace(/^●\s*/, '') : 'Live Site'}</span>
+            </div>
+            <span class="launchpad-row-action">${domain} ↗</span>
+          </a>
+        `;
+      }).join('');
+
+      listView.innerHTML = tableHeadHtml + rowsHtml;
+    };
+
+    window.refreshKineticGalaxy = function(newList) {
+      if (Array.isArray(newList) && newList.length > 0) {
+        try { localStorage.setItem('ak_portfolio_live_works', JSON.stringify(newList)); } catch (e) {}
+        buildNodes(newList);
+      }
+    };
+
+    // Initial Node Build
+    buildNodes(getItems());
 
     // ══════════════════════════════════════════════════════════
     // 3. DUAL VIEW TOGGLE SWITCHER ENGINE
@@ -563,7 +609,9 @@
         if (res && res.ok) {
           const data = await res.json();
           if (data && Array.isArray(data.liveWorks) && data.liveWorks.length > 0) {
-            try { localStorage.setItem('ak_portfolio_live_works', JSON.stringify(data.liveWorks)); } catch (e) {}
+            if (typeof window.refreshKineticGalaxy === 'function') {
+              window.refreshKineticGalaxy(data.liveWorks);
+            }
           }
         }
       } catch (e) {}
