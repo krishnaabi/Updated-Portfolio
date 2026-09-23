@@ -378,9 +378,20 @@ window.initFeaturedCarousel();
     const b = card.querySelector('.person b');
     const small = card.querySelector('.person small');
     if (p) p.textContent = item.quote;
-    if (img) img.src = item.img || 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=120&q=80';
     if (b) b.textContent = item.name;
     if (small) small.textContent = item.role;
+
+    if (img) {
+      const nameStr = item.name || 'User';
+      const fallbackAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(nameStr)}&background=ff4e1b&color=ffffff&bold=true&size=128`;
+      const avatarUrl = item.img || item.avatar_url || item.avatarUrl || item.image || fallbackAvatar;
+
+      img.onerror = () => {
+        img.onerror = null;
+        img.src = fallbackAvatar;
+      };
+      img.src = avatarUrl;
+    }
   };
 
   const startLoop = () => {

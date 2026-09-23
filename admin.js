@@ -2549,7 +2549,9 @@ const renderTestimonialsList = () => {
   listEl.innerHTML = allTestimonialsData.map((item, idx) => {
     const isFirst = idx === 0;
     const isLast = idx === allTestimonialsData.length - 1;
-    const avatar = item.img ? `<img src="${escapeHtml(item.img)}" alt="${escapeHtml(item.name)}" style="width:44px;height:44px;border-radius:50%;object-fit:cover;border:1.5px solid #dfddda;flex-shrink:0;">` : `<div style="width:44px;height:44px;border-radius:50%;background:var(--accent,#ff4e1b);color:#fff;display:grid;place-items:center;font-weight:800;font-size:15px;flex-shrink:0;">${escapeHtml((item.name || 'AK').slice(0, 2).toUpperCase())}</div>`;
+    const avatarSrc = item.img || item.avatar_url || item.avatarUrl || item.image || '';
+    const fallbackAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(item.name || 'AK')}&background=ff4e1b&color=fff&bold=true`;
+    const avatar = avatarSrc ? `<img src="${escapeHtml(avatarSrc)}" alt="${escapeHtml(item.name)}" style="width:44px;height:44px;border-radius:50%;object-fit:cover;border:1.5px solid #dfddda;flex-shrink:0;" onerror="this.onerror=null;this.src='${fallbackAvatar}';">` : `<div style="width:44px;height:44px;border-radius:50%;background:var(--accent,#ff4e1b);color:#fff;display:grid;place-items:center;font-weight:800;font-size:15px;flex-shrink:0;">${escapeHtml((item.name || 'AK').slice(0, 2).toUpperCase())}</div>`;
     return `<article style="padding:18px 20px;background:#ffffff;border:1px solid #e8e3dc;border-radius:16px;box-shadow:0 2px 8px rgba(0,0,0,0.02);display:flex;flex-direction:column;gap:12px;min-width:0;width:100%;box-sizing:border-box;">
       <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
         <div style="display:flex;gap:12px;align-items:center;min-width:0;flex:1 1 180px;">
